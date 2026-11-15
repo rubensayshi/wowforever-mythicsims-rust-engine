@@ -28,6 +28,11 @@
 //!   a Shadow hit of 95 to 223 on the magic table, and the Shadow Lash its row triggers on the
 //!   unit hit, 159 Shadow 5 sec later (`TRIGGERED_DOT_ITEMS`). The row's attack power reduction on
 //!   the target is not modelled.
+//! - Jom-jom's Gabbar (274952) and Deadhead Blade (274271) are chance on hit daggers with no
+//!   stated rate, registered the same way: Bolder'ok Boulder, a Physical hit of 98 on the ranged
+//!   table, and Grass Killer, a Nature hit of 50 to 76 on the magic table. Grass Killer's "Deals 3
+//!   times as much damage to Plants" is never applied: the client has no Plant creature type and a
+//!   request can name none.
 //! - Dreadfrost Saber (274603) is a spell data damage proc (`NewSpellDataDamageProc`), as Fiery
 //!   Plate Gauntlets' "Adds 4 fire damage to your weapon attack" is in the reference: its equip
 //!   aura (1294939) hears the wearer's landed main hand melee hits and casts a Frost hit of 1
@@ -200,6 +205,34 @@ pub(crate) const CHANCE_ON_HIT_ITEMS: &[Registration] = &[
         &[ItemVariant {
             item_id: 9372,
             item_name: "Sul'thraze the Lasher",
+        }],
+    ),
+    Registration::Proc(
+        ProcKind::Damage,
+        SpellDataProc {
+            buff_spell_id: 1295736,
+            is_weapon_proc: true,
+            trigger_spell_id: 1295736,
+            rateless: true,
+            ..SpellDataProc::EMPTY
+        },
+        &[ItemVariant {
+            item_id: 274952,
+            item_name: "Jom-jom's Gabbar",
+        }],
+    ),
+    Registration::Proc(
+        ProcKind::Damage,
+        SpellDataProc {
+            buff_spell_id: 1293518,
+            is_weapon_proc: true,
+            trigger_spell_id: 1293518,
+            rateless: true,
+            ..SpellDataProc::EMPTY
+        },
+        &[ItemVariant {
+            item_id: 274271,
+            item_name: "Deadhead Blade",
         }],
     ),
 ];
