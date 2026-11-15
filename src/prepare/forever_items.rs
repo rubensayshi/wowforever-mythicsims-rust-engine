@@ -185,11 +185,20 @@ pub(crate) struct VersusAttackPower {
 }
 
 /// The creature type bonuses of an item of the live client (`data/forever-client-item-bonuses.jsonl`,
-/// written by `tools/rust_client_items.py`), read under Forever's rules only.
+/// written by `tools/rust_client_items.py`) or of a reference item whose live tooltip states them
+/// (`data/forever-live-item-bonuses.jsonl`, written by `tools/rust_live_items.py`: Royal Seal of
+/// Eldre'Thalas's "+45 Attack Power against Demons"), read under Forever's rules only.
 pub(crate) fn versus_attack_power(item: i32) -> Option<VersusAttackPower> {
-    let text = crate::data::CLIENT_ITEM_BONUSES.row(i64::from(item))?;
-    let row: serde_json::Value = serde_json::from_str(text)
-        .unwrap_or_else(|err| panic!("data/forever-client-item-bonuses.jsonl row {item}: {err}"));
+    let (file, text) = crate::data::CLIENT_ITEM_BONUSES
+        .row(i64::from(item))
+        .map(|text| ("forever-client-item-bonuses.jsonl", text))
+        .or_else(|| {
+            crate::data::LIVE_ITEM_BONUSES
+                .row(i64::from(item))
+                .map(|text| ("forever-live-item-bonuses.jsonl", text))
+        })?;
+    let row: serde_json::Value =
+        serde_json::from_str(text).unwrap_or_else(|err| panic!("data/{file} row {item}: {err}"));
     let by_type = |field: &str| -> Vec<(String, f64)> {
         row[field]
             .as_object()
