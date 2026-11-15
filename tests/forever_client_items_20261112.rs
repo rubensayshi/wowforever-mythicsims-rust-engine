@@ -6,7 +6,8 @@
 //! - Defias Enforcer's Garb, the five leather pieces of a Forever set the reference does not
 //!   register: Mask 287019, Shoulderpads 276741, Chest 287020, Legguards 276746, Prowlers 287021.
 //!   Its bonuses of plain stats are applied ((2) +10 Fire Resistance, (3) +15 Stamina, (4)
-//!   Increased Swords +1); the (5) crit proc states no chance and refuses by name.
+//!   Increased Swords +1); the (5) crit proc is applied since 15 November 2026
+//!   (`src/prepare/forever_client_sets.rs`).
 //! - Krol'dok Battlegear's (2) +100 Armor and (3) Increased Defense +5 are applied; its (4) heal
 //!   on block and (5) Stamina when taking damage are applied since 13 November 2026
 //!   (`tests/forever_client_items_tank_procs_20261113.rs`).
@@ -327,10 +328,17 @@ fn four_defias_enforcer_pieces_add_one_sword_skill() {
     assert_eq!(skill(&rogue(&four)), skill(&rogue(&three)));
 }
 
-/// The crit proc of five pieces states no chance and is not prepared: the fifth piece refuses and
-/// names the bonus.
+/// The crit proc of five pieces is Defias Juggernaut from its client rows, whose ProcChance of 100
+/// the owner's decision of 13 November 2026 reads as the rate: every landed main hand melee hit
+/// gives 2% crit, melee, ranged and spell, for 20 sec, and the fifth piece no longer refuses.
 #[test]
-fn the_fifth_defias_enforcer_piece_is_refused_by_name() {
+fn five_defias_enforcer_pieces_proc_defias_juggernaut() {
+    let four = rogue(&[
+        (HEAD, DEFIAS_MASK),
+        (SHOULDER, DEFIAS_SHOULDERPADS),
+        (CHEST, DEFIAS_CHEST),
+        (LEGS, DEFIAS_LEGGUARDS),
+    ]);
     let five = rogue(&[
         (HEAD, DEFIAS_MASK),
         (SHOULDER, DEFIAS_SHOULDERPADS),
@@ -338,11 +346,49 @@ fn the_fifth_defias_enforcer_piece_is_refused_by_name() {
         (LEGS, DEFIAS_LEGGUARDS),
         (FEET, DEFIAS_PROWLERS),
     ]);
-    let reason = refusal(&five, Rules::Forever);
-    assert!(
-        reason.contains("set bonus Defias Enforcer's Garb 5P is not prepared yet (item 287021)"),
-        "{reason}"
+    let (prepared, player) = run(&five);
+    assert!(has_aura(&prepared, "Defias Enforcer's Garb 5P"));
+    let effect = prepared["effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|effect| effect["trigger_aura"] == "Defias Enforcer's Garb 5P")
+        .expect("the five piece's listener is exported");
+    assert_eq!(effect["kind"], "spell_data_stat_proc");
+    assert_eq!(effect["aura"], "Defias Juggernaut");
+    assert_eq!(effect["proc_chance"], 1.0);
+    assert_eq!(effect["landed_only"], true);
+    assert_eq!(effect["callbacks"], json!(["on_spell_hit_dealt"]));
+    let heard = effect["trigger_spells"].as_array().unwrap();
+    assert!(!heard.is_empty());
+    // The main hand's hits only: the off hand's swing is not among the spells heard.
+    for position in heard {
+        let spell = &prepared["player"]["spells"][position.as_u64().unwrap() as usize];
+        assert_ne!(spell["action_id"]["tag"], 2, "{spell}");
+    }
+    let buff = prepared["player"]["auras"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|aura| aura["label"] == "Defias Juggernaut")
+        .expect("the buff's aura");
+    assert_eq!(buff["duration_ns"], 20_000_000_000_i64);
+    assert_eq!(
+        effect["gain_log"],
+        "Gained {\"PhysicalCritPercent\": 2.000,\"SpellCritPercent\": 2.000,} from {SpellID: 1324683}."
     );
+    // Four pieces have no buff.
+    let (four_prepared, _) = run(&four);
+    assert!(!has_aura(&four_prepared, "Defias Juggernaut"));
+    assert!(player["dps"]["avg"].as_f64().unwrap() > 0.0);
+    let uptime = player["auras"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|aura| aura["id"]["spellId"] == 1324683)
+        .and_then(|aura| aura["uptimeSecondsAvg"].as_f64())
+        .unwrap_or(0.0);
+    assert!(uptime > 0.0, "Defias Juggernaut is up for {uptime} sec");
 }
 
 // ---------------------------------------------------------------------------------------------
