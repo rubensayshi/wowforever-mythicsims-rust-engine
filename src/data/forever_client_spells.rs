@@ -40,6 +40,10 @@
 //! Forever tooltips of the same day. (Krol'dok Battlegear's four and five piece rows, 1324296 to
 //! 1324309, are in the pinned store.)
 //!
+//! Nor are Jom-jom's Gabbar's Bolder'ok Boulder (1295736) and Deadhead Blade's Grass Killer
+//! (1293518): every field of theirs is the client's, read from wago.tools `product=wowf` with
+//! `build=1.60.1.70938` on 15 November 2026.
+//!
 //! A field the client hides and no tooltip states is left at zero: no range check, no missile
 //! travel, no spell power or attack power share. The one exception is `PERIODIC_CAN_CRIT`, which
 //! every Forever-added physical and Fire periodic damage row in the pinned store carries (19 of
@@ -125,10 +129,106 @@ pub(crate) fn rows() -> Vec<Spell> {
         blood_sacrifice_trigger(),
         blood_sacrifice(),
         smite(),
+        bolderok_boulder(),
+        grass_killer(),
         zealot_plate_trigger(),
         zealot_plate_energize(),
         shield_spike(),
     ]
+}
+
+/// Jom-jom's Gabbar's chance on hit (ItemEffect 234122, trigger type 2, no rate and no cooldown
+/// stated): "Launch a boulder, dealing 98 Physical damage." The row is its own trigger, as a
+/// reference chance on hit weapon's is.
+fn bolderok_boulder() -> Spell {
+    let mut attr = [0; 17];
+    // SpellMisc 843131: Attributes_0 262144 and Attributes_15 8192.
+    attr[0] = 262_144;
+    attr[15] = ATTR_15_BIT_13;
+    Spell {
+        id: 1_295_736,
+        name: "Bolder'ok Boulder".to_string(),
+        // SpellMisc 843131: SchoolMask 1, Physical.
+        school: 1,
+        attr,
+        // SpellLevels 152280: SpellLevel 43.
+        spell_level: 43,
+        // SpellMisc 843131: RangeIndex 6, SpellRange's 100 yards.
+        max_range: 100.0,
+        // SpellCategories 184301: ranged.
+        defense_type: 3,
+        // SpellEffect 1317973: School Damage (2) of 98 to the target (6), with no variance and no
+        // spell power or attack power coefficient.
+        effects: vec![Effect {
+            id: 1_317_973,
+            spell_id: 1_295_736,
+            index: 0,
+            effect_type: 2,
+            base_points: 98.0,
+            spell_level: 43,
+            pvp_mult: 1.0,
+            chain_amp: 1.0,
+            target: [6, 0],
+            ..Effect::default()
+        }],
+        ..Spell::default()
+    }
+}
+
+/// Deadhead Blade's chance on hit (ItemEffect 233730, trigger type 2, no rate and no cooldown
+/// stated): "Assault the target with a dangerous toxin, dealing 50 to 76 Nature damage. Deals 3
+/// times as much damage to Plants." The row is its own trigger, a Nature hit on the magic table.
+fn grass_killer() -> Spell {
+    let mut attr = [0; 17];
+    // SpellMisc 840948: Attributes_15 8192 and nothing else.
+    attr[15] = ATTR_15_BIT_13;
+    Spell {
+        id: 1_293_518,
+        name: "Grass Killer".to_string(),
+        // SpellMisc 840948: SchoolMask 8, Nature.
+        school: 8,
+        attr,
+        // SpellLevels 152075: SpellLevel 58.
+        spell_level: 58,
+        // SpellMisc 840948: RangeIndex 4, SpellRange's 30 yards.
+        max_range: 30.0,
+        // SpellCategories 183662: magic. Its dispel type, poison (4), is not a field of the row.
+        defense_type: 1,
+        effects: vec![
+            // SpellEffect 1314222: School Damage (2) of 63 to the target (6), variance 0.42
+            // (49.77 to 76.23, the tooltip's 50 to 76), with no spell power or attack power
+            // coefficient.
+            Effect {
+                id: 1_314_222,
+                spell_id: 1_293_518,
+                index: 0,
+                effect_type: 2,
+                base_points: 63.0,
+                spell_level: 58,
+                variance: 0.42,
+                pvp_mult: 1.0,
+                chain_amp: 1.0,
+                target: [6, 0],
+                ..Effect::default()
+            },
+            // SpellEffect 1314223: a Dummy (3) with base points 3 on the target (6): the "3 times
+            // as much damage" to Plants, which the server applies. The client's creature types
+            // (CreatureType) have no Plant and a request names none, so nothing reads it.
+            Effect {
+                id: 1_314_223,
+                spell_id: 1_293_518,
+                index: 1,
+                effect_type: 3,
+                base_points: 3.0,
+                spell_level: 58,
+                pvp_mult: 1.0,
+                chain_amp: 1.0,
+                target: [6, 0],
+                ..Effect::default()
+            },
+        ],
+        ..Spell::default()
+    }
 }
 
 /// Lightcrest Hammer's chance on hit (ItemEffect 234878, trigger type 2, no rate and no cooldown

@@ -884,7 +884,10 @@ class CommittedFileTests(unittest.TestCase):
         for item_id in (276741, 276746, 287019, 287020, 287021):
             self.assertEqual(rows[item_id]["set_name"], "Defias Enforcer's Garb")
             self.assertEqual(rows[item_id]["set_id"], tool.CLIENT_SETS["Defias Enforcer's Garb"])
-        self.assertEqual(sum("set_name" in row for row in rows.values()), 10)
+        # Savage Gladiator Shoulders join the reference set The Gladiator.
+        self.assertEqual(rows[277117]["set_name"], "The Gladiator")
+        self.assertEqual(rows[277117]["set_id"], tool.REFERENCE_SETS["The Gladiator"])
+        self.assertEqual(sum("set_name" in row for row in rows.values()), 11)
 
     def test_a_real_item_with_a_development_name_is_taken(self):
         self.assertTrue(tool.JUNK_NAME.search("Old Leather Jacket"))

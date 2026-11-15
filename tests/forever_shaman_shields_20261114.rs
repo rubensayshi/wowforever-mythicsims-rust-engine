@@ -166,7 +166,7 @@ fn lightning_shield_request(level: i64, rank: i64) -> Value {
 fn a_levelling_shaman_casts_the_lightning_shield_rank_it_knows() {
     // Rank 4 (945) is learned at 32, rank 5 (8134) at 40, rank 6 (10431) at 48 and rank 7
     // (10432) at 56.
-    for (level, rank) in [(30, 905), (42, 8134), (50, 10431)] {
+    for (level, rank) in [(30, 905), (36, 945), (42, 8134), (50, 10431)] {
         let request = lightning_shield_request(level, rank);
         let typed = prepared(&request);
         let refusals = prepared_refusals(&typed);
