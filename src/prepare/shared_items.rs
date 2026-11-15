@@ -63,6 +63,39 @@ pub(crate) struct SpellDataProc {
 /// procs a minute. No Blizzard source states Forever's; docs/mechanics.md.
 pub(crate) const CHANCE_ON_HIT_PPM: f64 = 1.08;
 
+/// Rateless chance on hit weapons whose rate combat logs have measured, by item, in procs a
+/// minute of the weapon's own speed. These replace [`CHANCE_ON_HIT_PPM`] for their weapon.
+///
+/// Public Forever logs of client 1.60.1.70938 (709 reports of 14 and 15 November 2026), counted
+/// on isolated hits: a landed hit of a wearer with no off-hand weapon and no other landed hit
+/// close enough to have rolled the proc, white swings and abilities pooled, the pooled rate
+/// rounded to the nearest 0.05:
+///
+/// - Toxic Revenger (9453), 11790: 601 procs in 10,607 hits on 7 players, 1.79 (1.66 to 1.93).
+/// - Meteor Shard (6220), 1292152: 192 in 4,152 on 4, 1.54 (1.34 to 1.77).
+/// - Bite of Serra'kis (6904), 8313: 99 in 3,101 on 4, 1.47 (1.21 to 1.79).
+/// - Stoneslayer (9418), 12731: 537 in 4,200 on 9, 1.97 (1.82 to 2.13).
+/// - The Black Knight (12974), 14106: 47 in 2,490 on 4, 0.60 (0.45 to 0.79).
+/// - Heartseeking Crossbow (13040), 29626: 105 in 747 ranged hits on 4 hunters, 2.72 (2.27 to
+///   3.24).
+const MEASURED_CHANCE_ON_HIT_PPM: &[(i32, f64)] = &[
+    (9453, 1.8),
+    (6220, 1.55),
+    (6904, 1.45),
+    (9418, 1.95),
+    (12974, 0.6),
+    (13040, 2.7),
+];
+
+/// The procs a minute of an item's rateless chance on hit under Forever's rules: the measured
+/// rate where logs gave the item one, [`CHANCE_ON_HIT_PPM`] otherwise.
+pub(crate) fn chance_on_hit_ppm(item_id: i32) -> f64 {
+    MEASURED_CHANCE_ON_HIT_PPM
+        .iter()
+        .find(|(item, _)| *item == item_id)
+        .map_or(CHANCE_ON_HIT_PPM, |(_, ppm)| *ppm)
+}
+
 impl SpellDataProc {
     /// The zero config the generated registrations fill in.
     pub(crate) const EMPTY: SpellDataProc = SpellDataProc {
@@ -515,12 +548,17 @@ fn spell_data_proc_rate(source: EffectSource, row: &'static Spell, entry_ppm: f6
     })
 }
 
-/// A rateless chance on hit's rate under Forever's rules ([`CHANCE_ON_HIT_PPM`]), in place of
+/// A rateless chance on hit's rate under Forever's rules ([`chance_on_hit_ppm`]), in place of
 /// whatever the row's sentinel reads as. A weapon rolls it on its own hits, by its own speed; any
 /// other item on the wearer's landed melee and ranged hits, by the speed of the weapon that hit.
 /// Spells never roll it.
 fn chance_on_hit_rate(cfg: &SpellDataProc, source: EffectSource) -> ProcOpt {
     let rateless = cfg.rateless;
+    let ppm = if source.is_enchant {
+        CHANCE_ON_HIT_PPM
+    } else {
+        chance_on_hit_ppm(source.id)
+    };
     Rc::new(move |sim, character, trigger| {
         if !rateless || sim.rules != super::sim::Rules::Forever {
             return;
@@ -531,7 +569,7 @@ fn chance_on_hit_rate(cfg: &SpellDataProc, source: EffectSource) -> ProcOpt {
             trigger.outcome = HitOutcome::LANDED;
         }
         trigger.proc_chance = 0.0;
-        trigger.dpm = dpm_for_mask(sim, unit, source, CHANCE_ON_HIT_PPM, trigger.proc_mask);
+        trigger.dpm = dpm_for_mask(sim, unit, source, ppm, trigger.proc_mask);
     })
 }
 

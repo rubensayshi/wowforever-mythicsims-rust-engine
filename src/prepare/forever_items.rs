@@ -519,8 +519,20 @@ fn create_weapon_proc_spell(
     itemhelpers::create_weapon_proc_spell(env, item_id, name, ppm, |env| Some(spell(env)));
 }
 
+/// Under Forever's rules, the weapons of [`WEAPON_DAMAGE_PROCS`] whose rate combat logs have
+/// measured, by item, in procs a minute of the weapon's speed.
+///
+/// - Stinging Viper (6472), 1291663: 1,328 procs in 16,295 isolated landed hits of paladins,
+///   shamans and warriors in 30 public Forever reports (client 1.60.1.70938, 14 and 15 November
+///   2026), 1.75 (1.66 to 1.84) a minute, in place of the reference's 3.2.
+const FOREVER_WEAPON_DAMAGE_PPM: &[(i32, f64)] = &[(6472, 1.75)];
+
 fn weapon_damage_proc(env: &mut Environment, proc: &WeaponDamageProc) {
-    create_weapon_proc_spell(env, proc.item_id, proc.name, proc.ppm, |env| {
+    let ppm = FOREVER_WEAPON_DAMAGE_PPM
+        .iter()
+        .find(|(item, _)| *item == proc.item_id && env.sim.rules == super::sim::Rules::Forever)
+        .map_or(proc.ppm, |(_, ppm)| *ppm);
+    create_weapon_proc_spell(env, proc.item_id, proc.name, ppm, |env| {
         let unit = env.player;
         let config = spell_data_proc_damage_spell_config(env, must_find(proc.spell_id));
         env.sim.get_or_register_spell(unit, config)

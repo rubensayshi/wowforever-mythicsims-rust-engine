@@ -329,8 +329,8 @@ pub(crate) struct CreatureTypeDamageItem {
 }
 
 /// The chance on hit items that deal more to some creature types.
-pub(crate) const CREATURE_TYPE_DAMAGE_ITEMS: [CreatureTypeDamageItem; 1] =
-    [CreatureTypeDamageItem {
+pub(crate) const CREATURE_TYPE_DAMAGE_ITEMS: [CreatureTypeDamageItem; 2] = [
+    CreatureTypeDamageItem {
         // Lightcrest Hammer's Smite (1299631): "Deals 2 times as much damage to Undead." The 2 is
         // the row's second effect (SpellEffect 1323966, a dummy with base points 2), which the
         // server applies.
@@ -338,7 +338,19 @@ pub(crate) const CREATURE_TYPE_DAMAGE_ITEMS: [CreatureTypeDamageItem; 1] =
         spell_id: 1299631,
         creature_types: &["MobTypeUndead"],
         multiplier: 2.0,
-    }];
+    },
+    CreatureTypeDamageItem {
+        // Drakefang Butcher's Rend (14118): "Wounds the target causing them to bleed for 161
+        // damage over 7 sec. Deals 2 times as much damage to Dragonkin." (Wowhead's Forever
+        // tooltip, 16 November 2026). The 2 is the row's second effect in the Forever client
+        // (SpellEffect 1324263, a dummy with base points 2, client 1.60.1.70938); it doubles
+        // the bleed's ticks.
+        item_id: 12463,
+        spell_id: 14118,
+        creature_types: &["MobTypeDragonkin"],
+        multiplier: 2.0,
+    },
+];
 
 /// After a chance on hit item registered its spell: a hit that deals more to some creature types
 /// takes its multiplier as the spell's damage multiplier when every target is of one, as a
