@@ -26,10 +26,12 @@ TOOL = ROOT / "tools" / "rust-data"
 MANIFEST = DATA / "manifest.json"
 # Data written by their own generators, not the import, and checked by them
 # (tools/rust_client_items.py check), and the live rows of items whose reference row the live
-# game has changed, checked by the data tests (src/data.rs, tests/forever_av_vendor_items_20261106.rs).
+# game has changed and their creature type bonuses, checked by the data tests (src/data.rs,
+# tests/forever_av_vendor_items_20261106.rs).
 OWN_FILES = {
     "forever-client-item-bonuses.jsonl",
     "forever-client-items.jsonl",
+    "forever-live-item-bonuses.jsonl",
     "forever-live-items.jsonl",
 }
 

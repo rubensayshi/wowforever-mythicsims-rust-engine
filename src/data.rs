@@ -89,6 +89,9 @@ table!(CLIENT_ITEM_BONUSES, "forever-client-item-bonuses.jsonl");
 // The live client's rows for items whose ITEMS row the live game has since changed, read before
 // ITEMS under Forever's rules (`src/prepare/items.rs`).
 table!(LIVE_ITEMS, "forever-live-items.jsonl");
+// The creature type bonuses of reference items whose live tooltip states them, which an item row
+// cannot state (`tools/rust_live_items.py`, `src/prepare/forever_items.rs`).
+table!(LIVE_ITEM_BONUSES, "forever-live-item-bonuses.jsonl");
 table!(RANDOM_SUFFIXES, "random-suffixes.jsonl");
 table!(ENCHANTS, "enchants.jsonl");
 table!(RAND_PROP_POINTS, "rand-prop-points.jsonl");

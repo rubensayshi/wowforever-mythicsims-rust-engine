@@ -1822,6 +1822,36 @@ the Go goldens and exporter uses. The departures:
     prepares without the effect, as every request did before, since the runtime does not follow
     a swap that changes a spell's damage modifier. A character of another class holds the mace
     as a plain weapon.
+- Classic stats the live rows kept where the Wowhead Forever tooltip no longer states them
+  (`tests/forever_live_items_20261115.rs`, 15 November 2026). `tools/rust_live_items.py` dropped
+  a stat the tooltip does not state only for primary stats, resistances, spell penetration, mana
+  per 5 sec, defense and bonus armor; it now also drops attack power, ranged and feral attack
+  power, spell damage, healing, school damage and the hit, crit, expertise, block, dodge and
+  parry ratings when the tooltip states none of them, the row's effects carry none, and every
+  "Equip:" line of the tooltip is one the tool reads. A live row keeps such a stat only where it
+  differs from the reference row's. Royal Seal of Eldre'Thalas (18473, the Hunter's) loses the
+  reference's 48 ranged attack power ("+10 Agility", "+15 Nature Resistance", "Equip: +45 Attack
+  Power against Demons."); Burst of Knowledge (11832) its 12 healing and 12 spell damage; Verdant
+  Footpads (13954) its 24 Nature damage; Sang'thraze the Deflector (9379) its static 15 parry
+  rating (the tooltip's parry is the chance on hit's 2% for 9 sec); Vigilance Charm (18370) its 24
+  dodge rating; Shroud of Arcane Mastery (22330) its 10 spell hit rating; Atal'ai Gloves (10787)
+  and Drakestone (10796) their 9 and 7 healing and spell damage against every target.
+  - An item's equip line "+N Attack Power against <creature type>" is melee and ranged attack
+    power, a `mob_type_bonus` with `ranged_attack_power` (which melee attacks read too), as Mark of
+    the Champion's: the client's equip spells for the line carry aura 102 and aura 131 together
+    (Seal of the Dawn's 23930, 1318938 and 1319047, every such equip spell the client reads), and
+    16 bows, guns, crossbows and thrown weapons carry it. Before 15 November 2026 Forever's
+    preparation gave it to melee attacks alone, so a ranged Hunter's seal, a crossbow's bonus
+    against Humanoids and every such ranged weapon did nothing for shots. Only an on hit proc's
+    bonus (Quel'Serrar's Sanctuary) and a Tier 1 set bonus, aura 102 alone, stay melee.
+  - A creature type line of these items, and of the Royal Seal's other class versions, is a row
+    of `data/forever-live-item-bonuses.jsonl`, which Forever's preparation reads as it reads
+    `data/forever-client-item-bonuses.jsonl`: the Hunter's seal 45 attack power, melee and
+    ranged, against Demons, the Rogue's 45 against Humanoids (18465), the Warlock's and the Shaman's 18 spell
+    damage against Demons (18467, 18471), Verdant Footpads' 21 against Undead, Atal'ai Gloves' 14
+    against Humanoids and Drakestone's 11 against Dragonkin. Many other reference items' tooltips
+    state a bonus against a creature type their rows never held (Tigerbane's "+9 Attack Power
+    against Beasts" beside its "+10 Attack Power"); those are not rows yet.
 - Fixes from character sheets, combat logs and the client 1.60.1.70862 rows of 6 to 9 November
   2026 (Forever preparation; the reference keeps its own):
   - Each Skyborne race has its own attribute offset from a Human of the same class, read from

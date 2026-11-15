@@ -157,7 +157,7 @@ fn the_mallets_row_carries_the_tooltips_stats() {
     assert_eq!(worn.1 - bare.1, 22.0, "Attack Power");
 }
 
-/// "+33 Attack Power against Undead": melee attack power on a target of that type alone. A
+/// "+33 Attack Power against Undead": attack power, melee and ranged, on a target of that type alone. A
 /// target of another type or of none (the app's requests name none) takes nothing, as the
 /// reference's Mark of the Champion.
 #[test]
@@ -170,7 +170,8 @@ fn the_mallets_bonus_applies_against_undead_only() {
     let bonus = effects(&prepared, "mob_type_bonus");
     assert_eq!(bonus.len(), 1, "{bonus:?}");
     assert_eq!(bonus[0]["aura"], "Ceremonial Mallet");
-    assert_eq!(bonus[0]["melee_attack_power"], 33.0);
+    assert_eq!(bonus[0]["ranged_attack_power"], 33.0);
+    assert_eq!(bonus[0]["melee_attack_power"].as_f64().unwrap_or(0.0), 0.0);
 
     for other in [humanoid, base] {
         let (prepared, player) = run(&other);

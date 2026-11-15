@@ -621,9 +621,13 @@ CREATURE_TYPES = {
     "Mechanicals": "MobTypeMechanical",
     "Undead": "MobTypeUndead",
 }
-# "Equip: +33 Attack Power against Undead." An attack power bonus against a creature type: melee
-# attack power only (A_MOD_MELEE_ATTACK_POWER_VERSUS, as Quel'Serrar's Sanctuary and the Tier 1
-# bonuses are), applied while the target is of the type.
+# "Equip: +33 Attack Power against Undead." An attack power bonus against a creature type,
+# applied while the target is of the type. The rows' field is named melee_attack_power_versus,
+# but Forever's preparation gives it to melee and ranged attack power alike: the client's equip
+# spells for this line carry A_MOD_MELEE_ATTACK_POWER_VERSUS (102) and
+# A_MOD_RANGED_ATTACK_POWER_VERSUS (131) together (Seal of the Dawn's 23930, 1318938, 1319047),
+# and bows, guns, crossbows and thrown weapons carry it. Only an on hit proc (Quel'Serrar's
+# Sanctuary, 22850) and the Tier 1 set bonuses are aura 102 alone, melee attack power only.
 VERSUS_LINE = re.compile(
     rf"Equip: \+{NUMBER} Attack Power against ({'|'.join(CREATURE_TYPES)})\.?", re.IGNORECASE
 )

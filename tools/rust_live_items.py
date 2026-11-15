@@ -18,6 +18,21 @@ reference row). The rules, per stat of the row's base stats (scaling_options "0"
 - a stat the tooltip does not state is dropped only when it is a primary stat, a resistance,
   spell penetration, mana per 5 sec, defense or bonus armor, the row's effects do not carry it,
   and its name appears nowhere on the tooltip;
+- attack power, ranged and feral attack power, spell damage, healing, school damage and the hit,
+  crit, expertise, block, dodge and parry ratings (UNSTATED_DROPPABLE), which the tooltip states
+  only in "Equip:" lines, are dropped the same way when the tooltip does not state them, the row's
+  effects do not carry them, and the tooltip has no "Equip:" line this tool cannot read (a line
+  it cannot read may state the stat in other words). Classic values the Forever tooltip no longer
+  states otherwise survive: Royal Seal of Eldre'Thalas (18473) kept the reference's 48 ranged
+  attack power where Forever's tooltip has "+45 Attack Power against Demons", and Sang'thraze the
+  Deflector (9379) a static 1% parry its tooltip gives only as a chance on hit;
+- an equip line that states attack power or spell damage against a creature type ("+45 Attack
+  Power against Demons", "Increases damage done to Undead by magical spells and effects by up to
+  21", "Grants an additional 18 spell damage against Demons") is not a stat of the row: it goes to
+  data/forever-live-item-bonuses.jsonl, the schema of tools/rust_client_items.py's bonus file,
+  which Forever's preparation reads the same way (src/prepare/forever_items.rs). Attack power
+  against a creature type is melee and ranged attack power, as the client's equip spells for the
+  line carry both auras (see tools/rust_client_items.py);
 - a generic "+N Attack Power" equip line is melee and ranged: a row that holds the same ranged
   attack power as attack power takes N for both, and a row that holds attack power alone keeps
   it alone, since Forever's preparation gives an item's attack power to ranged as well
@@ -43,7 +58,8 @@ reference row). The rules, per stat of the row's base stats (scaling_options "0"
   tooltip that names classes the row lacks adds them (Bonescythe Armor, Rogue).
 
 Existing live rows keep their stats, damage and speed as they are; only their on use cooldown,
-weapon skills and classes follow a tooltip the cache holds. So a row written from a hotfix push the tooltip does not show
+weapon skills, classes and creature type bonuses follow a tooltip the cache holds, and a stat of
+UNSTATED_DROPPABLE they still hold at the reference row's value is dropped by the rule above. So a row written from a hotfix push the tooltip does not show
 yet stays: Rage of the Storm (280604) is the ItemSparse row of hotfix push 113886 (docs/mechanics.md). An item with a "+N" line this tool cannot read is left out
 and listed.
 
@@ -70,6 +86,7 @@ import rust_client_items as client  # noqa: E402
 DATA = client.DATA
 ITEMS = client.ITEMS
 LIVE = DATA / "forever-live-items.jsonl"
+BONUSES = DATA / "forever-live-item-bonuses.jsonl"
 SKILL_INDICES = set(client.WEAPON_SKILLS.values())
 
 STAT_ARMOR, STAT_BONUS_ARMOR, STAT_BLOCK_VALUE = 30, 31, 27
@@ -82,6 +99,24 @@ DROPPABLE = {
     15: "Spell Penetration", 34: "mana per 5", 25: "Defense", STAT_BONUS_ARMOR: "Armor",
     **{stat: f"{school} Resistance" for school, stat in RESISTANCES.items()},
 }  # fmt: skip
+# Stats a tooltip states only in an "Equip:" line (rust_client_items.EQUIP_STATS): healing, spell
+# damage, the six school damages, spell hit and crit rating, attack power, ranged and feral attack
+# power, melee hit and crit rating, expertise, block rating and value, dodge and parry rating.
+UNSTATED_DROPPABLE = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 20, 21, 24, 26, 28, 29}
+# The Royal Seal of Eldre'Thalas of the Warlock and the Shaman (18467, 18471): spell damage and
+# healing, and spell damage against a creature type beside them.
+SEAL_SPELL_LINE = re.compile(
+    rf"Equip: Increases spell damage and healing by up to {client.NUMBER}\. Grants an additional "
+    rf"{client.NUMBER} spell damage against ({'|'.join(client.CREATURE_TYPES)})\.?",
+    re.IGNORECASE,
+)
+# The items whose creature type lines go to BONUSES: those whose row held the bonus as a stat it
+# always gives (Royal Seal of Eldre'Thalas 18473, Atal'ai Gloves 10787, Drakestone 10796) and the
+# other class versions of the Royal Seal, whose rows hold the rest of the line (18465, 18467,
+# 18471), with Verdant Footpads (13954), whose row held Nature damage for its Undead line. Many
+# reference items state a creature type bonus their rows never held (Tigerbane's "+9 Attack Power
+# against Beasts" beside its "+10 Attack Power"); they are left for a change of their own.
+VERSUS_ITEMS = {10787, 10796, 13954, 18465, 18467, 18471, 18473}
 # "+N Stat" lines the reference rows hold that client items do not carry.
 EXTRA_STAT_LINES = {"Ranged Attack Power": RANGED_ATTACK_POWER}
 # A rating stat the reference row may carry as a percent pseudo stat instead (Eye of the Beast's
@@ -166,10 +201,19 @@ def read_tooltip(response):
     if response.get("missing") or response.get("error") or "tooltip" not in response:
         return None
     lines, _ = client.tooltip_lines(response["tooltip"])
-    out = {"stats": {}, "text": " ".join(lines), "use_cooldowns": [], "skills": {}, "classes": []}
+    out = {
+        "stats": {}, "text": " ".join(lines), "use_cooldowns": [], "skills": {}, "classes": [],
+        "versus": {}, "versus_spell": {}, "unread_equip": 0,
+    }  # fmt: skip
 
     def add(stat, value):
         out["stats"][stat] = out["stats"].get(stat, 0) + value
+
+    def versus(key, name, value):
+        mob_type = client.CREATURE_TYPES[name.capitalize()]
+        if float(value) != round(float(value)):
+            raise client.Unreadable(f"fractional bonus against {name}")
+        out[key][mob_type] = out[key].get(mob_type, 0) + round(float(value))
 
     for line in lines:
         if SET_BONUS.match(line) or client.SET_LINE.match(line):
@@ -200,11 +244,21 @@ def read_tooltip(response):
         elif match := client.SKILL_LINE.fullmatch(line):
             index = client.WEAPON_SKILLS[match.group(1)]
             out["skills"][index] = out["skills"].get(index, 0) + int(match.group(2))
+        elif match := client.VERSUS_LINE.fullmatch(line):
+            versus("versus", match.group(2), match.group(1))
+        elif match := client.VERSUS_SPELL_LINE.fullmatch(line):
+            versus("versus_spell", match.group(1), match.group(2))
+        elif match := SEAL_SPELL_LINE.fullmatch(line):
+            add(4, int(match.group(1)))
+            add(5, int(match.group(1)))
+            versus("versus_spell", match.group(3), match.group(2))
         elif line.startswith("Equip:"):
             try:
                 stats = client.equip_stats(line)
             except client.Unreadable:
                 stats = None
+            if stats is None:
+                out["unread_equip"] += 1
             stats = dict(stats or {})
             # A generic attack power line is read as the reference rows hold it, attack power
             # alone: preparation gives it to ranged too (changes() moves a row's equal ranged).
@@ -291,14 +345,7 @@ def changes(row, live):
     option = row.get("scaling_options", {}).get("0", {})
     base = {int(k): v for k, v in (option.get("stats") or {}).items() if v}
     effects = effect_stats(row)
-    stated = dict(live["stats"])
-    if (
-        ATTACK_POWER in stated
-        and RANGED_ATTACK_POWER not in stated
-        and ATTACK_POWER in base
-        and base.get(RANGED_ATTACK_POWER) == base[ATTACK_POWER]
-    ):
-        stated[RANGED_ATTACK_POWER] = stated[ATTACK_POWER]
+    stated = as_row_reads(base, live)
     text = live["text"].lower()
     stats = {}
     for stat in sorted(set(base) | set(stated)):
@@ -310,6 +357,8 @@ def changes(row, live):
         if new is None:
             name = DROPPABLE.get(stat)
             if name and name.lower() not in text and stat not in effects:
+                stats[stat] = None
+            elif unstated(stat, stated, live, effects):
                 stats[stat] = None
             continue
         if old is None and effects.get(stat) == new:
@@ -342,6 +391,54 @@ def changes(row, live):
     if out and live.get("ilvl") and live["ilvl"] != option.get("ilvl"):
         out["ilvl"] = live["ilvl"]
     return out
+
+
+def unstated(stat, stated, live, effects):
+    """Whether a stat of UNSTATED_DROPPABLE the tooltip does not state (`stated`, the tooltip's
+    stats as the row reads them) is dropped: the row's effects do not carry it and the tooltip has
+    no "Equip:" line this tool cannot read."""
+    return (
+        stat in UNSTATED_DROPPABLE
+        and stat not in stated
+        and stat not in effects
+        and not live["unread_equip"]
+    )
+
+
+def as_row_reads(base, live):
+    """The tooltip's stats with a generic "+N Attack Power" read as ranged attack power too for a
+    row that holds the two equal, as changes() reads it."""
+    stated = dict(live["stats"])
+    if (
+        ATTACK_POWER in stated
+        and RANGED_ATTACK_POWER not in stated
+        and ATTACK_POWER in base
+        and base.get(RANGED_ATTACK_POWER) == base[ATTACK_POWER]
+    ):
+        stated[RANGED_ATTACK_POWER] = stated[ATTACK_POWER]
+    return stated
+
+
+def stale_change(row, reference, live):
+    """{stat: None} for each stat of UNSTATED_DROPPABLE an existing live row still holds at its
+    reference row's value that the tooltip does not state (`unstated`)."""
+    held = {int(k): v for k, v in (row["scaling_options"]["0"].get("stats") or {}).items() if v}
+    old = {int(k): v for k, v in (reference["scaling_options"]["0"].get("stats") or {}).items() if v}
+    effects = effect_stats(row)
+    stated = as_row_reads(held, live)
+    return {
+        stat: None
+        for stat, value in held.items()
+        if old.get(stat) == value and unstated(stat, stated, live, effects)
+    }
+
+
+def bonus_row(item_id, name, live):
+    """The data/forever-live-item-bonuses.jsonl row of an item of VERSUS_ITEMS whose tooltip
+    states attack power or spell damage against creature types, or None."""
+    if item_id not in VERSUS_ITEMS:
+        return None
+    return client.bonus_row(item_id, name, live)
 
 
 def live_row(row, change):
@@ -389,6 +486,7 @@ def build(cache, report=None):
     reference = reference_rows()
     live = live_rows()
     added, left_out = {}, {}
+    bonuses = {}
     for item_id, row in sorted(reference.items()):
         if not is_gear(row):
             continue
@@ -403,13 +501,16 @@ def build(cache, report=None):
                 continue
             if not stated:
                 continue
+            if bonus := bonus_row(item_id, row["name"], stated):
+                bonuses[item_id] = bonus
             change = {}
             if cooldown := cooldown_change(live[item_id], stated):
                 change["cooldown_ms"] = cooldown
             if (pseudo := skill_change(live[item_id], stated)) is not None:
                 change["pseudo_stats"] = pseudo
-            if unified := unified_change(live[item_id], stated):
-                change["stats"] = unified
+            dropped = {**stale_change(live[item_id], row, stated), **unified_change(live[item_id], stated)}
+            if dropped:
+                change["stats"] = dropped
             if (classes := class_change(live[item_id], stated)) is not None:
                 change["class_allowlist"] = classes
             if change:
@@ -423,11 +524,14 @@ def build(cache, report=None):
             continue
         if stated is None:
             continue
+        if bonus := bonus_row(item_id, row["name"], stated):
+            bonuses[item_id] = bonus
         change = changes(row, stated)
         if change:
             added[item_id] = (row["name"], change)
             live[item_id] = live_row(row, change)
     LIVE.write_text("".join(client.dump_row(live[i]) + "\n" for i in sorted(live)))
+    BONUSES.write_text("".join(client.dump_row(bonuses[i]) + "\n" for i in sorted(bonuses)))
     if report:
         lines = [f"{i}\t{n}\t{json.dumps(c, sort_keys=True)}\n" for i, (n, c) in sorted(added.items())]
         lines += [f"{i}\t{n}\tleft out: {r}\n" for i, (n, r) in sorted(left_out.items())]
@@ -458,6 +562,22 @@ def check():
             raise ValueError(f"{LIVE.name} line {number} (item {row['id']}): " + ", ".join(problems))
         previous = row["id"]
         count += 1
+    previous = 0
+    for number, line in enumerate(BONUSES.read_text().splitlines(), 1):
+        row = json.loads(line)
+        problems = []
+        if row["id"] <= previous:
+            problems.append("is not in increasing id order")
+        if row["id"] not in reference:
+            problems.append("is not an id items.jsonl holds")
+        fields = set(row) - {"id", "name"}
+        if not fields or not fields <= {"melee_attack_power_versus", "spell_damage_versus"}:
+            problems.append("does not have id, name and melee_attack_power_versus or spell_damage_versus")
+        if client.dump_row(row) != line:
+            problems.append("is not written as dump_row writes it")
+        if problems:
+            raise ValueError(f"{BONUSES.name} line {number} (item {row['id']}): " + ", ".join(problems))
+        previous = row["id"]
     return count
 
 
