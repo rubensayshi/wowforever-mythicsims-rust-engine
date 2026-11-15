@@ -103,10 +103,9 @@ fn judgement_refresh_hears_white_swings_only_under_forever_rules() {
         true
     );
     let reference = prepared(&request, Rules::GoReference);
-    assert_ne!(
-        effect(&reference, "judgement_refresh")["white_swings_only"],
-        true
-    );
+    assert!(effect(&reference, "judgement_refresh")
+        .get("white_swings_only")
+        .is_none());
 }
 
 /// White swings still keep Judgement of the Crusader up between judgements: the debuff is on

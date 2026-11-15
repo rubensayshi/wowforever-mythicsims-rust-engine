@@ -234,11 +234,14 @@ impl Paladin {
             .filter_map(|auras| auras.get(target_index).copied().flatten())
             .map(|aura| sim.aura(aura).label.clone())
             .collect();
-        effects.push(json!({
+        let mut refresh = json!({
             "kind": "judgement_refresh", "trigger_aura": format!("Judgement Refresh{label}"),
             "proc_mask": ProcMask::MELEE.names(), "judgement_auras": judgements,
-            "white_swings_only": sim.rules == crate::prepare::sim::Rules::Forever,
-        }));
+        });
+        if sim.rules == crate::prepare::sim::Rules::Forever {
+            refresh["white_swings_only"] = json!(true);
+        }
+        effects.push(refresh);
         // judgement.go: the active seal's judgement, then a rotation wake a batch window after
         // the cooldown ends.
         let judgement = self
