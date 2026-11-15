@@ -310,3 +310,22 @@ fn every_creature_type_bonus_belongs_to_a_client_item_and_names_a_creature_type(
         }
     }
 }
+
+#[test]
+fn every_live_creature_type_bonus_belongs_to_a_reference_item() {
+    for id in crate::data::LIVE_ITEM_BONUSES.keys() {
+        assert!(
+            crate::data::proto_row(&crate::data::ITEMS, "proto.SimItem", id).is_some(),
+            "item {id} has no reference row"
+        );
+        assert!(
+            crate::data::CLIENT_ITEM_BONUSES.row(id).is_none(),
+            "item {id} is in both bonus files"
+        );
+        let bonus = versus_attack_power(i32::try_from(id).unwrap()).unwrap();
+        assert!(!bonus.bonuses.is_empty() || !bonus.spell_bonuses.is_empty());
+    }
+    // Royal Seal of Eldre'Thalas, the Hunter's: "Equip: +45 Attack Power against Demons."
+    let seal = versus_attack_power(18473).unwrap();
+    assert_eq!(seal.bonuses, vec![("MobTypeDemon".to_string(), 45.0)]);
+}

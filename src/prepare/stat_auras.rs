@@ -129,6 +129,7 @@ pub(crate) fn character_stat_auras(env: &Environment) -> Vec<String> {
     candidates.extend(super::export_items::chance_on_hit_stat_auras(env));
     candidates.extend(lion_horn_proc_aura(env));
     candidates.extend(super::forever_tank_procs::stat_auras(env));
+    candidates.extend(super::forever_client_sets::stat_auras(env));
     candidates.extend(super::healer_gear::stat_auras(env));
     candidates.extend(simple_stat_active_auras(env));
     candidates.extend(

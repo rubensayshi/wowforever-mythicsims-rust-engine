@@ -30,7 +30,8 @@ row. So is a use, chance on hit or equip line the engine models by hand (ENGINE_
 Serpentbane Crown's use, the two Rock on Stick weapons' bash, Toofbreaker's bash, Dreadfrost
 Saber's Frost damage, Totem of Rage's shock damage, Maw of Min'loth's leech when struck), a use
 the engine never presses (UNPRESSED_USE: Zarla's Snack Pouch's whelp, whose damage no row
-states), and an equip line that acts only when the wearer is struck, which the engine refuses on the
+states, and Behemoth Bones' heal), an equip proc whose chance no row states (UNSTATED_PROC:
+Claymore of Two Moons), and an equip line that acts only when the wearer is struck, which the engine refuses on the
 character it can reach (Zealot Plate's mana, Girdle of Extracted Answers' damage on block). A use
 that is a stat buff (ON_USE_STATS: Heart of the Primeval, Lucky Shovelnose Tuft, Flamebreak
 Talisman) is written into the row as its item effect, as the reference rows hold a stat trinket's.
@@ -43,7 +44,8 @@ this tool does not read, is left out and listed.
 A piece of a set in CLIENT_SETS is taken with its set_name and set_id, as a reference row carries
 them; its tooltip's set block (the piece names and bonus lines) is not part of the row.
 Preparation applies the bonuses that are plain stats and refuses an equipment that reaches one of
-the others (src/prepare/forever_client_sets.rs). An id in REAL_ITEMS is taken
+the others (src/prepare/forever_client_sets.rs). A new piece of a set the reference rows hold
+(REFERENCE_SETS: The Gladiator) carries the two fields as those rows do. An id in REAL_ITEMS is taken
 although its name reads as development data.
 
 Most of the items the Forever client adds (ids from about 270000) have an Item row but no
@@ -128,6 +130,12 @@ QUEST_RANGED_SLOT = 26
 # applies or refuses each of the set's bonuses (src/prepare/forever_client_sets.rs,
 # CLIENT_ITEM_SETS), so a set here needs its entry there.
 CLIENT_SETS = {"Krol'dok Battlegear": 2135, "Defias Enforcer's Garb": 2136}
+# Sets whose other pieces are reference rows carrying set_name and set_id, with the ItemSet ID, to
+# which the Forever client adds a piece. The new piece's row carries the same two fields, so the
+# six pieces count as one set. Preparation registers no bonus for these sets, for the reference
+# pieces or the new one. The Gladiator (ItemSet 1): Savage Gladiator Shoulders 277117 beside the
+# five Classic pieces 11726 to 11731.
+REFERENCE_SETS = {"The Gladiator": 1}
 
 ITEM_TYPE = {
     1: "ItemTypeHead",
@@ -501,6 +509,10 @@ ENGINE_EFFECT = [
         # Fingerbreaker Stamp 276743: Strength while the wearer bleeds, which nothing in a fight
         # here causes, so the item is worn with its other lines (forever_effect_items.rs).
         "Equip: Increases Strength by 38 while affected by a Bleed.",
+        # Jom-jom's Gabbar 274952 and Deadhead Blade 274271.
+        "Chance on hit: Launch a boulder, dealing 98 Physical damage.",
+        "Chance on hit: Assault the target with a dangerous toxin, dealing 50 to 76 Nature damage. "
+        "Deals 3 times as much damage to Plants.",
     ]
 ]
 # Uses the engine never presses, by the exact line of the item it names: the item is taken with
@@ -512,6 +524,22 @@ UNPRESSED_USE = [
     for line in [
         "Use: Calls forth a Black Dragon Whelp to protect you in battle for a short period of "
         "time. (15 Min Cooldown)",
+        # Behemoth Bones 280065: its use (spell 1315849) heals the wearer and the nearest ally for
+        # 480 to 530 each, which changes no damage, threat or mana.
+        "Use: Crack open the bone, healing yourself for 480 to 530 and your nearest ally for 480 "
+        "to 530. (5 Min Cooldown)",
+    ]
+]
+# Equip procs the engine leaves out, by the exact line of the item it names: the item is taken with
+# its other lines, so a sim wears it without the proc. Claymore of Two Moons 280080: its equip
+# spell (1309550) is a dummy aura with ProcChance 100 on melee attacks beside a tooltip that says
+# "a chance", and no row states the chance or how often an attack waxes (Waxing Moon 1319378, 189
+# Arcane) rather than wanes (Waning Moon 1319382, 40 Strength). The server decides both.
+UNSTATED_PROC = [
+    re.compile(re.escape(line))
+    for line in [
+        "Equip: Your attacks have a chance to Wax, dealing 189 Arcane damage or Wane, granting 40 "
+        "Strength for 10 sec.",
     ]
 ]
 # A use that is a stat buff, by item: the exact use line of the tooltip and the item effect the row
@@ -593,9 +621,13 @@ CREATURE_TYPES = {
     "Mechanicals": "MobTypeMechanical",
     "Undead": "MobTypeUndead",
 }
-# "Equip: +33 Attack Power against Undead." An attack power bonus against a creature type: melee
-# attack power only (A_MOD_MELEE_ATTACK_POWER_VERSUS, as Quel'Serrar's Sanctuary and the Tier 1
-# bonuses are), applied while the target is of the type.
+# "Equip: +33 Attack Power against Undead." An attack power bonus against a creature type,
+# applied while the target is of the type. The rows' field is named melee_attack_power_versus,
+# but Forever's preparation gives it to melee and ranged attack power alike: the client's equip
+# spells for this line carry A_MOD_MELEE_ATTACK_POWER_VERSUS (102) and
+# A_MOD_RANGED_ATTACK_POWER_VERSUS (131) together (Seal of the Dawn's 23930, 1318938, 1319047),
+# and bows, guns, crossbows and thrown weapons carry it. Only an on hit proc (Quel'Serrar's
+# Sanctuary, 22850) and the Tier 1 set bonuses are aura 102 alone, melee attack power only.
 VERSUS_LINE = re.compile(
     rf"Equip: \+{NUMBER} Attack Power against ({'|'.join(CREATURE_TYPES)})\.?", re.IGNORECASE
 )
@@ -649,13 +681,13 @@ SET_BONUS_LINE = re.compile(r"^\((\d+)\) Set : .+$")
 
 
 def without_client_set(lines):
-    """The lines without the set block of a CLIENT_SETS set, and that set's name (None for a
+    """The lines without the set block of a CLIENT_SETS or REFERENCE_SETS set, and that set's name (None for a
     tooltip with no such block). The block is the set's "<name> (0/N)" line, its N piece names
     and its "(N) Set : ..." bonus lines, which close the tooltip. A block of any other shape, or
     of a set that is not listed, stays for parse_tooltip to refuse as a set piece."""
     for index, line in enumerate(lines):
         match = re.fullmatch(r"(.+) \(0/(\d+)\)", line)
-        if not match or match.group(1) not in CLIENT_SETS:
+        if not match or match.group(1) not in {**CLIENT_SETS, **REFERENCE_SETS}:
             continue
         pieces = int(match.group(2))
         bonuses = lines[index + 1 + pieces :]
@@ -720,7 +752,10 @@ def parse_tooltip(response):
                 out["stats"][34] = out["stats"].get(34, 0) + int(match.group(1))
         elif SET_LINE.match(line):
             raise Unreadable("a set piece")
-        elif any(pattern.fullmatch(line) for pattern in NO_FIGHT_EFFECT + ENGINE_EFFECT + UNPRESSED_USE):
+        elif any(
+            pattern.fullmatch(line)
+            for pattern in NO_FIGHT_EFFECT + ENGINE_EFFECT + UNPRESSED_USE + UNSTATED_PROC
+        ):
             equip_lines += 1
         elif line in ON_USE_STAT_LINES:
             equip_lines += 1
@@ -805,7 +840,8 @@ def row_for(item_id, sparse, item, response):
     damage_expected = False
     set_fields = {}
     if parsed.get("set"):
-        set_fields = {"set_name": parsed["set"], "set_id": CLIENT_SETS[parsed["set"]]}
+        set_id = {**CLIENT_SETS, **REFERENCE_SETS}[parsed["set"]]
+        set_fields = {"set_name": parsed["set"], "set_id": set_id}
     if item_class == ARMOR_CLASS and subclass == 6:
         if inventory != 14:
             raise Unreadable(f"shield in slot {inventory}")

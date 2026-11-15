@@ -2825,6 +2825,7 @@ pub(crate) fn item_proc_effects(env: &Environment, unrepresented: &mut Vec<Strin
     effects.extend(gear_proc_effects(env, unrepresented));
     effects.extend(spell_data_stat_proc_effects(env, unrepresented));
     effects.extend(super::forever_tank_procs::export_effects(env));
+    effects.extend(super::forever_client_sets::export_effects(env));
     effects.extend(super::forever_mana_procs::export_effects(env));
     effects.extend(energy_proc_effects(env, unrepresented));
     effects.extend(super::healer_gear::export_effects(env, unrepresented));
@@ -2862,10 +2863,15 @@ pub(crate) fn gear_proc_effects(env: &Environment, unrepresented: &mut Vec<Strin
             }));
         }
     }
-    // Under Forever's rules: an item's melee attack power and spell damage against creature
-    // types (Ceremonial Mallet's 33 attack power against Undead, Courier's Clasp's 10 spell damage
+    // Under Forever's rules: an item's attack power and spell damage against creature types
+    // (Ceremonial Mallet's 33 attack power against Undead, Courier's Clasp's 10 spell damage
     // against Humanoids), when every target is of a type its equip line names. A target of
-    // another type, or none, never takes it. The spell damage is Mark of the Champion's kind.
+    // another type, or none, never takes it. Both are Mark of the Champion's kind: the client's
+    // equip spells for "+N Attack Power against <type>" carry the melee and the ranged aura
+    // together (102 and 131: Seal of the Dawn's 23930, 1318938, 1319047), and bows, guns,
+    // crossbows and thrown weapons carry the line, so ranged attacks read it as melee ones do.
+    // Only an on hit proc's bonus (Quel'Serrar's, aura 102 alone) and a set bonus's
+    // (`client_set_effects`) stay melee attack power.
     if env.sim.rules == super::sim::Rules::Forever {
         let swaps_items = env.sim.item_swap(env.player).is_some();
         for item in chance_on_hit_items(env) {
@@ -2893,9 +2899,9 @@ pub(crate) fn gear_proc_effects(env: &Environment, unrepresented: &mut Vec<Strin
             // of the aura is one the runtime follows: a target of another type takes nothing.
             if power != 0.0 || spell_damage != 0.0 || swaps_items {
                 effects.push(json!({
-                    "kind": "mob_type_bonus", "aura": bonus.name, "attack_power": 0.0,
-                    "ranged_attack_power": 0.0, "spell_damage": spell_damage,
-                    "melee_attack_power": power,
+                    "kind": "mob_type_bonus", "aura": bonus.name, "attack_power": power,
+                    "ranged_attack_power": power, "spell_damage": spell_damage,
+                    "melee_attack_power": 0.0,
                 }));
             }
         }
