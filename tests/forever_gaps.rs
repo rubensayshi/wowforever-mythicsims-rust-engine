@@ -702,8 +702,9 @@ fn hammer_of_the_righteous_cleaves() {
     // judgements are ranged attacks (hotfixes of 11 November 2026) and melee procs skip them.
     // 960 since Ironfoe's Fury of Forgewright rolls 3% under Forever's rules (13 November 2026).
     // 967 since every ability's main hand strike rolls Windfury Totem, Holy Strike and Hammer of
-    // the Righteous among them (hotfixes of 13 November 2026).
-    assert_eq!(casts, 967.0);
+    // the Righteous among them (hotfixes of 13 November 2026). 949 since the totem's proc is a
+    // weapon strike (Forever's rules of 15 November 2026).
+    assert_eq!(casts, 949.0);
     assert!(damage > 0.0);
 }
 
@@ -727,15 +728,17 @@ fn seal_of_justice_judges_justice() {
     // Windfury Totem's Forever rules. 3262 since Judgement of Wisdom pays only on landed hits.
     // 3258 since the 11 November live rows of Truestrike Shoulders and Battleborn Armbraces.
     // 3256 since judgements are ranged attacks (hotfixes of 11 November 2026). 3273 since every
-    // ability's main hand strike rolls Windfury Totem (hotfixes of 13 November 2026).
-    assert_eq!(action(&player, 20164, 0).0, 3273.0);
+    // ability's main hand strike rolls Windfury Totem (hotfixes of 13 November 2026). 3282 since
+    // the totem's proc is a weapon strike (15 November 2026).
+    assert_eq!(action(&player, 20164, 0).0, 3282.0);
     // 756 since the 9 November live rows of Bloodmail Gauntlets, Bloodmail Boots and Songstone of
     // Ironforge (754 before). 759 since Windfury Totem's Forever rules. 751 since Judgement of
     // Wisdom pays only on landed hits. 748 since the 11 November live rows of Truestrike
     // Shoulders and Battleborn Armbraces. 749 since judgements are ranged attacks (hotfixes of
     // 11 November 2026). 754 since every ability's main hand strike rolls Windfury Totem
-    // (hotfixes of 13 November 2026).
-    assert_eq!(action(&player, 20184, 0).0, 754.0);
+    // (hotfixes of 13 November 2026). 748 since the totem's proc is a weapon strike (15
+    // November 2026).
+    assert_eq!(action(&player, 20184, 0).0, 748.0);
 }
 
 /// Shield Bash, Mocking Blow, Disarm, Intercept, Revenge off the target's threat and Freezing
@@ -753,7 +756,8 @@ fn warrior_strikes_and_freezing_trap_run() {
         // 78 since the notes of 2 November (Two-Handed Weapon Specialization 6%, Slam on 15 sec)
         // changed the rage a fight has (77 after #183 and #184).
         // 77 since the 11 November live rows of Truestrike Shoulders and Battleborn Armbraces.
-        ("arms-warrior-mocking-blow", 20560, 77.0),
+        // 78 since Windfury Totem's proc is a weapon strike (15 November 2026).
+        ("arms-warrior-mocking-blow", 20560, 78.0),
         ("protection-warrior-disarm", 676, 129.0),
         ("warrior-intercept", 20617, 50.0),
         ("arms-warrior-revenge", 25288, 0.0),
@@ -762,8 +766,9 @@ fn warrior_strikes_and_freezing_trap_run() {
         // on the pull (docs/prepull-damage.md); 213 before. 215 since the Cat swings at its
         // owner's melee and attack speed (Rapid Fire), which moves the fights' random draws. 211
         // since Judgement of Wisdom pays only on landed hits. 212 since the 11 November live row
-        // of Truestrike Shoulders.
-        ("hunter-freezing-trap", 1499, 212.0),
+        // of Truestrike Shoulders. 213 since Windfury Totem's proc is a weapon strike (15
+        // November 2026).
+        ("hunter-freezing-trap", 1499, 213.0),
     ] {
         let (_, player) = run(name);
         assert_eq!(action(&player, spell_id, 0).0, casts, "{name}");
@@ -788,8 +793,9 @@ fn a_druids_own_thorns_strikes_back() {
     // 991 with the raid's Battle Shout VII, Strength of Earth V and Grace of Air III at the
     // ranks below their Ahn'Qiraj 20 books (993 before). 993 again since the 9 November live row
     // of Tarnished Elven Ring (10 Agility, was 15), which the bear wears twice. 995 since the
-    // 11 November live rows of Truestrike Shoulders and Blackmist Armguards.
-    assert_eq!(action(&player, 9910, 0).0, 995.0);
+    // 11 November live rows of Truestrike Shoulders and Blackmist Armguards. 998 since Windfury
+    // Totem's proc is a weapon strike (15 November 2026).
+    assert_eq!(action(&player, 9910, 0).0, 998.0);
     assert!(action(&player, 9910, 2).1 > 0.0);
     // Off the target's threat nothing hits the druid, so the shield never strikes.
     let (_, player) = run("balance-druid-thorns");

@@ -208,9 +208,9 @@ fn cleave_rank_1_adds_thirty_threat() {
     let flat = number(&spell(&reference, CLEAVE_RANK_1)["flat_threat_bonus"]);
     assert!((flat - 1.53 * 20.0).abs() < 1e-9, "{flat}");
 
-    // Rank 5 carries the reference's 1.53 a spell level there, and under Forever's rules the 1.5
-    // ranks 1 and 2 measure, as a whole number (tests/classes/warrior/flat_threat.rs).
-    for (rules, want) in [(Rules::Forever, 90.0), (Rules::GoReference, 1.53 * 60.0)] {
+    // Rank 5 carries the reference's 1.53 a spell level there, and under Forever's rules the 1.6
+    // a spell level rank 4 measures, as a whole number (tests/classes/warrior/flat_threat.rs).
+    for (rules, want) in [(Rules::Forever, 96.0), (Rules::GoReference, 1.53 * 60.0)] {
         let at_60 = production_for("warrior", rules);
         let flat = number(&spell(&prepared(&at_60, rules), CLEAVE_RANK_5)["flat_threat_bonus"]);
         assert!((flat - want).abs() < 1e-9, "{flat}");

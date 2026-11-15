@@ -295,9 +295,18 @@ impl Shaman {
                         "per_stack": super::talents::maelstrom_per_stack(
                             sim.rules, talent("maelstrom_weapon")),
                         "max_stacks": 5,
+                        // Forever's rules: Windfury Totem's weapon strike, the party's (tag
+                        // 25584) or the shaman's own (tag 10610), gives no stack. Combat logs
+                        // taken after the hotfixes of 13 November 2026: 0 of 140 landed
+                        // strikes of ranks 1 and 2 and 0 of 121 of rank 3, where white swings,
+                        // Stormstrike and Windfury Weapon's strikes give them at the rate.
                         "chances": dpm_chances(env, &dpm, |spell| {
+                            let totem_strike = sim.rules == Rules::Forever
+                                && spell.action_id.other_id == "OtherActionAttack"
+                                && matches!(spell.action_id.tag, 25584 | 10610);
                             spell.proc_mask.matches(ProcMask::MELEE)
                                 && !spell.flags.matches(SpellFlag::PROC)
+                                && !totem_strike
                         }),
                     }));
                 }
@@ -598,6 +607,10 @@ impl Shaman {
                         effects[last]["trigger_without_damage"] = json!(true);
                         effects[last]["trigger_spends_no_charge"] = json!(true);
                         effects[last]["any_outcome_spends"] = json!(true);
+                        // Since the hotfixes of 13 November 2026 the proc is a weapon strike
+                        // with the rank's attack power added, and grants no charges
+                        // (src/prepare/buffs/windfury_effect.rs).
+                        effects[last]["strike_attack_power"] = json!(value);
                     }
                 }
                 _ => notes.push(

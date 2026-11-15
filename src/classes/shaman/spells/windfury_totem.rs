@@ -24,7 +24,7 @@ pub(crate) struct WindfuryTotem {
     trigger: AuraRef,
     proc_aura: AuraRef,
     bit: u32,
-    extra: SpellId,
+    pub(crate) extra: SpellId,
     triggers: Vec<bool>,
     spend: Vec<bool>,
     white: Vec<bool>,
@@ -37,6 +37,9 @@ pub(crate) struct WindfuryTotem {
     trigger_without_damage: bool,
     trigger_spends_no_charge: bool,
     any_outcome_spends: bool,
+    /// Forever's rules since the hotfixes of 13 November 2026: the attack power the proc's
+    /// weapon strike adds. With it the proc grants no charges.
+    pub(crate) strike_attack_power: Option<f64>,
 }
 
 /// Spellbook positions as a mask.
@@ -70,6 +73,7 @@ pub(crate) fn bind<A: Agent>(fight: &Fight<A>, effect: &Effect) -> Result<Windfu
         trigger_without_damage,
         trigger_spends_no_charge,
         any_outcome_spends,
+        strike_attack_power,
         ..
     } = effect
     else {
@@ -105,6 +109,7 @@ pub(crate) fn bind<A: Agent>(fight: &Fight<A>, effect: &Effect) -> Result<Windfu
         trigger_without_damage: *trigger_without_damage,
         trigger_spends_no_charge: *trigger_spends_no_charge,
         any_outcome_spends: *any_outcome_spends,
+        strike_attack_power: *strike_attack_power,
     })
 }
 
@@ -187,6 +192,10 @@ impl WindfuryTotem {
         if let Some((timer, duration)) = icd {
             fight.timers[timer] = fight.now + duration;
         }
+        // A weapon strike grants no charges of attack power.
+        if self.strike_attack_power.is_some() {
+            return true;
+        }
         fight.activate_aura(self.proc_aura);
         let mut charges = fight.aura(self.proc_aura).max_stacks;
         if self.trigger_spends_no_charge {
@@ -203,7 +212,8 @@ impl WindfuryTotem {
     /// it after a proc.
     pub(crate) fn cast_extra<A: Agent>(&self, fight: &mut Fight<A>, result: &SpellResult) {
         let mut extra = self.extra;
-        if fight.config.melee.replace_main_hand_swing {
+        // A weapon strike is no swing a queued Heroic Strike could replace.
+        if self.strike_attack_power.is_none() && fight.config.melee.replace_main_hand_swing {
             extra = A::replace_mh_swing(fight, extra);
         }
         fight.cast(extra, result.target);

@@ -89,12 +89,15 @@ fn heroic_strike_adds_whole_number_threat() {
     assert!((reference - 2.54 * 32.0).abs() < 1e-9, "{reference}");
 }
 
-/// Cleave: rank 2's 46 at level 32 and rank 5's 90 (1.5 at spell level 60). The reference adds
-/// 1.53 a spell level.
+/// Cleave: rank 2's 46 at level 32, rank 3's 60 (1.5 at spell level 40), rank 4's measured 80
+/// at level 50 and rank 5's 96 (rank 4's 1.6 at spell level 60). The reference adds 1.53 a
+/// spell level.
 #[test]
 fn cleave_adds_whole_number_threat() {
     assert_eq!(flat_threat(32, Rules::Forever, &CLEAVE), (7369, 46.0));
-    assert_eq!(flat_threat(60, Rules::Forever, &CLEAVE), (20569, 90.0));
+    assert_eq!(flat_threat(42, Rules::Forever, &CLEAVE), (11608, 60.0));
+    assert_eq!(flat_threat(52, Rules::Forever, &CLEAVE), (11609, 80.0));
+    assert_eq!(flat_threat(60, Rules::Forever, &CLEAVE), (20569, 96.0));
     let (_, reference) = flat_threat(32, Rules::GoReference, &CLEAVE);
     assert!((reference - 1.53 * 30.0).abs() < 1e-9, "{reference}");
 }

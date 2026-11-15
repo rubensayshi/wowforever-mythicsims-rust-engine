@@ -1079,12 +1079,18 @@ fn damage_shield_proc(
     {
         return None;
     }
-    Some(json!({
+    let mut effect = json!({
         "kind": "spell_data_damage_proc", "trigger_aura": a.label, "trigger_spells": Vec::<usize>::new(),
         "struck": true, "landed_only": true, "require_damage": false, "proc_chance": 1.0,
         "spell": position, "average": 0.0, "variance": 0.0, "roll": [damage, damage],
         "can_crit": false,
-    }))
+    });
+    // Forever's rules: a damage shield answers no hit blocked in full (prepare/export.rs
+    // `tank_damage_shields` has the counts).
+    if env.sim.rules == crate::prepare::sim::Rules::Forever {
+        effect["skips_full_blocks"] = json!(true);
+    }
+    Some(effect)
 }
 
 /// main.go `spellDataAbsorbProc`: shared.NewSpellDataAbsorbProc: a listener resolved from the

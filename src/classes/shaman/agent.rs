@@ -957,7 +957,11 @@ impl ShamanAgent {
                     )?);
                 }
                 Effect::WindfuryTotemSelf { .. } => {
-                    fight.agent.windfury_totem = Some(windfury_totem::bind(&fight, effect)?);
+                    let totem = windfury_totem::bind(&fight, effect)?;
+                    if let Some(attack_power) = totem.strike_attack_power {
+                        fight.windfury_strikes.push((totem.extra, attack_power));
+                    }
+                    fight.agent.windfury_totem = Some(totem);
                 }
                 Effect::WeaponSync {
                     sync,

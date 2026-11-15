@@ -229,10 +229,10 @@ fn threat_follows_the_in_game_captures() {
     near(&spell("revenge")["threat_multiplier"], 2.25);
     near(&spell("revenge")["flat_threat_bonus"], 0.0);
     // Heroic Strike VIII (spell level 56): rank IX is an Ahn'Qiraj 20 book (book_ranks). Forever's
-    // rules round the flat threat to whole numbers, 2.5 and 1.5 a spell level at these ranks
-    // (tests/classes/warrior/flat_threat.rs).
+    // rules round the flat threat to whole numbers: 2.5 a spell level on Heroic Strike, and on
+    // Cleave V the 1.6 a spell level rank IV measures (tests/classes/warrior/flat_threat.rs).
     near(&spell("heroic_strike")["flat_threat_bonus"], 140.0);
-    near(&spell("cleave")["flat_threat_bonus"], 90.0);
+    near(&spell("cleave")["flat_threat_bonus"], 96.0);
     near(&spell("sunder_armor")["flat_threat_bonus"], 206.0);
 
     let effect = |kind: &str| {

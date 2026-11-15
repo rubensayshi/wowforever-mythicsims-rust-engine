@@ -1290,7 +1290,11 @@ const DAMAGE_SHIELD_REASON: &str = "a damage shield: hears only physical hits th
 /// hit of the shield's damage that cannot crit. The damage is the shield's bid in its category;
 /// the shield spell adds the wearer's spell power by its coefficient. Under Forever's rules a
 /// paladin's own Retribution Aura rank or a druid's own Thorns the rotation casts is one more
-/// shield.
+/// shield, and a hit blocked in full brings no answer: in a protection warrior's combat logs of
+/// levels 45 to 59 (clients 1.60.1.70862 to 1.60.1.70938) Thorns answered 1 of 8,334 full blocks,
+/// and Razorsteel Shoulders' shield 34 of 5,281 full blocks against 3,835 of 3,840 partial ones
+/// and 15,042 of 15,069 hits. A block whose remainder an absorb takes still brings one. The
+/// reference answers every landed hit.
 fn tank_damage_shields(env: &Environment) -> Vec<Value> {
     let mut effects = Vec::new();
     let mut auras: Vec<_> = ["Retribution Aura (External)", "Thorns (External)"]
@@ -1348,6 +1352,7 @@ fn tank_damage_shields(env: &Environment) -> Vec<Value> {
         if env.sim.rules == crate::prepare::sim::Rules::Forever {
             effect["average"] = json!(damage);
             effect["roll"] = Value::Null;
+            effect["skips_full_blocks"] = json!(true);
         }
         effects.push(effect);
     }

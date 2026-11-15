@@ -39,10 +39,18 @@ const CLEAVE_THREAT_PER_LEVEL: f64 = 1.53;
 /// 20 to 24, 7 November 2026). The per level figure above would give 30.6 at the rank's level 20.
 const CLEAVE_RANK_1_ID: i32 = 845;
 const CLEAVE_RANK_1_THREAT: f64 = 30.0;
-/// Cleave rank 2 (7369, spell level 30) adds 46 under Forever's rules; ranks 3 to 5 carry the
-/// 1.5 a spell level ranks 1 and 2 measure, as whole numbers (60, 75 and 90).
+/// Cleave rank 2 (7369, spell level 30) adds 46 under Forever's rules. Rank 4 (11609, spell
+/// level 50) adds 80, split over the targets it lands on: a protection warrior's combat and
+/// threat logs at levels 48 to 59 (clients 1.60.1.70862 to 1.60.1.70938) read 80.2 over 53
+/// Cleaves (79.5 to 80.8; 80.3 on one target, 79.8 on two), where 1.5 a spell level gave 75.
+/// Rank 3 is not measured well (62 over 17 readings) and keeps the 1.5 a spell level ranks 1 and
+/// 2 measure, 60. Rank 5 (20569) is not measured and carries rank 4's 1.6 a spell level, 96.
 const CLEAVE_RANK_2_ID: i32 = 7369;
 const CLEAVE_RANK_2_THREAT: f64 = 46.0;
+const CLEAVE_RANK_4_ID: i32 = 11609;
+const CLEAVE_RANK_4_THREAT: f64 = 80.0;
+const CLEAVE_RANK_5_ID: i32 = 20569;
+const CLEAVE_RANK_5_THREAT: f64 = 96.0;
 const FOREVER_CLEAVE_THREAT_PER_LEVEL: f64 = 1.5;
 /// Heroic Strike ranks 1 to 4 (78, 284, 285, 1608) under Forever's rules: whole numbers, Rank 4
 /// measured at 60.08 over 104 clean threat readings on client 1.60.1.70862 (8 November 2026),
@@ -84,6 +92,8 @@ fn cleave_threat(rules: Rules, rank: &crate::prepare::spelldata::Spell) -> f64 {
     match rank.id {
         CLEAVE_RANK_1_ID => CLEAVE_RANK_1_THREAT,
         CLEAVE_RANK_2_ID => CLEAVE_RANK_2_THREAT,
+        CLEAVE_RANK_4_ID => CLEAVE_RANK_4_THREAT,
+        CLEAVE_RANK_5_ID => CLEAVE_RANK_5_THREAT,
         _ => whole_threat_per_level(FOREVER_CLEAVE_THREAT_PER_LEVEL, rank),
     }
 }
@@ -98,21 +108,28 @@ fn slam_threat(rules: Rules, rank: &crate::prepare::spelldata::Spell) -> f64 {
 /// Shield Slam's flat threat. The Go reference adds 508 on every rank. Under Forever's rules
 /// rank 1 (23922, spell level 40) adds 178: a protection warrior's combat and threat logs at
 /// levels 40 to 42 (client 1.60.1.70862, 8 November 2026) held 177.7 over damage from 223 to
-/// 400, once on a crit too. Ranks 2 to 4 are not measured: they carry rank 1's 4.45 a spell
-/// level as whole numbers, 214, 240 and 267.
+/// 400, once on a crit too. Another protection warrior's logs at levels 46 to 59 (clients
+/// 1.60.1.70862 to 1.60.1.70938) read rank 1 at 178.1 over 134 slams, rank 2 (23923, spell level
+/// 48) at 202.85 over 379 (202.76 to 202.94) and rank 3 (23924, spell level 54) at 229.25 over
+/// 36 (229.10 to 229.39), so the ranks do not share rank 1's 4.45 a spell level (214 and 240).
+/// Rank 4 (23925, spell level 60) is not measured: it takes the line through ranks 2 and 3,
+/// 4.33 a spell level, 255.
 const SHIELD_SLAM_REFERENCE_FLAT_THREAT: f64 = 508.0;
-const SHIELD_SLAM_RANK_1_ID: i32 = 23922;
-const SHIELD_SLAM_RANK_1_THREAT: f64 = 178.0;
-const FOREVER_SHIELD_SLAM_THREAT_PER_LEVEL: f64 = 4.45;
+const SHIELD_SLAM_FOREVER_THREAT: [(i32, f64); 4] = [
+    (23922, 178.0),
+    (23923, 203.0),
+    (23924, 229.0),
+    (23925, 255.0),
+];
 
 pub(super) fn shield_slam_threat(rules: Rules, rank: &crate::prepare::spelldata::Spell) -> f64 {
     if rules != Rules::Forever {
         return SHIELD_SLAM_REFERENCE_FLAT_THREAT;
     }
-    match rank.id {
-        SHIELD_SLAM_RANK_1_ID => SHIELD_SLAM_RANK_1_THREAT,
-        _ => whole_threat_per_level(FOREVER_SHIELD_SLAM_THREAT_PER_LEVEL, rank),
-    }
+    SHIELD_SLAM_FOREVER_THREAT
+        .iter()
+        .find(|(id, _)| *id == rank.id)
+        .map_or(SHIELD_SLAM_REFERENCE_FLAT_THREAT, |(_, threat)| *threat)
 }
 
 /// The hand Shield Slam and Shield Bash strike with. Their rows require the shield and name no

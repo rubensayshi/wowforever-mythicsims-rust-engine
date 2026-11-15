@@ -170,6 +170,7 @@ impl<A: Agent> Fight<A> {
             after_attacker * target_multiplier * outcome_multiplier,
             result.outcome & OUTCOME_BLOCK != 0 && after_outcome == 0.0,
         );
+        self.player_hit_non_physical = values.school & 1 == 0;
         // Go ApplyPostOutcomeDamageModifiers: the player's dynamic damage taken modifiers, as
         // an absorb shield, then the floor.
         // Go registers the item shields before the class's modifiers.

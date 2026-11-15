@@ -228,8 +228,9 @@ fn shield_slam_and_shield_bash_strike_with_the_main_hand() {
             json!(["ProcMaskMeleeOHSpecial"])
         );
     }
-    // Rank 4 at spell level 60 carries rank 1's measured 4.45 a spell level: 267.
-    assert_eq!(spell(&forever, SHIELD_SLAM).1["flat_threat_bonus"], 267.0);
+    // Rank 4 at spell level 60 takes the line through the measured ranks 2 and 3 (203 at spell
+    // level 48, 229 at 54): 255.
+    assert_eq!(spell(&forever, SHIELD_SLAM).1["flat_threat_bonus"], 255.0);
     assert_eq!(spell(&reference, SHIELD_SLAM).1["flat_threat_bonus"], 508.0);
     // Windfury Totem rolls on them since the hotfixes of 13 November 2026 ("activated by all
     // melee abilities even if it doesn't involve your main hand weapon"); it never did before.

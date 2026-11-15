@@ -8,6 +8,11 @@
 //! cost comes back. In raw combat logs of client 1.60.1.70862, 36 avoided Executes from 14
 //! warriors all keep the pool, for example 46.9 rage to 37.9 after a parry and one Bloodrage
 //! tick at a cost of 10.
+//!
+//! Under Forever's rules the cast also makes an attack of its own before the damage, and each
+//! of the two that lands rolls the party's Windfury Totem. Combat logs taken after the hotfix
+//! of 14 November 2026: the totem's strike followed 267 of 846 landed Executes (31.6%, where
+//! one roll gives 20%) and 35 of 185 dodged ones (18.9%, where the damage rolled nothing).
 
 use crate::core::fight::{melee::PhysicalOutcome, Agent, Fight, Side, SpellId};
 
@@ -16,6 +21,7 @@ pub(crate) struct Execute {
     pub(crate) base_damage: f64,
     pub(crate) damage_per_rage: f64,
     pub(crate) extra_rage_on_landed: bool,
+    pub(crate) cast_attack_rolls_windfury_totem: bool,
 }
 
 pub(crate) fn apply<A: Agent>(fight: &mut Fight<A>, spell: SpellId, target: Side, params: Execute) {
@@ -27,6 +33,9 @@ pub(crate) fn apply<A: Agent>(fight: &mut Fight<A>, spell: SpellId, target: Side
     if !params.extra_rage_on_landed {
         fight.spend_rage(extra, metrics);
         fight.resources[metrics].events -= 1;
+    }
+    if params.cast_attack_rolls_windfury_totem {
+        fight.windfury_cast_attack(spell, target);
     }
     // Go's arm64 build fuses this multiply and add.
     let base = params.damage_per_rage.mul_add(extra, params.base_damage);

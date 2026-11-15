@@ -300,13 +300,14 @@ fn blessed_band_of_light_gives_no_hit() {
 }
 
 /// The Darkspear Signets (272068 to 272071) restore what the Alliance's Militant's Bands
-/// (271913 to 271916) do, 3, 3, 2 and 2 mana per 5 sec, where the pinned rows say 9, 7, 6 and 4.
+/// (271913 to 271916) do, 4, 3, 3 and 2 mana per 5 sec as the live Forever tooltips of both
+/// rings read on 15 November 2026, where the pinned rows say 9, 7, 6 and 4.
 #[test]
 fn darkspear_signets_match_the_militants_bands() {
     const RINGS: [(i64, i64, f64, f64); 4] = [
-        (272_068, 271_913, 3.0, 9.0),
+        (272_068, 271_913, 4.0, 9.0),
         (272_069, 271_914, 3.0, 7.0),
-        (272_070, 271_915, 2.0, 6.0),
+        (272_070, 271_915, 3.0, 6.0),
         (272_071, 271_916, 2.0, 4.0),
     ];
     for (signet, band, live, pinned) in RINGS {
@@ -319,4 +320,22 @@ fn darkspear_signets_match_the_militants_bands() {
             "{signet}"
         );
     }
+}
+
+/// Channeler's Ring (272406) "now has Spell Power (was Spirit)": its live Forever tooltip of 15
+/// November 2026 reads +14 Intellect, 1% hit and up to 9 damage and healing from magical spells,
+/// where the pinned row gives 8 Spirit. The reference keeps the Spirit.
+#[test]
+fn channelers_ring_trades_spirit_for_spell_power() {
+    const RING: i64 = 272_406;
+    for (stat, value) in [
+        ("SpellDamage", 9.0),
+        ("HealingPower", 9.0),
+        ("Spirit", 0.0),
+        ("MeleeHitRating", 10.0),
+    ] {
+        assert_eq!(added(RING, Rules::Forever, stat), value, "{stat}");
+    }
+    assert!(added(RING, Rules::GoReference, "Spirit") >= 8.0);
+    assert_eq!(added(RING, Rules::GoReference, "SpellDamage"), 0.0);
 }

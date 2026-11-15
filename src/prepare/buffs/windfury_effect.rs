@@ -192,6 +192,9 @@ pub(crate) fn windfury_totem_effect(
         effect["spend_require_damage"] = json!(false);
         effect["trigger_spends_no_charge"] = json!(true);
         effect["any_outcome_spends"] = json!(true);
+        // Since the hotfixes of 13 November 2026 the proc is a weapon strike, so the charges
+        // above are never granted (docs/mechanics.md, the hotfixes of 13 November 2026).
+        effect["strike_attack_power"] = json!(super::generated::WINDFURY_TOTEM.known_value(0));
     }
     Some(effect)
 }

@@ -143,6 +143,8 @@ fn a_hidden_line_leaves_berserker_rage_unused() {
     );
     // Shown, it goes every 30 seconds once the autocast cooldowns ahead of it have had the GCD.
     let shown = casts(&logs, BERSERKER_RAGE);
+    // It can wait out one global cooldown when the cooldown ends inside one: the totem's strike
+    // moves the rage, and with it when Hamstring takes the GCD.
     assert_eq!(shown.len(), 3, "{shown:?}");
-    assert_eq!(shown[1] - shown[0], 30.0);
+    assert!((30.0..=31.5).contains(&(shown[1] - shown[0])), "{shown:?}");
 }
