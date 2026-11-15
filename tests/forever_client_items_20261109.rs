@@ -158,8 +158,9 @@ fn namas_necklace_carries_the_tooltips_stats() {
     assert_eq!(worn.1 - bare.1, 12.0, "Attack Power");
 }
 
-/// "+19 Attack Power against Humanoids" is melee attack power on a Humanoid target alone, as the
-/// Ceremonial Mallet's line against Undead; a target of another type or of none takes nothing.
+/// "+19 Attack Power against Humanoids" is attack power, melee and ranged, on a Humanoid target
+/// alone, as the Ceremonial Mallet's line against Undead; a target of another type or of none
+/// takes nothing.
 #[test]
 fn namas_necklace_bonus_applies_against_humanoids_only() {
     let humanoid = prepared(&with_target_type(
@@ -169,7 +170,8 @@ fn namas_necklace_bonus_applies_against_humanoids_only() {
     .unwrap_or_else(|err| panic!("{err}"));
     let bonus = necklace_bonuses(&humanoid);
     assert_eq!(bonus.len(), 1, "{bonus:?}");
-    assert_eq!(bonus[0]["melee_attack_power"], 19.0);
+    assert_eq!(bonus[0]["ranged_attack_power"], 19.0);
+    assert_eq!(bonus[0]["melee_attack_power"].as_f64().unwrap_or(0.0), 0.0);
     simulate_prepared(&humanoid).unwrap();
 
     for other in [

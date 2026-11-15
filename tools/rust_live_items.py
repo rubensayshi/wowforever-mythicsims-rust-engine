@@ -31,7 +31,8 @@ reference row). The rules, per stat of the row's base stats (scaling_options "0"
   21", "Grants an additional 18 spell damage against Demons") is not a stat of the row: it goes to
   data/forever-live-item-bonuses.jsonl, the schema of tools/rust_client_items.py's bonus file,
   which Forever's preparation reads the same way (src/prepare/forever_items.rs). Attack power
-  against a creature type is melee attack power only, as the client tool reads it;
+  against a creature type is melee and ranged attack power, as the client's equip spells for the
+  line carry both auras (see tools/rust_client_items.py);
 - a generic "+N Attack Power" equip line is melee and ranged: a row that holds the same ranged
   attack power as attack power takes N for both, and a row that holds attack power alone keeps
   it alone, since Forever's preparation gives an item's attack power to ranged as well

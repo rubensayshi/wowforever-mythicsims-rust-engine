@@ -158,7 +158,22 @@ fn the_hunters_seal_gives_no_ranged_attack_power_of_its_own() {
     assert_eq!(added(&seal, &without, "RangedAttackPower"), 48.0);
 }
 
-/// Against Demons the seal adds 45 melee attack power; against any other type, or none, nothing.
+/// A ranged Hunter's shots read the seal's attack power against Demons: the same request deals
+/// more damage when its target is a Demon than when it is of no type.
+#[test]
+fn the_hunters_seal_raises_ranged_damage_against_demons() {
+    let dps = |mob_type: Option<&str>| -> f64 {
+        let value = prepared(&hunter(ROYAL_SEAL_HUNTER, mob_type), Rules::Forever);
+        simulate(&value)["dps"]["avg"]
+            .as_f64()
+            .unwrap_or_else(|| panic!("no dps"))
+    };
+    let (demon, none) = (dps(Some("MobTypeDemon")), dps(None));
+    assert!(demon - none > 3.0, "Demon {demon}, no type {none}");
+}
+
+/// Against Demons the seal adds 45 attack power, melee and ranged, as the client's equip spells for
+/// such lines carry both auras; against any other type, or none, nothing.
 #[test]
 fn the_hunters_seal_adds_attack_power_against_demons_alone() {
     let demons = prepared(
@@ -166,9 +181,9 @@ fn the_hunters_seal_adds_attack_power_against_demons_alone() {
         Rules::Forever,
     );
     let effect = bonus(&demons, "Royal Seal of Eldre'Thalas").expect("the bonus against Demons");
-    assert_eq!(effect["melee_attack_power"], 45.0);
-    assert_eq!(effect["attack_power"], 0.0);
-    assert_eq!(effect["ranged_attack_power"], 0.0);
+    assert_eq!(effect["ranged_attack_power"], 45.0);
+    assert_eq!(effect["attack_power"], 45.0);
+    assert_eq!(effect["melee_attack_power"].as_f64().unwrap_or(0.0), 0.0);
     assert_eq!(effect["spell_damage"], 0.0);
     simulate(&demons);
     for mob_type in [None, Some("MobTypeUndead"), Some("MobTypeHumanoid")] {

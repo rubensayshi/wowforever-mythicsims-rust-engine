@@ -178,7 +178,7 @@ pub(crate) fn chance_on_hit_registrations(item: i32) -> Vec<(ProcKind, SpellData
 pub(crate) struct VersusAttackPower {
     /// The item's name, which its permanent aura is labelled with.
     pub(crate) name: String,
-    /// The melee attack power by the request's creature type (`MobTypeUndead`).
+    /// The attack power, melee and ranged, by the request's creature type (`MobTypeUndead`).
     pub(crate) bonuses: Vec<(String, f64)>,
     /// The spell damage by the request's creature type, as Mark of the Champion's.
     pub(crate) spell_bonuses: Vec<(String, f64)>,
