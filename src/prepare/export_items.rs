@@ -1498,14 +1498,21 @@ fn spell_data_damage_proc_effects(
             continue;
         }
         let position = spell_position(env, &ActionId::spell(damage.id));
-        let names = callback_names(listener.callback);
+        let mut names = callback_names(listener.callback);
+        // A live client equip proc's "Dealing damage" mask names periodic damage beside the
+        // hits (Bolt's Charged Eyeball): the runtime hears both, as the hits' listener over the
+        // ticks too.
+        let forever_equip = env.sim.rules == super::sim::Rules::Forever
+            && super::forever_effect_items::equip_damage_procs().any(|cfg| cfg.name == label);
+        let ticks = forever_equip && names == ["on_spell_hit_dealt", "on_periodic_damage_dealt"];
+        if ticks {
+            names.truncate(1);
+        }
         let outcome_ok =
             listener.outcome == HitOutcome::EMPTY || listener.outcome == HitOutcome::LANDED;
         let struck_ok = !struck || hears_the_targets_swings(env, &listener);
         // A live client equip proc's damage over time that rolls a magic hit goes on as the hit
         // lands and ticks its amount, as a Forever chance on hit's does.
-        let forever_equip = env.sim.rules == super::sim::Rules::Forever
-            && super::forever_effect_items::equip_damage_procs().any(|cfg| cfg.name == label);
         let shape = position.and_then(|position| {
             proc_damage_shape(env, damage, position).ok().or_else(|| {
                 forever_equip
@@ -1552,6 +1559,9 @@ fn spell_data_damage_proc_effects(
         }
         if struck {
             exported["struck"] = json!(true);
+        }
+        if ticks {
+            exported["ticks"] = json!(true);
         }
         effects.push(exported);
     }

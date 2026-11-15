@@ -32,7 +32,8 @@
 //!   stated rate, registered the same way: Bolder'ok Boulder, a Physical hit of 98 on the ranged
 //!   table, and Grass Killer, a Nature hit of 50 to 76 on the magic table. Grass Killer's "Deals 3
 //!   times as much damage to Plants" is never applied: the client has no Plant creature type and a
-//!   request can name none.
+//!   request can name none. Brush Cutter (274265), a one-hand axe, carries the same Grass Killer
+//!   (ItemEffect 233726) and is registered beside the blade.
 //! - Dreadfrost Saber (274603) is a spell data damage proc (`NewSpellDataDamageProc`), as Fiery
 //!   Plate Gauntlets' "Adds 4 fire damage to your weapon attack" is in the reference: its equip
 //!   aura (1294939) hears the wearer's landed main hand melee hits and casts a Frost hit of 1
@@ -41,6 +42,13 @@
 //!   is in the reference: its equip aura (1295064) hears the melee hits the wearer takes and, 10%
 //!   of the time and at most once in 3 sec, casts a Physical leech of 40 (1295065) on the
 //!   attacker. Only a character who tanks the target is struck.
+//! - Bolt's Charged Eyeball (280032) is one too: its equip aura (1311505) hears every hit and
+//!   tick of damage the wearer deals and, 15% of the time and at most once in 3 sec, casts
+//!   Grounded Electroshock (1315996), a Nature hit of 60 on the magic table, on the unit the
+//!   damage landed on. The tooltip's "to you or your current target" has no row of its own: the
+//!   hit's one effect aims at the unit the proc names, and no row states a hit on the wearer or a
+//!   chance of one, so the wearer is never hit. "Deals 3 times as much damage to Dinosaurs" never
+//!   applies: no creature type is a Dinosaur.
 //! - Heart of the Primeval (274615) is a stat on-use trinket (`NewSimpleStatActive`), as Talisman
 //!   of Ephemeral Power is in the reference: its client row carries the use as an item effect
 //!   (19 spell damage and healing for 30 sec, on the use spell's own cooldowns), which the shared
@@ -230,10 +238,16 @@ pub(crate) const CHANCE_ON_HIT_ITEMS: &[Registration] = &[
             rateless: true,
             ..SpellDataProc::EMPTY
         },
-        &[ItemVariant {
-            item_id: 274271,
-            item_name: "Deadhead Blade",
-        }],
+        &[
+            ItemVariant {
+                item_id: 274271,
+                item_name: "Deadhead Blade",
+            },
+            ItemVariant {
+                item_id: 274265,
+                item_name: "Brush Cutter",
+            },
+        ],
     ),
 ];
 
@@ -426,6 +440,20 @@ pub(crate) const EQUIP_DAMAGE_PROC_ITEMS: &[Registration] = &[
         &[ItemVariant {
             item_id: 274608,
             item_name: "Maw of Min'loth",
+        }],
+    ),
+    // Bolt's Charged Eyeball's equip aura hears the damage the wearer deals, ticks included, and
+    // casts a Nature hit on the unit it landed on (docs/mechanics.md).
+    Registration::Proc(
+        ProcKind::Damage,
+        SpellDataProc {
+            trigger_spell_id: 1311505,
+            buff_spell_id: 1315996,
+            ..SpellDataProc::EMPTY
+        },
+        &[ItemVariant {
+            item_id: 280032,
+            item_name: "Bolt's Charged Eyeball",
         }],
     ),
     // Farraki Kris's equip aura hears the wearer's harmful spells and casts a Periodic Leech on

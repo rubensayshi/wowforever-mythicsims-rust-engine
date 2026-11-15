@@ -1186,6 +1186,8 @@ pub(crate) struct DamageProc {
     pub(crate) taken_outcome: u16,
     /// Forever's rules, a damage shield's: a hit the player blocks in full brings no answer.
     pub(crate) skips_full_blocks: bool,
+    /// Forever's rules: the trigger spells' ticks are heard as their hits are.
+    pub(crate) ticks: bool,
 }
 
 /// A proc whose manager rolls on landed hits and whose handler a spell batch window later
@@ -2147,6 +2149,7 @@ pub(crate) fn damage_proc_of(effect: &Effect, spells: usize) -> Option<DamagePro
     let mut rng_label = None;
     let mut taken_outcome = 0;
     let mut skips_full_blocks = false;
+    let mut ticks = false;
     let (trigger_spells, struck, casts, landed_only, require_damage, proc_chance, spell, chances) =
         match effect {
             Effect::SpellDataDamageProc {
@@ -2162,9 +2165,11 @@ pub(crate) fn damage_proc_of(effect: &Effect, spells: usize) -> Option<DamagePro
                 rng_label: label,
                 taken_outcome: taken,
                 skips_full_blocks: skips,
+                ticks: hears_ticks,
                 ..
             } => {
                 skips_full_blocks = *skips;
+                ticks = *hears_ticks;
                 delay = *delay_ns;
                 rng_label = label.clone();
                 taken_outcome = outcome_bits(taken);
@@ -2219,6 +2224,7 @@ pub(crate) fn damage_proc_of(effect: &Effect, spells: usize) -> Option<DamagePro
         rng_label,
         taken_outcome,
         skips_full_blocks,
+        ticks,
     })
 }
 

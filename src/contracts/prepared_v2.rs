@@ -2906,6 +2906,11 @@ pub enum Effect {
         /// A block whose remainder an absorb takes is not one.
         #[serde(default, skip_serializing_if = "is_false")]
         skips_full_blocks: bool,
+        /// Forever's rules, a live client equip proc whose mask names periodic damage beside the
+        /// hits (Bolt's Charged Eyeball): the ticks of the trigger spells are heard as their hits
+        /// are.
+        #[serde(default, skip_serializing_if = "is_false")]
+        ticks: bool,
     },
     /// common/shared/shared_utils.go NewSpellDataAbsorbOnUse: the item use's aura shields the
     /// wearer for the absorb effect's roll against the schools its bits name.

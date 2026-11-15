@@ -458,6 +458,9 @@ NO_FIGHT_EFFECT = [
         r"Use: Sift through an [A-Za-z' ]+ Dirt Pile\. .*",
         # Egan's Blaster 13289: its use (spell 17368) frees the ghosts of a Stratholme quest.
         r"Use: Use to free Spectral and Ghostly Citizens\.",
+        # Ward of the Dead 217727, an item level 1 quest trinket: its equip spell (440841) shows a
+        # quest grave.
+        r"Equip: Reveals the grave which hides an offering\.",
     ]
 ]
 # Use, chance on hit and equip lines the engine models by hand
@@ -509,10 +512,13 @@ ENGINE_EFFECT = [
         # Fingerbreaker Stamp 276743: Strength while the wearer bleeds, which nothing in a fight
         # here causes, so the item is worn with its other lines (forever_effect_items.rs).
         "Equip: Increases Strength by 38 while affected by a Bleed.",
-        # Jom-jom's Gabbar 274952 and Deadhead Blade 274271.
+        # Jom-jom's Gabbar 274952, and Deadhead Blade 274271 and Brush Cutter 274265.
         "Chance on hit: Launch a boulder, dealing 98 Physical damage.",
         "Chance on hit: Assault the target with a dangerous toxin, dealing 50 to 76 Nature damage. "
         "Deals 3 times as much damage to Plants.",
+        # Bolt's Charged Eyeball 280032: Grounded Electroshocks (EQUIP_DAMAGE_PROC_ITEMS).
+        "Equip: Dealing damage has a chance to deal 60 Nature damage to you or your current "
+        "target. Deals 3 times as much damage to Dinosaurs. (Proc chance: 15%, 3s cooldown)",
     ]
 ]
 # Uses the engine never presses, by the exact line of the item it names: the item is taken with

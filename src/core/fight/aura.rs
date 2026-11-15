@@ -1335,6 +1335,9 @@ impl<A: Agent> Fight<A> {
                     A::on_periodic_damage_dealt(self, aura, kind, spell, result)
                 }
                 AuraBehavior::RevelationTrigger => self.revelation_callback(aura, spell, result),
+                AuraBehavior::SpellDataDamageProc(proc) if self.damage_procs[proc].ticks => {
+                    self.damage_proc_callback(aura, proc, Some(spell), result)
+                }
                 _ => {}
             }
         }
