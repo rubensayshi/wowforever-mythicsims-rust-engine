@@ -1793,6 +1793,23 @@ the Go goldens and exporter uses. The departures:
   (Judgement of Command a melee one since the hotfixes of 13 November 2026) and is not a spell of
   the mask either. A wearer with no mana bar wears the rod as a plain mace,
   and under the reference's rules it is still worn with its stats alone.
+- Bolt's Charged Eyeball (280032), trinket, item level 63 (`tests/forever_client_items_20261116.rs`):
+  "Equip: Dealing damage has a chance to deal 60 Nature damage to you or your current target.
+  Deals 3 times as much damage to Dinosaurs. (Proc chance: 15%, 3s cooldown)". The client rows
+  wago.tools serves (`product=wowf`, build 1.60.1.70938, read on 16 November 2026): ItemEffect
+  236825 equips Grounded Electroshocks (1311505), SpellAuraOptions 248082: ProcChance 15,
+  ProcCategoryRecovery 3000, ProcTypeMask 332116 (melee swings and abilities, ranged attacks and
+  abilities, harmful abilities and spells, and harmful periodic damage dealt). Its SpellEffect
+  1341855 is a dummy aura triggering Grounded Electroshock (1315996), a School Damage of 60,
+  Nature, magic defense, no variance and no coefficient, on implicit target 25 (the unit the proc
+  names); 1351835 is a dummy of 3, the tripling against Dinosaurs. It registers as an equip damage
+  proc (`forever_effect_items::EQUIP_DAMAGE_PROC_ITEMS`) whose listener hears the hits and, since
+  the mask names periodic damage, the ticks of the wearer's spells as well (`ticks` on the
+  `spell_data_damage_proc` effect). Each landed hit or tick rolls 15% while the 3 sec recovery is
+  off, and the shock rolls the magic hit and crit on the unit the damage landed on. No row holds
+  a hit on the wearer or a chance of one, so "to you or your current target" is read as the row
+  states it and the wearer is never hit. No creature type is a Dinosaur, so the tripling never
+  applies. Under the reference's rules the trinket is still refused as unknown.
 - Four items that refused players' sims on 13 November 2026 ("no item with id N") and two more
   rows a run of `tools/rust_client_items.py build` over every candidate found
   (`tests/forever_client_items_20261114b.rs`), from Wowhead's Forever tooltips and the client

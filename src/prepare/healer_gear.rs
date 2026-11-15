@@ -143,6 +143,11 @@ const READ_AURAS: &[i32] = &[
 /// build phase.
 pub(crate) fn apply(env: &mut Environment) -> Result<(), Refusal> {
     if !applies(env) {
+        // Sudden Insight restores mana on any spell cast, a damage spell's too, so Forever's
+        // rules give it to any spec that wears the five pieces.
+        if env.rules == Rules::Forever {
+            sudden_insight(env);
+        }
         return Ok(());
     }
     apply_client_set_bonuses(env);
@@ -809,17 +814,8 @@ fn stacking_stat_auras(env: &Environment) -> Vec<String> {
     labels
 }
 
-/// The healer gear's listeners: mana on cast and The Furious Storm.
-pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>) -> Vec<Value> {
-    if !applies(env) {
-        // The Furious Storm acts on damage spells too, so Forever's rules describe it for any
-        // spec.
-        return if env.rules == Rules::Forever {
-            furious_storm_effects(env)
-        } else {
-            Vec::new()
-        };
-    }
+/// The mana listeners' effects: Sudden Insight for any spec, and a healer's mana returns.
+fn mana_on_cast_effects(env: &Environment) -> Vec<Value> {
     let unit = env.player;
     let book = &env.sim.unit(unit).spellbook;
     let mut effects = Vec::new();
@@ -855,6 +851,25 @@ pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>)
             "crit_only": listener.crit_only,
         }));
     }
+    effects
+}
+
+/// The healer gear's listeners: mana on cast and The Furious Storm.
+pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>) -> Vec<Value> {
+    if !applies(env) {
+        // The Furious Storm and Sudden Insight act on damage spells too, so Forever's rules
+        // describe them for any spec.
+        return if env.rules == Rules::Forever {
+            let mut effects = mana_on_cast_effects(env);
+            effects.extend(furious_storm_effects(env));
+            effects
+        } else {
+            Vec::new()
+        };
+    }
+    let unit = env.player;
+    let book = &env.sim.unit(unit).spellbook;
+    let mut effects = mana_on_cast_effects(env);
     for share in &env.healer_gear.heal_shares {
         effects.push(json!({
             "kind": "shield_on_heal", "item_id": 0, "aura": env.sim.aura(share.aura).label,
