@@ -44,6 +44,10 @@
 //! (1293518): every field of theirs is the client's, read from wago.tools `product=wowf` with
 //! `build=1.60.1.70938` on 15 November 2026.
 //!
+//! Nor are Bolt's Charged Eyeball's Grounded Electroshocks (1311505) and the Grounded
+//! Electroshock it casts (1315996): every field of theirs is the client's, read from wago.tools
+//! `product=wowf` with `build=1.60.1.70938` on 16 November 2026.
+//!
 //! A field the client hides and no tooltip states is left at zero: no range check, no missile
 //! travel, no spell power or attack power share. The one exception is `PERIODIC_CAN_CRIT`, which
 //! every Forever-added physical and Fire periodic damage row in the pinned store carries (19 of
@@ -131,6 +135,8 @@ pub(crate) fn rows() -> Vec<Spell> {
         smite(),
         bolderok_boulder(),
         grass_killer(),
+        grounded_electroshocks(),
+        grounded_electroshock(),
         zealot_plate_trigger(),
         zealot_plate_energize(),
         shield_spike(),
@@ -227,6 +233,99 @@ fn grass_killer() -> Spell {
                 ..Effect::default()
             },
         ],
+        ..Spell::default()
+    }
+}
+
+/// Bolt's Charged Eyeball's equip spell (ItemEffect 236825, trigger type 1, on equip): "Dealing
+/// damage has a chance to deal 60 Nature damage to you or your current target. Deals 3 times as
+/// much damage to Dinosaurs. (Proc chance: 15%, 3s cooldown)". An aura on the wearer that casts
+/// another spell on a hit, as Dreadfrost Saber's does.
+fn grounded_electroshocks() -> Spell {
+    let mut attr = [0; 17];
+    // SpellMisc 862178: Attributes_0 64 (a passive) and nothing else.
+    attr[0] = 64;
+    Spell {
+        id: 1_311_505,
+        name: "Grounded Electroshocks".to_string(),
+        // SpellMisc 862178: SchoolMask 1, the aura's own. The damage is the other row's.
+        school: 1,
+        attr,
+        // SpellAuraOptions 248082: ProcChance 15 (the tooltip's 15%), ProcCategoryRecovery 3000
+        // (the tooltip's 3s cooldown) and ProcTypeMask 332116: melee swings, melee abilities,
+        // ranged attacks, ranged abilities, harmful abilities, harmful spells and harmful
+        // periodic damage dealt, the tooltip's "Dealing damage".
+        proc_chance: 15,
+        proc_flags: [332_116, 0],
+        icd_ms: 3000,
+        // The chance column is the roll (`proc_chance_source::COLUMN`, the default).
+        ref_ids: vec![1_315_996],
+        effects: vec![
+            // SpellEffect 1341855: Apply Aura (6) of Dummy (4) on the caster, triggering 1315996.
+            Effect {
+                id: 1_341_855,
+                spell_id: 1_311_505,
+                index: 0,
+                effect_type: 6,
+                aura: 4,
+                pvp_mult: 1.0,
+                trigger_id: 1_315_996,
+                chain_amp: 1.0,
+                target: [1, 0],
+                ..Effect::default()
+            },
+            // SpellEffect 1351835: Apply Aura (6) of Dummy (4) on the caster, base points 3: the
+            // "3 times as much damage" to Dinosaurs, which the server applies. The client's
+            // creature types (CreatureType) have no Dinosaur and a request names none, so nothing
+            // reads it.
+            Effect {
+                id: 1_351_835,
+                spell_id: 1_311_505,
+                index: 1,
+                effect_type: 6,
+                aura: 4,
+                base_points: 3.0,
+                pvp_mult: 1.0,
+                chain_amp: 1.0,
+                target: [1, 0],
+                ..Effect::default()
+            },
+        ],
+        ..Spell::default()
+    }
+}
+
+/// The spell Bolt's Charged Eyeball's aura casts: a Nature hit of 60. Its one effect aims at the
+/// unit the proc names (implicit target 25, any unit): the unit the wearer's damage landed on.
+/// No row holds a hit on the wearer, or a chance of one, beside it, so "to you or your current
+/// target" is read as the row states it, a hit on the target.
+fn grounded_electroshock() -> Spell {
+    let mut attr = [0; 17];
+    // SpellMisc 862172: Attributes_15 8192 and nothing else.
+    attr[15] = ATTR_15_BIT_13;
+    Spell {
+        id: 1_315_996,
+        name: "Grounded Electroshock".to_string(),
+        // SpellMisc 862172: SchoolMask 8, Nature.
+        school: 8,
+        attr,
+        // SpellMisc 862172: RangeIndex 6, SpellRange's 100 yards.
+        max_range: 100.0,
+        // SpellCategories 188422: magic.
+        defense_type: 1,
+        // SpellEffect 1348627: School Damage (2) of 60 to the target (25), with no variance and
+        // no spell power or attack power coefficient.
+        effects: vec![Effect {
+            id: 1_348_627,
+            spell_id: 1_315_996,
+            index: 0,
+            effect_type: 2,
+            base_points: 60.0,
+            pvp_mult: 1.0,
+            chain_amp: 1.0,
+            target: [25, 0],
+            ..Effect::default()
+        }],
         ..Spell::default()
     }
 }
