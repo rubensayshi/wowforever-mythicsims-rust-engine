@@ -31,6 +31,9 @@ pub(crate) struct RageBar {
     /// Forever's rules: the rage a point of damage taken gives, counted before armor, block and
     /// absorbs. Zero for the Go reference, whose rule reads maximum health.
     pub(crate) damage_taken_rage_per_damage: f64,
+    /// Forever's rules: what a direct hit of a school other than Physical multiplies the rage
+    /// from damage taken by. Zero leaves it a physical hit's.
+    pub(crate) spell_damage_taken_rage_multiplier: f64,
     pub(crate) threat_per_rage: f64,
     /// Go `RageGainThreatMultiplied` (patch 182): a gain counts `threat_per_rage` times the
     /// player's threat multiplier at the gain, split between the targets at the end of the fight.
@@ -231,7 +234,12 @@ impl<A: Agent> Fight<A> {
                 return;
             }
             let bar = self.rage_bar();
-            let generated = pre_armor * per_damage * bar.damage_taken_multiplier;
+            let mut generated = pre_armor * per_damage * bar.damage_taken_multiplier;
+            // A direct hit of a school other than Physical gives twice a physical hit's rage
+            // (prepare/rage.rs).
+            if self.player_hit_non_physical && bar.spell_damage_taken_rage_multiplier > 0.0 {
+                generated *= bar.spell_damage_taken_rage_multiplier;
+            }
             let metrics = bar.damage_taken_metrics;
             self.add_rage(generated, metrics);
             return;

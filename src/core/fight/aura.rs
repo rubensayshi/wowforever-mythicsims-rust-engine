@@ -1649,7 +1649,7 @@ impl<A: Agent> Fight<A> {
     /// cooldown, the chance roll; then charges, one fewer when an auto granted them, and an
     /// extra main hand attack at once. Under Forever's rules every charge, and the auto that
     /// granted them spends none.
-    fn windfury_trigger(&mut self, aura: AuraRef, spell: SpellId, result: &SpellResult) {
+    pub(crate) fn windfury_trigger(&mut self, aura: AuraRef, spell: SpellId, result: &SpellResult) {
         let windfury = self.windfury.as_ref().expect("Windfury Totem is bound");
         if !windfury.trigger_spells[spell] || result.outcome & super::OUTCOME_LANDED == 0 {
             return;
@@ -1657,11 +1657,12 @@ impl<A: Agent> Fight<A> {
         if windfury.trigger_require_damage && result.damage == 0.0 {
             return;
         }
-        let (trigger_chance, proc_aura, extra, keeps_charge) = (
+        let (trigger_chance, proc_aura, extra, keeps_charge, strike) = (
             windfury.trigger_chance,
             windfury.proc_aura,
             windfury.extra,
             windfury.trigger_spends_no_charge,
+            windfury.strike,
         );
         let icd = self.aura(aura).icd;
         if let Some((timer, _)) = icd {
@@ -1674,6 +1675,14 @@ impl<A: Agent> Fight<A> {
         }
         if let Some((timer, duration)) = icd {
             self.timers[timer] = self.now + duration;
+        }
+        // Forever's rules since the hotfixes of 13 November 2026: the proc is a weapon strike on
+        // the unit hit, cast at once. It grants no charges of attack power and is no swing a
+        // queued Heroic Strike could replace.
+        if strike {
+            let extra = extra.expect("a Windfury Totem a spell triggers has an extra attack");
+            self.cast(extra, result.target);
+            return;
         }
         self.activate_aura(proc_aura);
         let mut charges = self.aura(proc_aura).max_stacks;
@@ -1741,6 +1750,10 @@ impl<A: Agent> Fight<A> {
                     || (state.require_damage && result.damage == 0.0)))
             || (state.taken_outcome != 0 && result.outcome & state.taken_outcome == 0)
         {
+            return;
+        }
+        // Forever's damage shields: the target's swing blocked in full brings no answer.
+        if state.skips_full_blocks && spell.is_none() && self.player_hit_pre_armor.1 {
             return;
         }
         let (chance, damage_spell) = (state.chance, state.spell);

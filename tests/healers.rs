@@ -437,6 +437,9 @@ fn forever_healer_sims_count_healing_less_overhealing() {
     // Judgement of Wisdom rolls on a missed hit under the reference's rules and not under
     // Forever's, which would part the rolls: the raid leaves it off.
     holy["raid"]["debuffs"]["judgementOfWisdom"] = false.into();
+    // Windfury Totem's proc is a weapon strike under Forever's rules and an extra swing under
+    // the reference's, which would part the rolls too: the party stands none.
+    holy["raid"]["parties"][0]["buffs"]["windfuryTotem"] = false.into();
     // Talents that mean the same in the reference's tree and push 113554's, which Forever's
     // rules read, so both draw the same rolls: Divine Strength 5, Healing Light 3, Infusion of
     // Light 2, Illumination 5, Divine Favor and Holy Shock; Precision 3, Guardian's Favor 2,

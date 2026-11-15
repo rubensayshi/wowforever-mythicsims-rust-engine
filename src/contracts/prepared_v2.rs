@@ -2501,6 +2501,12 @@ pub enum Effect {
         /// (Forever combat logs, 8 of 8 missed swings). Without it only landed autos do.
         #[serde(default, skip_serializing_if = "is_false")]
         any_outcome_spends: bool,
+        /// Forever's rules since the hotfixes of 13 November 2026: the proc casts the extra
+        /// attack as a weapon strike, the main hand's weapon damage with this much attack power
+        /// added, on the special attack table. No charges of attack power are granted, and a
+        /// queued swing replacement leaves the strike alone.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        strike_attack_power: Option<f64>,
     },
     /// The raid's Sunder Armor, ramped one stack a period from the pull; target armor at
     /// each stack count, as Go computes it.
@@ -2892,6 +2898,10 @@ pub enum Effect {
         /// outcome the other fields allow.
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         taken_outcome: Vec<String>,
+        /// Forever's rules, a damage shield's: a hit the player blocks in full brings no answer.
+        /// A block whose remainder an absorb takes is not one.
+        #[serde(default, skip_serializing_if = "is_false")]
+        skips_full_blocks: bool,
     },
     /// common/shared/shared_utils.go NewSpellDataAbsorbOnUse: the item use's aura shields the
     /// wearer for the absorb effect's roll against the schools its bits name.
@@ -4248,6 +4258,10 @@ pub enum Effect {
         /// charge.
         #[serde(default, skip_serializing_if = "is_false")]
         any_outcome_spends: bool,
+        /// Forever's rules, as on the party's totem: the proc casts the extra attack as a weapon
+        /// strike with this much attack power added, and grants no charges.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        strike_attack_power: Option<f64>,
     },
     /// Mana Spring Totem: the water totem's aura, whose MP5 is a class stat aura.
     ManaSpringTotem {
@@ -4417,6 +4431,10 @@ pub enum Effect {
         /// Without it, as in Go, 10 times the damage before armor over maximum health.
         #[serde(default, skip_serializing_if = "is_zero_f64")]
         damage_taken_rage_per_damage: f64,
+        /// Forever's rules: what a direct hit of a school other than Physical multiplies that
+        /// rage by. Without it such a hit gives a physical hit's rage.
+        #[serde(default, skip_serializing_if = "is_zero_f64")]
+        spell_damage_taken_rage_multiplier: f64,
     },
     /// Go `AttachMultiplicativePseudoStatBuff` on the player's damage taken multiplier, for
     /// auras that are not up from the reset: the gain multiplies, the expiry divides.
@@ -4528,6 +4546,10 @@ pub enum Effect {
         /// gets none of its cost back.
         #[serde(default, skip_serializing_if = "is_false")]
         extra_rage_on_landed: bool,
+        /// Forever's rules: the cast makes an attack of its own before the damage, and one that
+        /// lands rolls Windfury Totem, so an Execute rolls the totem twice.
+        #[serde(default, skip_serializing_if = "is_false")]
+        cast_attack_rolls_windfury_totem: bool,
     },
     /// Hamstring: a fixed base on the special hit table.
     Hamstring {

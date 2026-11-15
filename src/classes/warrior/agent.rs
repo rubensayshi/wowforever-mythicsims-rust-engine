@@ -951,12 +951,14 @@ impl WarriorAgent {
                     base_damage,
                     damage_per_rage,
                     extra_rage_on_landed,
+                    cast_attack_rolls_windfury_totem,
                     ..
                 } => {
                     fight.agent.execute = Some(Execute {
                         base_damage: *base_damage,
                         damage_per_rage: *damage_per_rage,
                         extra_rage_on_landed: *extra_rage_on_landed,
+                        cast_attack_rolls_windfury_totem: *cast_attack_rolls_windfury_totem,
                     })
                 }
                 Effect::Hamstring { base_damage, .. } => fight.agent.hamstring = *base_damage,

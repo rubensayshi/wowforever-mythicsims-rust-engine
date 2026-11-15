@@ -134,6 +134,8 @@ pub(crate) fn rage_bar_effect(
         if let Some(attacker) = sim.unit(unit).current_target {
             effect["damage_taken_rage_per_damage"] =
                 serde_json::json!(damage_taken_rage_per_damage(sim.unit(attacker).level));
+            effect["spell_damage_taken_rage_multiplier"] =
+                serde_json::json!(SPELL_DAMAGE_TAKEN_RAGE_MULTIPLIER);
         }
     }
     effect
@@ -148,17 +150,32 @@ pub(crate) fn rage_bar_effect(
 /// instead of 50%.
 ///
 /// `A` by the attacker's level is measured on combat logs of warriors and bears taking melee
-/// hits (client 1.60.1.70862 and earlier): 21.8% from attackers of levels 17 to 38, 23.9% at 42
-/// and 31% at 44 on hundreds of hits each, 36% at 46 and 38% at 50 on a few dozen. The 40% at
-/// 63 is the top of the notes' range and is not measured; no log covers attackers of 47 to 49
-/// or 51 to 63. Levels between two rows take the line between them.
+/// hits (client 1.60.1.70862 to 1.60.1.70938): 21.8% from attackers of levels 17 to 38, 23.9% at
+/// 42, 31% at 44, 36% at 46 and 37.7% at 47 on hundreds of hits each. From 47 to 59 it holds
+/// near 38%: a protection warrior's logs of levels 45 to 59 read `2.5 * (1 - A)` as 1.550 from
+/// attackers of level 55 (281 hits), 1.545 at 56 (233), 1.551 at 57 (186), 1.559 at 58 (180)
+/// and 1.544 at 59 (38), where a line from 38% at 50 to 40% at 63 gave 1.0% to 1.8% too little
+/// rage at 57 to 59. The 40% at 63 is the top of the notes' range and is not measured; no log
+/// covers attackers of 60 to 63, which take the line from 38% at 59. Levels between two rows
+/// take the line between them.
 const DAMAGE_TAKEN_RAGE_FACTOR_FOREVER: f64 = 2.5;
-const DAMAGE_TAKEN_RAGE_ASSUMED_ARMOR: [(i32, f64); 6] = [
+/// A direct hit of a school other than Physical gives twice the rage of a physical one. A
+/// warrior's combat logs of levels 27 to 38 (clients 1.60.1.70862 to 1.60.1.70938), hits from
+/// rage-using mobs with Defensive Stance divided out, read `2.5 * (1 - A)` as 1.960 on 3,702
+/// physical swings (1.944 to 1.979) and 2.08 on 74 physical Shoots, against 3.85 on 26 arcane
+/// swings (3.80 to 3.89) and 3.83 on 9 fire swings. Periodic ticks read the same double (Poison
+/// 3.75 on 116, Localized Toxin 3.86 on 41, Rend 3.76 on 44); a tick taken gives no rage here
+/// yet. The reference has no such rule.
+const SPELL_DAMAGE_TAKEN_RAGE_MULTIPLIER: f64 = 2.0;
+const DAMAGE_TAKEN_RAGE_ASSUMED_ARMOR: [(i32, f64); 9] = [
     (38, 0.218),
     (42, 0.239),
     (44, 0.31),
     (46, 0.36),
+    (47, 0.377),
     (50, 0.38),
+    (55, 0.381),
+    (59, 0.38),
     (63, 0.40),
 ];
 
@@ -199,6 +216,12 @@ mod damage_taken_rage_tests {
         assert_eq!(damage_taken_rage_assumed_armor(38), 0.218);
         assert!((damage_taken_rage_assumed_armor(40) - 0.2285).abs() < 1e-12);
         assert_eq!(damage_taken_rage_assumed_armor(44), 0.31);
+        assert_eq!(damage_taken_rage_assumed_armor(47), 0.377);
+        // Held near 38% through attackers of level 59, then the line to the notes' 40% at 63.
+        assert_eq!(damage_taken_rage_assumed_armor(55), 0.381);
+        assert!((damage_taken_rage_assumed_armor(57) - 0.3805).abs() < 1e-12);
+        assert_eq!(damage_taken_rage_assumed_armor(59), 0.38);
+        assert!((damage_taken_rage_assumed_armor(60) - 0.385).abs() < 1e-12);
         assert_eq!(damage_taken_rage_assumed_armor(63), 0.40);
         assert_eq!(damage_taken_rage_assumed_armor(70), 0.40);
     }

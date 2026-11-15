@@ -516,14 +516,19 @@ the Go goldens and exporter uses. The departures:
     client 1.60.1.70938 still showed the hit on 14 November 2026, so the row is the post's.
   - "Darkspear signet rings have had their Mp5 corrected and now match Alliance-equivalent
     rings." The Alliance's rings of the same four item levels are the Militant's Bands (271913
-    to 271916, Theramore Expeditionary Force), 3, 3, 2 and 2 mana per 5 sec at item levels 63,
-    53, 43 and 33, so the live rows of the Darkspear Signets (272068 to 272071) take those in
-    place of 9, 7, 6 and 4. The post gives no number and both tooltip sources still showed the
-    old ones on 14 November 2026: the values are read from "now match".
-  - Not taken, each waiting on a row or a tooltip that shows the change: "Channeler's Ring now
-    has Spell Power (was Spirit)" (272406; no amount is stated), "Everstaring Abomination Eye's
-    Spirit stats corrected" (284097), "The Bad Hat no longer provides an incorrect amount of
-    spell power" (260212) and "The Souvenir Sea Shell's stats have been corrected" (274749).
+    to 271916, Theramore Expeditionary Force). The live Forever tooltips of both sets read 4, 3,
+    3 and 2 mana per 5 sec at item levels 63, 53, 43 and 33 on 15 November 2026, so the live
+    rows of the Darkspear Signets (272068 to 272071) and of the two Militant's Bands whose
+    reference rows differ (271913 at 3, 271915 at 2) take those in place of 9, 7, 6 and 4.
+  - "Channeler's Ring now has Spell Power (was Spirit)" (272406): its live tooltip of 15
+    November 2026 reads +14 Intellect, 1% hit and "Increases damage and healing done by magical
+    spells and effects by up to 9", so the live row trades the 8 Spirit for 9 spell damage and
+    9 healing. "The Bad Hat no longer provides an incorrect amount of spell power" (260212): its
+    tooltip states 37 healing and 12 damage and no Shadow damage, so the live row drops the
+    reference's 23 Shadow damage. "The Souvenir Sea Shell's stats have been corrected" (274749):
+    +10 Stamina, where the reference says 13.
+  - Not taken, each waiting on a row or a tooltip that shows the change: "Everstaring
+    Abomination Eye's Spirit stats corrected" (284097).
     "Gloves of Holy Might is now only activated by spells and abilities that are harmful and
     deal damage" (867): Wowhead's tooltip names spell 1330855 for its equip effect (ItemEffect
     238916 in client 1.60.1.70938; a 15% chance with a 20 second cooldown), which the pinned
@@ -1328,12 +1333,48 @@ the Go goldens and exporter uses. The departures:
   for 8, 8, 9, 10 and 11 read 12.0, 12.2, 13.5, 15.0 and 16.7), with nothing flat. The reference
   adds 135 to every rank of Hamstring and gives Shield Bash its damage
   (`tests/forever_warrior_threat_20261107.rs`).
+- Forever's rules of 15 November 2026 (`tests/forever_rules_20261115.rs`):
+  - Windfury Totem's proc is a weapon strike. The live rows (Wowhead Forever, 15 November 2026):
+    10610 now deals weapon damage, with a 100 ms cooldown, and applies no attack power aura; the
+    party aura 10612 holds the 246 attack power as a dummy beside its 20% proc. So under
+    Forever's rules a proc casts one main hand strike at once: the main hand's weapon damage with
+    the totem's attack power added, on the special attack table (it never glances), with no
+    charges of attack power and no Heroic Strike in its place. It keeps the main hand auto's
+    listeners: seals, chance on hit items, Sword Specialization and rage hear it as a swing.
+    Combat logs taken after the hotfix of 14 November 2026, counted on strikes with nothing else
+    within 150 ms: Sword Specialization 8 of 198 (white swings 4.8%), Hand of Justice 4 of 272,
+    Seal of Command 29 of 136, Seal of Fury 88 of 97, Seal of Righteousness 32 of 38, and Echo
+    of Command 0 of 64 (the Unsealed Wrath rule above holds). Maelstrom Weapon takes no stack
+    from it: 0 of 140 landed strikes of ranks 1 and 2 and 0 of 121 of rank 3. An Execute's cast
+    makes an attack of its own before the damage, and a landed one rolls the totem: the strike
+    followed 267 of 846 landed Executes (31.6%, where one roll gives 20%) and 35 of 185 dodged
+    ones (18.9%). The Sweeping Strikes copy still never rolls it (0 of 490).
+  - A damage shield (Thorns, Retribution Aura, an item's) answers no hit blocked in full. A
+    protection warrior's logs of levels 45 to 59: Thorns answered 1 of 8,334 full blocks, and
+    Razorsteel Shoulders' shield 34 of 5,281, against 3,835 of 3,840 partial blocks and 15,042
+    of 15,069 hits. A block whose remainder an absorb takes still brings one.
+  - A direct hit taken of a school other than Physical gives twice the rage of a physical one: a
+    warrior's logs of levels 27 to 38, hits from rage-using mobs with Defensive Stance divided out,
+    read 3.85 on 26 arcane swings and 3.83 on 9 fire swings against 1.96 on 3,702 physical ones
+    (periodic ticks read the same double, but a tick taken gives no rage here yet). Rage from
+    damage taken holds near 38% assumed armor from attackers of level 47 to 59 (a protection
+    warrior's logs: 281, 233, 186, 180 and 38 hits from levels 55 to 59), then takes the line to
+    the notes' 40% at 63, so a level 63 boss is unchanged (`src/prepare/rage.rs`).
+  - Live item rows (Wowhead Forever tooltips, 15 November 2026): Diabolic Mantle (18757) +16
+    Stamina, 5 mana per 5 sec and 17 Fire damage; the Darkspear Signets, Militant's Bands,
+    Channeler's Ring, Bad Hat and Souvenir Sea Shell under the hotfixes of 13 November 2026
+    above.
 - Heroic Strike, Cleave and Slam add whole numbers of flat threat, from Forever combat logs on
   client 1.60.1.70862 (8 November 2026). Heroic Strike ranks 1 to 4 add 17, 28, 40 and 60 (Rank
   4 measured at 60.08 over 104 clean readings, Rank 3 at 39.99) and ranks 5 and up 2.5 a spell
   level (80 to 150); Cleave rank 2 adds 46 and ranks 3 to 5 the 1.5 a spell level ranks 1 and 2
-  measure (60, 75 and 90); Slam adds 1.5 a spell level on every rank, rounded (Rank 1 at spell
-  level 20 adds 30, rank 2 45). The reference adds 2.54 a spell level for Heroic Strike, 1.53 for
+  measure (60 and 75; rank 5 below); Slam adds 1.5 a spell level on every rank, rounded (Rank 1 at
+  spell level 20 adds 30, rank 2 45). A protection warrior's combat and threat logs at levels 46
+  to 59 (clients 1.60.1.70862 to 1.60.1.70938) read Cleave rank 4 (11609) at 80.2 over 53
+  Cleaves, 80 split over the targets it lands on, so rank 5 (20569, not measured) takes rank 4's
+  1.6 a spell level, 96. Shield Slam ranks 2 and 3 read 202.85 over 379 slams and 229.25 over 36,
+  not rank 1's 4.45 a spell level (214 and 240): ranks 1 to 3 add 178, 203 and 229, and rank 4
+  (not measured) takes the line through ranks 2 and 3, 255. The reference adds 2.54 a spell level for Heroic Strike, 1.53 for
   Cleave and a flat 140 for every rank of Slam (`tests/classes/warrior/flat_threat.rs`).
 - Bloodrage's threat, from Forever combat logs: its instant 10 rage makes 50 threat in Battle
   and Defensive Stance alike while its ticks take the stance, and rage gained before the pull

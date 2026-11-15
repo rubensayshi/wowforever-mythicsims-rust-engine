@@ -257,18 +257,21 @@ fn charges_after_auto_procs(logs: &str) -> Vec<(i32, i32)> {
     left
 }
 
-/// After a main hand auto procs the totem and its extra swing goes off, one charge is left
-/// under Forever's rules: the proc grants both and the auto spends none. The reference takes
-/// one off for the auto, and the extra swing spends the other.
+/// The reference grants one charge of attack power after a main hand auto procs the totem,
+/// which a landed extra swing spends. Forever's rules grant none: since the hotfixes of 13
+/// November 2026 the proc is a weapon strike with the totem's attack power added (the live
+/// rows of 10610 and 10612, `tests/forever_rules_20261115.rs`).
 #[test]
-fn an_auto_proc_leaves_one_charge_after_its_extra_swing() {
-    let forever = charges_after_auto_procs(&fury_log(Rules::Forever));
-    assert!(forever.len() > 5, "{forever:?}");
+fn an_auto_proc_grants_charges_in_the_reference_only() {
+    let forever = fury_log(Rules::Forever);
     assert!(
-        forever.iter().all(|&charges| charges == (2, 1)),
-        "{forever:?}"
+        forever.contains(&format!("Tag: {TOTEM_SWING}}}")),
+        "no totem strike"
     );
-    // The reference grants one charge fewer, which a landed extra swing spends.
+    assert!(
+        !forever.lines().any(|line| charge_change(line).is_some()),
+        "Forever's totem granted charges"
+    );
     let reference = charges_after_auto_procs(&fury_log(Rules::GoReference));
     assert!(reference.len() > 5, "{reference:?}");
     assert!(
@@ -311,13 +314,10 @@ fn missed_autos_spending(logs: &str) -> (usize, usize) {
     (misses, spent)
 }
 
-/// A missed auto spends a charge under Forever's rules (8 of 8 missed swings in the logs). The
-/// reference spends charges on landed autos only.
+/// The reference spends charges on landed autos only. Forever's rules spent one on a missed
+/// auto too (8 of 8 missed swings in the logs) until the proc became a strike that grants none.
 #[test]
-fn a_missed_auto_spends_a_charge() {
-    let (misses, spent) = missed_autos_spending(&fury_log(Rules::Forever));
-    assert!(misses > 3, "{misses} misses with charges up");
-    assert_eq!(spent, misses);
+fn a_missed_auto_spends_no_charge_in_the_reference() {
     let (misses, spent) = missed_autos_spending(&fury_log(Rules::GoReference));
     assert!(misses > 0, "{misses} misses with charges up");
     assert_eq!(spent, 0);

@@ -1,7 +1,9 @@
 //! Weaponmaster's sword branch, Sword Specialization, under Forever's rules, from Forever combat
-//! logs with a two-hand sword at 5/5: a Windfury Totem swing's roll brings no extra swing (0 of
-//! 6), Sweeping Strikes' hits never roll it (0 of 336 over two logs), and Whirlwind and Cleave
-//! roll it once a cast, not once a target (Whirlwind 7 procs on 100 casts and 283 landed hits).
+//! logs with a two-hand sword at 5/5: Sweeping Strikes' hits never roll it (0 of 336 over two
+//! logs), and Whirlwind and Cleave roll it once a cast, not once a target (Whirlwind 7 procs on
+//! 100 casts and 283 landed hits). Windfury Totem's strike rolls it since the hotfixes of 13
+//! November 2026 made the totem's proc a weapon strike: 8 extra swings on 198 strikes (4.0%,
+//! white swings 4.8%), where the totem's extra swing brought 0 of 6 before.
 
 use forever_engine::{contracts::prepared_v2::PreparedV2, prepare_json_with, Rules};
 use serde_json::{json, Value};
@@ -77,11 +79,10 @@ fn landed_swings(result: &Value, tag: i64) -> u64 {
         .sum()
 }
 
-/// With both procs certain and nothing but autos, every landed main hand swing brings one Sword
-/// Specialization swing under Forever's rules: the totem's extra swing does not roll it. The
-/// reference rolls it off the totem's swing too, so a landed totem swing brings another.
+/// With both procs certain and nothing but autos, every landed main hand swing and every landed
+/// totem strike brings one Sword Specialization swing, under Forever's rules as in the reference.
 #[test]
-fn a_windfury_totem_swing_does_not_roll_sword_specialization() {
+fn a_windfury_totem_strike_rolls_sword_specialization() {
     let swings = |rules: Rules| {
         let mut request = request("arms-warrior", rules);
         request["raid"]["parties"][0]["players"][0]["rotation"] = json!({
@@ -110,7 +111,7 @@ fn a_windfury_totem_swing_does_not_roll_sword_specialization() {
         autos > 500 && totem > 500,
         "{autos} autos, {totem} totem swings"
     );
-    assert_eq!(sword, autos);
+    assert_eq!(sword, autos + totem);
     let (sword, autos, totem) = swings(Rules::GoReference);
     assert_eq!(sword, autos + totem);
 }
@@ -163,6 +164,8 @@ fn one_whirlwind_brings_one_sword_specialization_swing() {
         });
         let mut prepared = prepared(&request, rules);
         every_hit_procs(&mut prepared);
+        // The totem stays down: its strike rolls Sword Specialization of its own.
+        effect(&mut prepared, "windfury_totem")["trigger_proc_chance"] = json!(0.0);
         // Rage for Sweeping Strikes and the first Whirlwind before the pull.
         effect(&mut prepared, "rage_bar")["starting_rage"] = json!(100.0);
         let logs = simulate(prepared, 1, true)["logs"]
@@ -187,7 +190,7 @@ fn one_whirlwind_brings_one_sword_specialization_swing() {
 fn only_forever_rules_narrow_sword_specialization() {
     let mut forever = prepared(&request("arms-warrior", Rules::Forever), Rules::Forever);
     let effect_forever = effect(&mut forever, "weaponmaster_sword").clone();
-    assert_eq!(effect_forever["skips_windfury_totem_swing"], json!(true));
+    assert!(effect_forever.get("skips_windfury_totem_swing").is_none());
     assert_eq!(
         effect_forever["excluded_class_spells"],
         json!([

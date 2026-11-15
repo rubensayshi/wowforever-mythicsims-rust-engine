@@ -1143,6 +1143,9 @@ pub(crate) struct Windfury {
     pub(crate) trigger_spends_no_charge: bool,
     /// Forever's rules: every outcome of a spending auto spends a charge, a miss included.
     pub(crate) any_outcome_spends: bool,
+    /// Forever's rules since the hotfixes of 13 November 2026: the proc casts a weapon strike
+    /// (`Fight::windfury_strikes`) and grants no charges of attack power.
+    pub(crate) strike: bool,
 }
 
 /// The trigger aura of an effect `Fight::damage_procs` holds: a spell data damage proc, or a
@@ -1181,6 +1184,8 @@ pub(crate) struct DamageProc {
     pub(crate) rng_label: Option<String>,
     /// A struck proc's outcomes of the hit taken, as `HitOutcome` bits; zero hears every one.
     pub(crate) taken_outcome: u16,
+    /// Forever's rules, a damage shield's: a hit the player blocks in full brings no answer.
+    pub(crate) skips_full_blocks: bool,
 }
 
 /// A proc whose manager rolls on landed hits and whose handler a spell batch window later
@@ -1824,6 +1829,9 @@ pub(crate) struct Fight<A: Agent> {
     /// outcome's multiplier and the player's damage taken multipliers, and whether a block took
     /// all of it: what rage from damage taken reads under Forever's rules.
     pub(crate) player_hit_pre_armor: (f64, bool),
+    /// Whether the last hit on the player was of a school other than Physical, which rage from
+    /// damage taken reads under Forever's rules.
+    pub(crate) player_hit_non_physical: bool,
     pub(crate) player: Player,
     /// Go `Unit.CastSpeed`. Go's unit reset restores the pseudo stats but not this value,
     /// so a speed change undone at the end of a fight carries into the next one.
@@ -1966,6 +1974,11 @@ pub(crate) struct Fight<A: Agent> {
     /// the shaman's own) and the time it did, while that hit's listeners run: its charge spender
     /// skips it. Another swing in that instant, as the off hand's, still spends.
     pub(crate) windfury_free_swing: Option<(SpellId, i64)>,
+    /// Forever's rules since the hotfixes of 13 November 2026: the Windfury Totem attacks that
+    /// are weapon strikes, the party's and the shaman's own, each with the attack power its
+    /// strike adds. Such an attack keeps the main hand auto's listeners and rolls the special
+    /// attack table (`Fight::apply_melee_auto`).
+    pub(crate) windfury_strikes: Vec<(SpellId, f64)>,
     /// The generated buffs other players cast on the player on cooldown.
     pub(crate) external_cooldowns: Vec<external_cooldown::ExternalCooldown>,
     /// The auras other than the druid's own that carry Innervate's regeneration.
@@ -2133,6 +2146,7 @@ pub(crate) fn damage_proc_of(effect: &Effect, spells: usize) -> Option<DamagePro
     let mut delay = None;
     let mut rng_label = None;
     let mut taken_outcome = 0;
+    let mut skips_full_blocks = false;
     let (trigger_spells, struck, casts, landed_only, require_damage, proc_chance, spell, chances) =
         match effect {
             Effect::SpellDataDamageProc {
@@ -2147,8 +2161,10 @@ pub(crate) fn damage_proc_of(effect: &Effect, spells: usize) -> Option<DamagePro
                 delay_ns,
                 rng_label: label,
                 taken_outcome: taken,
+                skips_full_blocks: skips,
                 ..
             } => {
+                skips_full_blocks = *skips;
                 delay = *delay_ns;
                 rng_label = label.clone();
                 taken_outcome = outcome_bits(taken);
@@ -2202,6 +2218,7 @@ pub(crate) fn damage_proc_of(effect: &Effect, spells: usize) -> Option<DamagePro
         delay,
         rng_label,
         taken_outcome,
+        skips_full_blocks,
     })
 }
 
@@ -2542,6 +2559,7 @@ impl<A: Agent> Fight<A> {
                 crit_multiplies_swing,
                 no_threat_before_pull,
                 damage_taken_rage_per_damage,
+                spell_damage_taken_rage_multiplier,
                 ..
             } => Some(rage::RageBar {
                 max: max_rage.max(100.0),
@@ -2556,6 +2574,7 @@ impl<A: Agent> Fight<A> {
                 crit_multiplies_swing: *crit_multiplies_swing,
                 no_threat_before_pull: *no_threat_before_pull,
                 damage_taken_rage_per_damage: *damage_taken_rage_per_damage,
+                spell_damage_taken_rage_multiplier: *spell_damage_taken_rage_multiplier,
                 gain_threat: Vec::new(),
                 damage_taken_metrics: 0,
                 refund_metrics: 0,
@@ -4188,6 +4207,7 @@ impl<A: Agent> Fight<A> {
             raid_debuffs: Vec::new(),
             player_hit_resistance: (0.0, 1.0),
             player_hit_pre_armor: (0.0, false),
+            player_hit_non_physical: false,
             damage_taken_auras: Vec::new(),
             resetting_auras: false,
             self_target: None,
@@ -4301,6 +4321,7 @@ impl<A: Agent> Fight<A> {
             enemy_slows: Vec::new(),
             windfury: None,
             windfury_free_swing: None,
+            windfury_strikes: Vec::new(),
             external_cooldowns: Vec::new(),
             innervate_regens: Vec::new(),
             ley_line_innervate: None,
@@ -5094,6 +5115,7 @@ impl<A: Agent> Fight<A> {
                 spend_require_damage,
                 trigger_spends_no_charge,
                 any_outcome_spends,
+                strike_attack_power,
                 ..
             } = effect
             {
@@ -5135,7 +5157,13 @@ impl<A: Agent> Fight<A> {
                     spend_require_damage: *spend_require_damage,
                     trigger_spends_no_charge: *trigger_spends_no_charge,
                     any_outcome_spends: *any_outcome_spends,
+                    strike: strike_attack_power.is_some(),
                 });
+                if let (Some(extra), Some(attack_power)) =
+                    (*extra_attack_spell, *strike_attack_power)
+                {
+                    fight.windfury_strikes.push((extra, attack_power));
+                }
             }
         }
         fight.bind_heal_procs(effects)?;

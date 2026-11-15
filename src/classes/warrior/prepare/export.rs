@@ -202,6 +202,9 @@ impl Warrior {
             // Combat logs of client 1.60.1.70862: 36 of 36 avoided Executes keep the extra rage
             // and get none of the cost back (spells/execute.rs).
             execute_effect["extra_rage_on_landed"] = json!(true);
+            // Combat logs taken after the hotfix of 14 November 2026: Windfury Totem's strike
+            // follows 267 of 846 landed Executes and 35 of 185 dodged ones (spells/execute.rs).
+            execute_effect["cast_attack_rolls_windfury_totem"] = json!(true);
         }
         effects.push(execute_effect);
         // hamstring.go
@@ -631,9 +634,11 @@ impl Warrior {
                 // 16 October 2026 beta notes: Shield Bash and Shield Slam no longer trigger it.
                 "excluded_class_spells": ["shield_bash", "shield_slam"]});
             // Forever combat logs with a two-hand sword at 5/5: Sweeping Strikes' hits never
-            // roll it (0 of 336 over two logs), a Windfury Totem swing's roll brings no swing (0
-            // of 6), and Whirlwind and Cleave roll it once a cast (Whirlwind 7 procs on 100
-            // casts and 283 landed hits).
+            // roll it (0 of 336 over two logs), and Whirlwind and Cleave roll it once a cast
+            // (Whirlwind 7 procs on 100 casts and 283 landed hits). Windfury Totem's attack
+            // rolls it since the hotfixes of 13 November 2026 made it a weapon strike: 8 extra
+            // swings on 198 strikes (4.0%, white swings 4.8% in the same logs), where the
+            // totem's extra swing brought 0 of 6 before.
             if sim.rules == Rules::Forever {
                 effect["excluded_class_spells"] = json!([
                     "shield_bash",
@@ -641,7 +646,6 @@ impl Warrior {
                     "sweeping_strikes_hit",
                     "sweeping_strikes_normalized_hit"
                 ]);
-                effect["skips_windfury_totem_swing"] = json!(true);
                 effect["once_a_cast_class_spells"] =
                     json!(["whirlwind", "whirlwind_off_hand", "cleave"]);
             }

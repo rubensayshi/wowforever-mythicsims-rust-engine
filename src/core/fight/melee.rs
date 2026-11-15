@@ -1094,6 +1094,48 @@ impl<A: Agent> Fight<A> {
         }
     }
 
+    /// The attack power a Windfury Totem strike adds, for the spell that is one under Forever's
+    /// rules; none for any other spell.
+    pub(crate) fn windfury_strike_attack_power(&self, spell: SpellId) -> Option<f64> {
+        self.windfury_strikes
+            .iter()
+            .find(|(strike, _)| *strike == spell)
+            .map(|(_, attack_power)| *attack_power)
+    }
+
+    /// Forever's rules: the attack a cast makes of its own before its damage, as Execute's
+    /// does. It rolls the special attack table for nothing but the party's Windfury Totem,
+    /// which a landed one rolls as a landed hit does: it deals no damage, counts in no metric
+    /// and reaches no other listener. Nothing is rolled without a totem that strikes.
+    pub(crate) fn windfury_cast_attack(&mut self, spell: SpellId, target: Side) {
+        let Some((trigger, strike)) = self
+            .windfury
+            .as_ref()
+            .map(|windfury| (windfury.trigger, windfury.strike))
+        else {
+            return;
+        };
+        if !strike || !self.aura(trigger).active {
+            return;
+        }
+        let mut result = SpellResult {
+            armor_multiplier: 1.0,
+            target,
+            attacker: self.spells[spell].caster,
+            outcome: 0,
+            damage: 0.0,
+            threat: 0.0,
+        };
+        let metrics = self.spells[spell].metrics[target.index()];
+        self.apply_physical_outcome(
+            spell,
+            &mut result,
+            PhysicalOutcome::MeleeSpecialHit { count: false },
+        );
+        self.spells[spell].metrics[target.index()] = metrics;
+        self.windfury_trigger(trigger, spell, &result);
+    }
+
     /// The auto attack spell's `ApplyEffects`: weapon damage on the white hit table.
     pub(crate) fn apply_melee_auto(&mut self, spell: SpellId, target: Side, hand: Hand) {
         if hand == Hand::Ranged {
@@ -1101,13 +1143,25 @@ impl<A: Agent> Fight<A> {
         }
         A::before_melee_auto(self, spell, hand);
         let caster = self.caster(spell);
-        let attack_power = self.melee_attack_power_of(caster);
+        let mut attack_power = self.melee_attack_power_of(caster);
+        // A Windfury Totem strike (Forever's rules): the main hand's weapon damage with the
+        // totem's attack power added, on the special attack table, so it never glances and
+        // takes no dual wield miss penalty.
+        let strike = self.windfury_strike_attack_power(spell);
+        if let Some(bonus) = strike {
+            attack_power += bonus;
+        }
         let weapon = self.autos_of_mut(caster).attack(hand).weapon.clone();
         let mut base = self.weapon_damage(&weapon, attack_power);
         if hand == Hand::Off {
             base *= 0.5;
         }
-        let result = self.calc_physical_damage(spell, target, base, PhysicalOutcome::MeleeWhite);
+        let outcome = if strike.is_some() {
+            PhysicalOutcome::MeleeSpecialHitAndCrit { count: true }
+        } else {
+            PhysicalOutcome::MeleeWhite
+        };
+        let result = self.calc_physical_damage(spell, target, base, outcome);
         self.deal_damage(spell, result, false);
     }
 
