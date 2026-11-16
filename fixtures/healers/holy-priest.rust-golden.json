@@ -1,56 +1,56 @@
 {
   "actions": {
     "{\"spellId\":10901}": {
-      "casts": 4772.0,
+      "casts": 4750.0,
       "crit_ticks": 0.0,
       "crits": 0.0,
       "healing": 0.0,
-      "hits": 4772.0,
+      "hits": 4750.0,
       "overhealing": 0.0,
-      "shielding": 5466278.282267645,
+      "shielding": 5437230.002199859,
       "ticks": 0.0
     },
     "{\"spellId\":10917}": {
-      "casts": 2842.0,
+      "casts": 3192.0,
       "crit_ticks": 0.0,
-      "crits": 1062.0,
-      "healing": 4847082.28719437,
-      "hits": 4622.0,
-      "overhealing": 49949.7265400915,
+      "crits": 1196.0,
+      "healing": 5433939.5555990925,
+      "hits": 5188.0,
+      "overhealing": 55997.35650344585,
       "shielding": 0.0,
       "ticks": 0.0
     },
     "{\"spellId\":10929}": {
-      "casts": 2933.0,
-      "crit_ticks": 2522.0,
+      "casts": 2868.0,
+      "crit_ticks": 2454.0,
       "crits": 0.0,
-      "healing": 3176426.9356833384,
+      "healing": 3079974.0211342457,
       "hits": 0.0,
-      "overhealing": 607736.6760432972,
+      "overhealing": 589282.6159091722,
       "shielding": 0.0,
-      "ticks": 11440.0
+      "ticks": 11187.0
     },
     "{\"spellId\":10965}": {
-      "casts": 2976.0,
+      "casts": 2971.0,
       "crit_ticks": 0.0,
-      "crits": 523.0,
-      "healing": 6827805.161453635,
-      "hits": 2453.0,
-      "overhealing": 387459.72436865675,
+      "crits": 520.0,
+      "healing": 6792958.895203402,
+      "hits": 2451.0,
+      "overhealing": 385482.291738796,
       "shielding": 0.0,
       "ticks": 0.0
     },
     "{\"spellId\":401859}": {
-      "casts": 4962.0,
+      "casts": 4841.0,
       "crit_ticks": 0.0,
-      "crits": 2776.0,
-      "healing": 5450231.956418693,
-      "hits": 12755.0,
-      "overhealing": 309286.1207436152,
+      "crits": 2828.0,
+      "healing": 5394460.263534293,
+      "hits": 12649.0,
+      "overhealing": 306121.2259873106,
       "shielding": 0.0,
       "ticks": 0.0
     }
   },
-  "hps": 476.44026985508003,
-  "seconds_oom": 97.39924379014995
+  "hps": 483.25807447921477,
+  "seconds_oom": 95.23896572101343
 }
