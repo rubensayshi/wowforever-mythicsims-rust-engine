@@ -1798,7 +1798,7 @@ pub(crate) struct Fight<A: Agent> {
     pub(crate) stacking_cds: Vec<healer_gear::StackingCd>,
     /// A healer's on-use shields on heals: [`Effect::ShieldOnHeal`].
     pub(crate) shields_on_heal: Vec<healer_gear::ShieldOnHeal>,
-    /// A healer's instant cast auras: [`Effect::InstantCastAura`].
+    /// The instant cast auras: [`Effect::InstantCastAura`].
     pub(crate) instant_casts: Vec<healer_gear::InstantCast>,
     /// Go `rageBar`, for a player that has one.
     pub(crate) rage: Option<rage::RageBar>,

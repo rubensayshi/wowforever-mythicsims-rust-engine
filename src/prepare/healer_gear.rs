@@ -862,6 +862,7 @@ pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>)
         return if env.rules == Rules::Forever {
             let mut effects = mana_on_cast_effects(env);
             effects.extend(furious_storm_effects(env));
+            effects.extend(natures_swiftness_effects(env));
             effects
         } else {
             Vec::new()
@@ -905,8 +906,37 @@ pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>)
             unrepresented.push("Rotmending has no spell".to_string());
         }
     }
-    // Nature's Swiftness (the Shaman's 16188, the Druid's 17116): the next heal with a cast
-    // time is instant, and its cast spends the aura.
+    effects.extend(natures_swiftness_effects(env));
+    // Vestments of Faith (8): Epiphany.
+    if let (Some(trigger), Some(aura)) = (
+        env.sim.get_aura(unit, "Vestments of Faith 8P"),
+        env.sim.get_aura(unit, EPIPHANY),
+    ) {
+        let row = must_find(28804);
+        let bonus = Stats::from_pairs(&[(Stat::MP5, row.effect_n(1).base_points)]);
+        let id = ActionId::spell(row.id);
+        effects.push(json!({
+            "kind": "spell_data_stat_proc", "trigger_aura": env.sim.aura(trigger).label,
+            "aura": env.sim.aura(aura).label,
+            "trigger_spells": proc_trigger_spells(env, &spell_cast_trigger("")),
+            "callbacks": ["on_cast_complete"], "landed_only": false, "require_damage": false,
+            "proc_chance": f64::from(must_find(28802).proc_chance) / 100.0,
+            "gain_log": format!("Gained {} from {}.", flat_string(&bonus), action_id_string(&id)),
+            "expire_log": format!("Lost {} from fading {}.", flat_string(&bonus), action_id_string(&id)),
+        }));
+    }
+    effects.extend(furious_storm_effects(env));
+    effects
+}
+
+/// Nature's Swiftness (the Shaman's 16188, the Druid's 17116): the next spell its mods change
+/// that has a cast time is instant, and its cast spends the aura. A healer sim's heals, and under
+/// Forever's rules an Elemental or Enhancement Shaman's Lightning Bolt and Chain Lightning when a
+/// rotation casts it.
+fn natures_swiftness_effects(env: &Environment) -> Vec<Value> {
+    let unit = env.player;
+    let book = &env.sim.unit(unit).spellbook;
+    let mut effects = Vec::new();
     for spell_id in [16188, 17116] {
         let id = ActionId::spell(spell_id);
         let cast = book
@@ -933,25 +963,6 @@ pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>)
             "changes": changes,
         }));
     }
-    // Vestments of Faith (8): Epiphany.
-    if let (Some(trigger), Some(aura)) = (
-        env.sim.get_aura(unit, "Vestments of Faith 8P"),
-        env.sim.get_aura(unit, EPIPHANY),
-    ) {
-        let row = must_find(28804);
-        let bonus = Stats::from_pairs(&[(Stat::MP5, row.effect_n(1).base_points)]);
-        let id = ActionId::spell(row.id);
-        effects.push(json!({
-            "kind": "spell_data_stat_proc", "trigger_aura": env.sim.aura(trigger).label,
-            "aura": env.sim.aura(aura).label,
-            "trigger_spells": proc_trigger_spells(env, &spell_cast_trigger("")),
-            "callbacks": ["on_cast_complete"], "landed_only": false, "require_damage": false,
-            "proc_chance": f64::from(must_find(28802).proc_chance) / 100.0,
-            "gain_log": format!("Gained {} from {}.", flat_string(&bonus), action_id_string(&id)),
-            "expire_log": format!("Lost {} from fading {}.", flat_string(&bonus), action_id_string(&id)),
-        }));
-    }
-    effects.extend(furious_storm_effects(env));
     effects
 }
 

@@ -3776,9 +3776,10 @@ pub enum Effect {
         #[serde(default, skip_serializing_if = "is_zero")]
         spell_id: i32,
     },
-    /// MythicSim's healer sims under Forever's rules: a spell whose aura makes the next cast of
-    /// the spells it changes instant and is spent by that cast, as Nature's Swiftness. Each
-    /// change is one spell's mod while the aura is up, by spellbook position.
+    /// Forever's rules: a spell whose aura makes the next cast of the spells it changes instant
+    /// and is spent by that cast, as Nature's Swiftness (a healer's heals, a Shaman's Lightning
+    /// Bolt and Chain Lightning). Each change is one spell's mod while the aura is up, by
+    /// spellbook position.
     InstantCastAura {
         spell_id: i32,
         aura: String,

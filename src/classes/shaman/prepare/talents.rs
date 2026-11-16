@@ -977,9 +977,11 @@ impl Shaman {
             AuraConfig {
                 label: "Nature's Swiftness".to_string(),
                 action_id: Some(spell_action(16188)),
-                // A Restoration healer sim's is up until a heal spends it (Rust only); Go
-                // registers it without a duration.
-                duration: if self.spec == super::Spec::Restoration {
+                // Up until a cast spends it, as client 16188 states (an infinite duration and
+                // one charge): a Restoration healer sim's, and under Forever's rules any spec's,
+                // so an Elemental or Enhancement rotation can cast it. Go registers it without a
+                // duration.
+                duration: if self.spec == super::Spec::Restoration || sim.rules == Rules::Forever {
                     NEVER_EXPIRES
                 } else {
                     0

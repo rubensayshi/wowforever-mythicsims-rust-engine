@@ -908,6 +908,11 @@ the Go goldens and exporter uses. The departures:
   October 2026 beta notes); the globes taken spell hits spend are not modelled, since the healer
   takes none. The prepared effects are `instant_cast_aura`, the shaman's `water_shield` and the
   heals' channel shapes (`tests/healer_spells.rs`).
+- Nature's Swiftness on a damage Shaman (client 16188, 1.60.1.70938): a rotation that casts it
+  makes the next Lightning Bolt or Chain Lightning instant, and that cast spends it. The row
+  lasts until spent (DurationIndex 21, one charge), so under Forever's rules the aura stays up
+  for an Elemental or Enhancement Shaman too; before, the gate refused such a rotation
+  (`tests/forever_rules_20261117.rs`).
 - A healer Priest's talents that read a heal's target or its history, from the client rows and
   tooltips: Divine Aegis (431622) turns each crit of a direct heal, Penance's bolts and Prayer of
   Mending's charges into an absorb of 5%, 10% or 15% of the heal, counted as the absorb aura's
