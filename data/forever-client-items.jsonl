@@ -739,7 +739,7 @@
 {"id":287001,"name":"Waterlogged Shoulderpads","type":"ItemTypeShoulder","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"2":12,"3":8,"20":5,"30":93},"ilvl":41}}}
 {"id":287002,"name":"Risen Sentry's Links","type":"ItemTypeLegs","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"0":8,"2":15,"25":8,"30":222},"ilvl":40}}}
 {"id":287003,"name":"Corroded Handguards","type":"ItemTypeHands","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"2":5,"21":14,"30":156},"ilvl":39}}}
-{"id":287004,"name":"Touch of the Depths","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeWand","weapon_speed":1.9,"scaling_options":{"0":{"weapon_damage_min":70,"weapon_damage_max":71,"stats":{"3":5,"8":5},"ilvl":40}}}
+{"id":287004,"name":"Touch of the Depths","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeWand","weapon_speed":1.9,"scaling_options":{"0":{"weapon_damage_min":49,"weapon_damage_max":92,"stats":{"3":5,"8":5},"ilvl":40}}}
 {"id":287005,"name":"Sword of Dismemberment","type":"ItemTypeWeapon","weapon_type":"WeaponTypeSword","hand_type":"HandTypeTwoHand","weapon_speed":3.7,"scaling_options":{"0":{"weapon_damage_min":110,"weapon_damage_max":166,"ilvl":42}}}
 {"id":287006,"name":"Resurged Axe","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOneHand","weapon_speed":2.6,"scaling_options":{"0":{"weapon_damage_min":49,"weapon_damage_max":93,"stats":{"3":7,"5":4},"ilvl":40}}}
 {"id":287007,"name":"Stretched Footpads","type":"ItemTypeFeet","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"2":13,"4":14,"5":5,"30":44,"34":4},"ilvl":44}}}
@@ -769,7 +769,7 @@
 {"id":287033,"name":"Furbolg Berserker's Boots","type":"ItemTypeFeet","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":18,"16":9,"24":10,"30":417},"ilvl":58}}}
 {"id":287034,"name":"Grove Subjugator's Blade","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeOneHand","weapon_speed":1.8,"scaling_options":{"0":{"weapon_damage_min":33,"weapon_damage_max":62,"stats":{"2":6,"4":68,"5":68,"16":-10,"21":14},"ilvl":60}}}
 {"id":287035,"name":"Demon Worshipper's Necklace","type":"ItemTypeNeck","scaling_options":{"0":{"stats":{"3":13,"4":11,"5":11},"ilvl":59}}}
-{"id":287036,"name":"Satyr's Touch","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeWand","weapon_speed":1.9,"scaling_options":{"0":{"weapon_damage_min":111,"weapon_damage_max":111,"stats":{"2":9,"20":5},"ilvl":59}}}
+{"id":287036,"name":"Satyr's Touch","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeWand","weapon_speed":1.9,"scaling_options":{"0":{"weapon_damage_min":77,"weapon_damage_max":145,"stats":{"2":9,"20":5},"ilvl":59}}}
 {"id":287037,"name":"Shaper's Robe","type":"ItemTypeChest","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"3":15,"4":18,"5":18,"16":15,"30":85},"ilvl":60}}}
 {"id":287040,"name":"Dinosaur Hide Belt","type":"ItemTypeWaist","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"1":12,"2":18,"30":97,"31":100},"ilvl":61}}}
 {"id":287041,"name":"Time-Forgotten Bindings","type":"ItemTypeWrist","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"2":13,"16":5,"20":10,"30":155},"ilvl":60}}}
