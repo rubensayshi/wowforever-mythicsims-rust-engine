@@ -1237,6 +1237,31 @@ the Go goldens and exporter uses. The departures:
   reference rows hold them. "Increases damage done to <creature type> by magical spells and
   effects by up to N" is spell damage against that type in the bonus file, which the export turns
   into a `mob_type_bonus` as Mark of the Champion's (`tests/forever_client_items_lines_20261110.rs`).
+- Random enchantments, from the client 1.60.1.70938 data: the Forever client has no
+  ItemRandomProperties table, so the reference database's suffixes ("of the Monkey" 611, a fixed
+  +10 Agility and +10 Stamina) are not what an item rolls. An item that reads "<Random
+  enchantment>" names an item bonus tree (ItemXBonusTree, ItemBonusTreeNode) of item bonus lists,
+  each a suffix name and shares of the item's random property points in ten thousandths, rounded
+  half up. The client rolls 17 names the reference has none of: of the Sorcerer, Elder, Channeler,
+  Physician, Prophet, Hierophant, Bandit, Beast, Champion, Defender and Knight, of Magic, and the
+  five "of Fire Protection" kind. Potent Boots (15171, item level 50, 16 points) of the Sorcerer
+  (bonus list 12745: Intellect 7266, Stamina 4106, spell power 3725) reads +12 Intellect, +7
+  Stamina and 6 damage and healing, and of the Monkey (12721, 6666 each) +11 and +11, as Wowhead's
+  Forever tooltips of the item with each bonus do (16 November 2026). A request states the bonus
+  list as the item's random suffix; the lists start at 12688, above every reference suffix, which
+  still read as before. An item takes only the lists its own tree rolls, and any other is refused.
+  Attack power counts for melee and ranged, spell power for damage and healing, "of Healing" its
+  healing and its third as damage, "of Eluding" its Agility and 12 dodge rating (item effect
+  213334, spell 13669, 1%). "of Regeneration" is health per 5 sec, which the sim has no stat for.
+  A resistance share is read as the client's stat type states it; Wowhead's tooltips do not show
+  the line, so those values are not checked against a tooltip. 35 rolling items' rows state no
+  points (dungeon blues such as Dire Nail 10828): theirs are the RandPropPoints cell of the row's
+  item level and slot and the quality of Wowhead's tooltip, 14 for Dire Nail, whose "of the
+  Sorcerer" 66.5 spell power reads 67. Astral Guard (13254) and Ragnaros Core (17982) have no
+  Forever tooltip and are left out. `tools/forever_random_enchantments.py` writes
+  `data/forever-random-enchantments.jsonl` and `data/forever-random-enchantment-items.jsonl`;
+  `src/prepare/forever_random_enchantments.rs` reads them
+  (`tests/forever_random_enchantments_20261116.rs`).
 - Items whose live row differs from the reference database: Forever's rules read
   `data/forever-live-items.jsonl` before `data/items.jsonl`, and the reference's rules keep the
   pinned rows. The first rows are the Alterac Valley reputation off hands and shield, which the
