@@ -235,16 +235,35 @@
           }
         },
         "condition": {
-          "cmp": {
-            "lhs": {
-              "currentRage": {}
-            },
-            "op": "OpGe",
-            "rhs": {
-              "const": {
-                "val": "45"
+          "or": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "45"
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
       }
