@@ -78,6 +78,12 @@ pub(crate) const CHANCE_ON_HIT_PPM: f64 = 1.08;
 /// - The Black Knight (12974), 14106: 47 in 2,490 on 4, 0.60 (0.45 to 0.79).
 /// - Heartseeking Crossbow (13040), 29626: 105 in 747 ranged hits on 4 hunters, 2.72 (2.27 to
 ///   3.24).
+///
+/// From the public Forever logs of 13 to 16 November 2026 (client 1.60.1.70938), every landed
+/// melee hit of the wearer, triggered ones such as Execute and Judgement of Command included,
+/// priced on the weapon's base speed:
+///
+/// - Destiny (647), 17152: 670 procs in 9,440 hits, 1.18 (1.10 to 1.27).
 const MEASURED_CHANCE_ON_HIT_PPM: &[(i32, f64)] = &[
     (9453, 1.8),
     (6220, 1.55),
@@ -85,6 +91,7 @@ const MEASURED_CHANCE_ON_HIT_PPM: &[(i32, f64)] = &[
     (9418, 1.95),
     (12974, 0.6),
     (13040, 2.7),
+    (647, 1.2),
 ];
 
 /// The procs a minute of an item's rateless chance on hit under Forever's rules: the measured

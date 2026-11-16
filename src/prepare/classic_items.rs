@@ -368,16 +368,24 @@ fn darkmoon_card_maelstrom(env: &mut Environment) {
 }
 
 /// Heart of Wyrmthalak: equip: melee and ranged attacks have a chance to deal 112 to 168 Fire
-/// damage (27655). The 0.4 PPM is master's.
+/// damage (27655). The 0.4 PPM is master's. Under Forever's rules it rolls 2 times a minute,
+/// each hit on the speed of the weapon behind it: 934 procs in 11,259 landed melee and ranged
+/// hits of 8 wearers in public Forever reports (client 1.60.1.70938, 13 to 16 November 2026),
+/// 2.00 (1.88 to 2.12) a minute. The client row (27656) states no rate.
 fn heart_of_wyrmthalak(env: &mut Environment) {
+    let ppm = if env.sim.rules == super::sim::Rules::Forever {
+        2.0
+    } else {
+        0.4
+    };
     // Go `NewLegacyPPMManager`, which an item swap rebuilds for the weapons in the hands.
-    let trigger_dpm: TriggerDpmFn = Rc::new(|sim, unit| {
+    let trigger_dpm: TriggerDpmFn = Rc::new(move |sim, unit| {
         Rc::new(
-            sim.new_ppm_manager(unit, 0.4, ProcMask::MELEE_OR_RANGED)
+            sim.new_ppm_manager(unit, ppm, ProcMask::MELEE_OR_RANGED)
                 .rebuilt_by_swap(
                     sim,
                     unit,
-                    super::item_swap::ManagerChance::Ppm(0.4),
+                    super::item_swap::ManagerChance::Ppm(ppm),
                     super::item_swap::ManagerMask::Static(ProcMask::MELEE_OR_RANGED),
                 ),
         )
