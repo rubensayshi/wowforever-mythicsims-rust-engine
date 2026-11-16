@@ -93,6 +93,14 @@ table!(LIVE_ITEMS, "forever-live-items.jsonl");
 // cannot state (`tools/rust_live_items.py`, `src/prepare/forever_items.rs`).
 table!(LIVE_ITEM_BONUSES, "forever-live-item-bonuses.jsonl");
 table!(RANDOM_SUFFIXES, "random-suffixes.jsonl");
+// The random enchantments the Forever client rolls, by item bonus list, and the items that roll
+// them with their random property points (`tools/forever_random_enchantments.py`,
+// `src/prepare/forever_random_enchantments.rs`).
+table!(RANDOM_ENCHANTMENTS, "forever-random-enchantments.jsonl");
+table!(
+    RANDOM_ENCHANTMENT_ITEMS,
+    "forever-random-enchantment-items.jsonl"
+);
 table!(ENCHANTS, "enchants.jsonl");
 table!(RAND_PROP_POINTS, "rand-prop-points.jsonl");
 table!(CONSUMABLES, "consumables.jsonl");
