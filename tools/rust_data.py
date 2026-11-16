@@ -32,6 +32,8 @@ OWN_FILES = {
     "forever-client-item-bonuses.jsonl",
     "forever-client-items.jsonl",
     "forever-live-item-bonuses.jsonl",
+    "forever-random-enchantments.jsonl",
+    "forever-random-enchantment-items.jsonl",
     "forever-live-items.jsonl",
 }
 

@@ -241,9 +241,16 @@ pub(crate) fn new_item(spec: &Message, rules: Rules) -> Result<Item, Refusal> {
     item.rand_prop_points = scaling.i32("rand_prop_points");
     let suffix = spec.i32("random_suffix");
     if suffix != 0 {
-        item.random_suffix = random_suffix(suffix).ok_or_else(|| {
-            Refusal::new("unknown_item", format!("no random suffix with id {suffix}"))
-        })?;
+        // Forever's rules read a client item bonus list before the reference's suffixes.
+        let client = (rules == Rules::Forever)
+            .then(|| super::forever_random_enchantments::random_enchantment(id, suffix))
+            .flatten();
+        item.random_suffix = match client {
+            Some(found) => found?,
+            None => random_suffix(suffix).ok_or_else(|| {
+                Refusal::new("unknown_item", format!("no random suffix with id {suffix}"))
+            })?,
+        };
     }
     let enchant_id = spec.i32("enchant");
     if enchant_id != 0 {

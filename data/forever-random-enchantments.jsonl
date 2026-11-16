@@ -1,0 +1,273 @@
+{"id":12688,"name":"of Intellect","allocations":[["Intellect",6000]]}
+{"id":12689,"name":"of Spirit","allocations":[["Spirit",6000]]}
+{"id":12690,"name":"of Stamina","allocations":[["Stamina",6000]]}
+{"id":12691,"name":"of the Owl","allocations":[["Intellect",3000],["Spirit",3000]]}
+{"id":12718,"name":"of the Eagle","allocations":[["Intellect",6666],["Stamina",6666]]}
+{"id":12719,"name":"of the Whale","allocations":[["Spirit",6666],["Stamina",6666]]}
+{"id":12720,"name":"of the Owl","allocations":[["Intellect",6666],["Spirit",6666]]}
+{"id":12721,"name":"of the Monkey","allocations":[["Agility",6666],["Stamina",6666]]}
+{"id":12722,"name":"of the Bear","allocations":[["Stamina",6666],["Strength",6666]]}
+{"id":12723,"name":"of the Gorilla","allocations":[["Intellect",6666],["Strength",6666]]}
+{"id":12724,"name":"of the Falcon","allocations":[["Agility",6666],["Intellect",6666]]}
+{"id":12725,"name":"of the Boar","allocations":[["Spirit",6666],["Strength",6666]]}
+{"id":12726,"name":"of the Wolf","allocations":[["Agility",6666],["Spirit",6666]]}
+{"id":12727,"name":"of the Tiger","allocations":[["Agility",6666],["Strength",6666]]}
+{"id":12728,"name":"of Agility","allocations":[["Agility",10000]]}
+{"id":12729,"name":"of Intellect","allocations":[["Intellect",10000]]}
+{"id":12730,"name":"of Spirit","allocations":[["Spirit",10000]]}
+{"id":12731,"name":"of Stamina","allocations":[["Stamina",10000]]}
+{"id":12732,"name":"of Strength","allocations":[["Strength",10000]]}
+{"id":12733,"name":"of Power","allocations":[["AttackPower",20000],["RangedAttackPower",20000]]}
+{"id":12734,"name":"of Magic","allocations":[["SpellDamage",11700],["HealingPower",11700]]}
+{"id":12735,"name":"of Healing","allocations":[["SpellDamage",7333],["HealingPower",22000]]}
+{"id":12736,"name":"of Defense","allocations":[["DefenseRating",6667]]}
+{"id":12737,"name":"of Regeneration","unmodeled":[["Health per 5 sec",8000]]}
+{"id":12738,"name":"of Concentration","allocations":[["MP5",4000]]}
+{"id":12739,"name":"of Eluding","allocations":[["Agility",3333]],"stats":[["DodgeRating",12]]}
+{"id":12740,"name":"of Arcane Protection","allocations":[["ArcaneResistance",6666],["Stamina",6666]]}
+{"id":12741,"name":"of Fire Protection","allocations":[["FireResistance",6666],["Stamina",6666]]}
+{"id":12742,"name":"of Frost Protection","allocations":[["FrostResistance",6666],["Stamina",6666]]}
+{"id":12743,"name":"of Nature Protection","allocations":[["NatureResistance",6666],["Stamina",6666]]}
+{"id":12744,"name":"of Shadow Protection","allocations":[["ShadowResistance",6666],["Stamina",6666]]}
+{"id":12745,"name":"of the Sorcerer","allocations":[["Intellect",7266],["Stamina",4106],["SpellDamage",3725],["HealingPower",3725]]}
+{"id":12746,"name":"of the Elder","allocations":[["Intellect",7266],["SpellDamage",3725],["HealingPower",3725],["Spirit",4106]]}
+{"id":12747,"name":"of the Channeler","allocations":[["SpellDamage",3725],["HealingPower",3725],["Spirit",4106],["Stamina",7266]]}
+{"id":12748,"name":"of the Physician","allocations":[["SpellDamage",2341],["HealingPower",7024],["Intellect",4106],["Stamina",7266]]}
+{"id":12749,"name":"of the Prophet","allocations":[["Intellect",7266],["SpellDamage",2341],["HealingPower",7024],["Spirit",4106]]}
+{"id":12750,"name":"of the Hierophant","allocations":[["SpellDamage",2341],["HealingPower",7024],["Spirit",4106],["Stamina",7266]]}
+{"id":12751,"name":"of the Bandit","allocations":[["Agility",3193],["AttackPower",8212],["RangedAttackPower",8212],["Stamina",7266]]}
+{"id":12752,"name":"of the Beast","allocations":[["Agility",4106],["Stamina",7266],["Strength",3193]]}
+{"id":12753,"name":"of the Champion","allocations":[["DefenseRating",2128],["Stamina",7266],["Strength",4106]]}
+{"id":12754,"name":"of the Defender","allocations":[["DefenseRating",2737],["SpellDamage",3725],["HealingPower",3725],["Stamina",7266]]}
+{"id":12755,"name":"of the Knight","allocations":[["SpellDamage",3725],["HealingPower",3725],["Stamina",7366],["Strength",4106]]}
+{"id":12756,"name":"of Arcane Wrath","allocations":[["ArcaneDamage",14300]]}
+{"id":12757,"name":"of Fiery Wrath","allocations":[["FireDamage",14300]]}
+{"id":12758,"name":"of Frozen Wrath","allocations":[["FrostDamage",14300]]}
+{"id":12759,"name":"of Holy Wrath","allocations":[["HolyDamage",14300]]}
+{"id":12760,"name":"of Nature's Wrath","allocations":[["NatureDamage",14300]]}
+{"id":12761,"name":"of Shadow Wrath","allocations":[["ShadowDamage",14300]]}
+{"id":12905,"name":"of the Sorcerer","allocations":[["Intellect",7601],["Stamina",5066],["SpellDamage",20000],["HealingPower",20000]]}
+{"id":12906,"name":"of the Sorcerer","allocations":[["Intellect",7601],["Stamina",5066],["SpellDamage",47500],["HealingPower",47500]]}
+{"id":12907,"name":"of the Elder","allocations":[["Intellect",7601],["SpellDamage",20000],["HealingPower",20000],["Spirit",5066]]}
+{"id":12908,"name":"of the Elder","allocations":[["Intellect",7601],["SpellDamage",47500],["HealingPower",47500],["Spirit",5066]]}
+{"id":12909,"name":"of the Channeler","allocations":[["SpellDamage",20000],["HealingPower",20000],["Spirit",5066],["Stamina",7601]]}
+{"id":12910,"name":"of the Channeler","allocations":[["SpellDamage",47500],["HealingPower",47500],["Spirit",5066],["Stamina",7601]]}
+{"id":12911,"name":"of the Physician","allocations":[["SpellDamage",12533],["HealingPower",37600],["Intellect",5066],["Stamina",7601]]}
+{"id":12912,"name":"of the Physician","allocations":[["SpellDamage",29767],["HealingPower",89300],["Intellect",5066],["Stamina",7601]]}
+{"id":12913,"name":"of the Prophet","allocations":[["Intellect",7601],["SpellDamage",29767],["HealingPower",89300],["Spirit",5066]]}
+{"id":12914,"name":"of the Prophet","allocations":[["Intellect",7601],["SpellDamage",12533],["HealingPower",37600],["Spirit",5066]]}
+{"id":12915,"name":"of the Hierophant","allocations":[["SpellDamage",12533],["HealingPower",37600],["Spirit",5066],["Stamina",7601]]}
+{"id":12916,"name":"of the Hierophant","allocations":[["SpellDamage",29767],["HealingPower",89300],["Spirit",5066],["Stamina",7601]]}
+{"id":12917,"name":"of Magic","allocations":[["Intellect",10000],["SpellDamage",47500],["HealingPower",47500]]}
+{"id":12918,"name":"of Magic","allocations":[["Intellect",10000],["SpellDamage",20000],["HealingPower",20000]]}
+{"id":12919,"name":"of Healing","allocations":[["Intellect",10000],["SpellDamage",12533],["HealingPower",37600]]}
+{"id":12920,"name":"of Healing","allocations":[["Intellect",10000],["SpellDamage",29767],["HealingPower",89300]]}
+{"id":12945,"name":"of the Eagle","allocations":[["Intellect",4800],["Stamina",4800]]}
+{"id":12946,"name":"of the Whale","allocations":[["Spirit",4800],["Stamina",4800]]}
+{"id":12947,"name":"of the Owl","allocations":[["Intellect",4800],["Spirit",4800]]}
+{"id":12948,"name":"of the Monkey","allocations":[["Agility",4800],["Stamina",4800]]}
+{"id":12949,"name":"of the Bear","allocations":[["Stamina",4800],["Strength",4800]]}
+{"id":12950,"name":"of the Gorilla","allocations":[["Intellect",4800],["Strength",4800]]}
+{"id":12951,"name":"of the Falcon","allocations":[["Agility",4800],["Intellect",4800]]}
+{"id":12952,"name":"of the Boar","allocations":[["Spirit",4800],["Strength",4800]]}
+{"id":12953,"name":"of the Wolf","allocations":[["Agility",4800],["Spirit",4800]]}
+{"id":12954,"name":"of the Tiger","allocations":[["Agility",4800],["Strength",4800]]}
+{"id":12955,"name":"of Intellect","allocations":[["Intellect",7200]]}
+{"id":12956,"name":"of Agility","allocations":[["Agility",7200]]}
+{"id":12957,"name":"of Spirit","allocations":[["Spirit",7200]]}
+{"id":12958,"name":"of Stamina","allocations":[["Stamina",7200]]}
+{"id":12959,"name":"of Strength","allocations":[["Strength",7200]]}
+{"id":12960,"name":"of Power","allocations":[["AttackPower",14400],["RangedAttackPower",14400]]}
+{"id":12961,"name":"of Magic","allocations":[["SpellDamage",8424],["HealingPower",8424]]}
+{"id":12962,"name":"of Healing","allocations":[["SpellDamage",5280],["HealingPower",15840]]}
+{"id":12963,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",4800],["Stamina",4800]]}
+{"id":12964,"name":"of Fire Protection","allocations":[["FireResistance",4800],["Stamina",4800]]}
+{"id":12965,"name":"of Frost Protection","allocations":[["FrostResistance",4800],["Stamina",4800]]}
+{"id":12966,"name":"of Nature Protection","allocations":[["NatureResistance",4800],["Stamina",4800]]}
+{"id":12967,"name":"of Shadow Protection","allocations":[["ShadowResistance",4800],["Stamina",4800]]}
+{"id":12968,"name":"of Holy Wrath","allocations":[["HolyDamage",10296]]}
+{"id":12969,"name":"of the Physician","allocations":[["SpellDamage",1461],["HealingPower",4383],["Intellect",2562],["Stamina",4534]]}
+{"id":12970,"name":"of the Prophet","allocations":[["Intellect",4534],["SpellDamage",1461],["HealingPower",4383],["Spirit",2562]]}
+{"id":12971,"name":"of the Hierophant","allocations":[["SpellDamage",1461],["HealingPower",4383],["Spirit",2562],["Stamina",4534]]}
+{"id":12972,"name":"of the Beast","allocations":[["Agility",2562],["Stamina",4534],["Strength",1992]]}
+{"id":12973,"name":"of the Knight","allocations":[["SpellDamage",2324],["HealingPower",2324],["Stamina",4534],["Strength",2562]]}
+{"id":12974,"name":"of Defense","allocations":[["DefenseRating",4800]]}
+{"id":12975,"name":"of the Champion","allocations":[["DefenseRating",1328],["Stamina",4534],["Strength",2562]]}
+{"id":12976,"name":"of the Defender","allocations":[["DefenseRating",1708],["SpellDamage",2324],["HealingPower",2324],["Stamina",4534]]}
+{"id":12977,"name":"of Arcane Wrath","allocations":[["ArcaneDamage",10296]]}
+{"id":12978,"name":"of Fiery Wrath","allocations":[["FireDamage",10296]]}
+{"id":12979,"name":"of Frozen Wrath","allocations":[["FrostDamage",10296]]}
+{"id":12980,"name":"of Shadow Wrath","allocations":[["ShadowDamage",10296]]}
+{"id":12981,"name":"of the Sorcerer","allocations":[["Intellect",4534],["Stamina",2562],["SpellDamage",2324],["HealingPower",2324]]}
+{"id":12982,"name":"of the Elder","allocations":[["Intellect",4534],["SpellDamage",2324],["HealingPower",2324],["Spirit",2562]]}
+{"id":12983,"name":"of the Channeler","allocations":[["SpellDamage",2324],["HealingPower",2324],["Spirit",2562],["Stamina",4534]]}
+{"id":12984,"name":"of Nature's Wrath","allocations":[["NatureDamage",10296]]}
+{"id":12985,"name":"of the Bandit","allocations":[["Agility",1992],["AttackPower",5124],["RangedAttackPower",5124],["Stamina",4534]]}
+{"id":12986,"name":"of Frost Resistance","allocations":[["FrostResistance",4400]]}
+{"id":12987,"name":"of Nature Resistance","allocations":[["NatureResistance",4400]]}
+{"id":12988,"name":"of Shadow Resistance","allocations":[["ShadowResistance",4400]]}
+{"id":12989,"name":"of Fire Resistance","allocations":[["FireResistance",4400]]}
+{"id":12992,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",6666]]}
+{"id":12993,"name":"of Frost Resistance","allocations":[["FrostResistance",6666]]}
+{"id":12994,"name":"of Nature Resistance","allocations":[["NatureResistance",6666]]}
+{"id":12995,"name":"of Shadow Resistance","allocations":[["ShadowResistance",6666]]}
+{"id":12996,"name":"of Fire Resistance","allocations":[["FireResistance",6666]]}
+{"id":12997,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",3800]]}
+{"id":12998,"name":"of Frost Resistance","allocations":[["FrostResistance",3800]]}
+{"id":12999,"name":"of Nature Resistance","allocations":[["NatureResistance",3800]]}
+{"id":13000,"name":"of Shadow Resistance","allocations":[["ShadowResistance",3800]]}
+{"id":13001,"name":"of Fire Resistance","allocations":[["FireResistance",3800]]}
+{"id":13002,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",7500]]}
+{"id":13003,"name":"of Frost Resistance","allocations":[["FrostResistance",7500]]}
+{"id":13004,"name":"of Nature Resistance","allocations":[["NatureResistance",7500]]}
+{"id":13005,"name":"of Shadow Resistance","allocations":[["ShadowResistance",7500]]}
+{"id":13006,"name":"of Fire Resistance","allocations":[["FireResistance",7500]]}
+{"id":13007,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",8500]]}
+{"id":13008,"name":"of Frost Resistance","allocations":[["FrostResistance",8500]]}
+{"id":13009,"name":"of Shadow Resistance","allocations":[["ShadowResistance",8500]]}
+{"id":13010,"name":"of Nature Resistance","allocations":[["NatureResistance",8500]]}
+{"id":13011,"name":"of Fire Resistance","allocations":[["FireResistance",8500]]}
+{"id":13012,"name":"of the Eagle","allocations":[["Intellect",5666],["Stamina",5666]]}
+{"id":13013,"name":"of the Whale","allocations":[["Spirit",5666],["Stamina",5666]]}
+{"id":13014,"name":"of the Monkey","allocations":[["Agility",5666],["Stamina",5666]]}
+{"id":13015,"name":"of the Bear","allocations":[["Stamina",5666],["Strength",5666]]}
+{"id":13016,"name":"of the Boar","allocations":[["Spirit",5666],["Strength",5666]]}
+{"id":13017,"name":"of the Wolf","allocations":[["Agility",5666],["Spirit",5666]]}
+{"id":13018,"name":"of the Tiger","allocations":[["Agility",5666],["Strength",5666]]}
+{"id":13019,"name":"of Agility","allocations":[["Agility",8500]]}
+{"id":13020,"name":"of Stamina","allocations":[["Stamina",8500]]}
+{"id":13021,"name":"of Strength","allocations":[["Strength",8500]]}
+{"id":13022,"name":"of Power","allocations":[["AttackPower",17000],["RangedAttackPower",17000]]}
+{"id":13023,"name":"of the Beast","allocations":[["Agility",3024],["Stamina",5352],["Strength",2352]]}
+{"id":13024,"name":"of the Bandit","allocations":[["Agility",2352],["AttackPower",6049],["RangedAttackPower",6049],["Stamina",5352]]}
+{"id":13025,"name":"of Holy Wrath","allocations":[["HolyDamage",12155]]}
+{"id":13026,"name":"of the Champion","allocations":[["DefenseRating",1568],["Stamina",5352],["Strength",3024]]}
+{"id":13027,"name":"of the Defender","allocations":[["DefenseRating",2016],["SpellDamage",2744],["HealingPower",2744],["Stamina",5352]]}
+{"id":13028,"name":"of the Eagle","allocations":[["Intellect",5000],["Stamina",5000]]}
+{"id":13029,"name":"of the Whale","allocations":[["Spirit",5000],["Stamina",5000]]}
+{"id":13030,"name":"of the Monkey","allocations":[["Agility",5000],["Stamina",5000]]}
+{"id":13031,"name":"of the Bear","allocations":[["Stamina",5000],["Strength",5000]]}
+{"id":13032,"name":"of the Boar","allocations":[["Spirit",5000],["Strength",5000]]}
+{"id":13033,"name":"of the Wolf","allocations":[["Agility",5000],["Spirit",5000]]}
+{"id":13034,"name":"of the Tiger","allocations":[["Agility",5000],["Strength",5000]]}
+{"id":13035,"name":"of Agility","allocations":[["Agility",7500]]}
+{"id":13036,"name":"of Stamina","allocations":[["Stamina",7500]]}
+{"id":13037,"name":"of Strength","allocations":[["Strength",7500]]}
+{"id":13038,"name":"of Power","allocations":[["AttackPower",15000],["RangedAttackPower",15000]]}
+{"id":13039,"name":"of the Beast","allocations":[["Agility",2669],["Stamina",4723],["Strength",2075]]}
+{"id":13040,"name":"of the Bandit","allocations":[["Agility",2075],["AttackPower",5338],["RangedAttackPower",5338],["Stamina",4723]]}
+{"id":13041,"name":"of Holy Wrath","allocations":[["HolyDamage",10725]]}
+{"id":13044,"name":"of the Owl","allocations":[["Intellect",5000],["Spirit",5000]]}
+{"id":13045,"name":"of Intellect","allocations":[["Intellect",7500]]}
+{"id":13046,"name":"of Spirit","allocations":[["Spirit",7500]]}
+{"id":13047,"name":"of the Physician","allocations":[["SpellDamage",1522],["HealingPower",4566],["Intellect",2669],["Stamina",4723]]}
+{"id":13048,"name":"of the Prophet","allocations":[["Intellect",4723],["SpellDamage",1522],["HealingPower",4566],["Spirit",2669]]}
+{"id":13049,"name":"of the Hierophant","allocations":[["SpellDamage",1522],["HealingPower",4569],["Spirit",2669],["Stamina",4723]]}
+{"id":13050,"name":"of the Sorcerer","allocations":[["Intellect",4723],["Stamina",2669],["SpellDamage",2421],["HealingPower",2421]]}
+{"id":13051,"name":"of the Elder","allocations":[["Intellect",4723],["SpellDamage",2421],["HealingPower",2421],["Spirit",2669]]}
+{"id":13052,"name":"of the Channeler","allocations":[["SpellDamage",2421],["HealingPower",2421],["Spirit",2669],["Stamina",4723]]}
+{"id":13053,"name":"of Magic","allocations":[["SpellDamage",8775],["HealingPower",8775]]}
+{"id":13054,"name":"of Healing","allocations":[["SpellDamage",5500],["HealingPower",16500]]}
+{"id":13055,"name":"of Magic","allocations":[["SpellDamage",9945],["HealingPower",9945]]}
+{"id":13056,"name":"of Healing","allocations":[["SpellDamage",6233],["HealingPower",18700]]}
+{"id":13057,"name":"of Arcane Wrath","allocations":[["ArcaneDamage",12155]]}
+{"id":13058,"name":"of Fiery Wrath","allocations":[["FireDamage",12155]]}
+{"id":13059,"name":"of Frozen Wrath","allocations":[["FrostDamage",12155]]}
+{"id":13060,"name":"of Holy Wrath","allocations":[["HolyDamage",12155]]}
+{"id":13061,"name":"of Nature's Wrath","allocations":[["NatureDamage",12155]]}
+{"id":13062,"name":"of Shadow Wrath","allocations":[["ShadowDamage",12155]]}
+{"id":13063,"name":"of Regeneration","unmodeled":[["Health per 5 sec",6800]]}
+{"id":13064,"name":"of Concentration","allocations":[["MP5",3400]]}
+{"id":13084,"name":"of Arcane Wrath","allocations":[["ArcaneDamage",10725]]}
+{"id":13085,"name":"of Fiery Wrath","allocations":[["FireDamage",10725]]}
+{"id":13086,"name":"of Frozen Wrath","allocations":[["FrostDamage",10725]]}
+{"id":13087,"name":"of Nature's Wrath","allocations":[["NatureDamage",10725]]}
+{"id":13088,"name":"of Shadow Wrath","allocations":[["ShadowDamage",10725]]}
+{"id":13089,"name":"of the Owl","allocations":[["Intellect",5666],["Spirit",5666]]}
+{"id":13090,"name":"of Spirit","allocations":[["Spirit",8500]]}
+{"id":13091,"name":"of Intellect","allocations":[["Intellect",8500]]}
+{"id":13092,"name":"of the Sorcerer","allocations":[["Intellect",5352],["Stamina",3024],["SpellDamage",2744],["HealingPower",2744]]}
+{"id":13093,"name":"of the Elder","allocations":[["Intellect",5352],["SpellDamage",2744],["HealingPower",2744],["Spirit",3024]]}
+{"id":13094,"name":"of the Channeler","allocations":[["SpellDamage",2744],["HealingPower",2744],["Spirit",3024],["Stamina",5352]]}
+{"id":13095,"name":"of the Prophet","allocations":[["Intellect",5352],["SpellDamage",1725],["HealingPower",5175],["Spirit",3024]]}
+{"id":13096,"name":"of the Physician","allocations":[["SpellDamage",1725],["HealingPower",5175],["Intellect",3024],["Stamina",5352]]}
+{"id":13097,"name":"of the Hierophant","allocations":[["SpellDamage",1725],["HealingPower",5175],["Spirit",3024],["Stamina",5352]]}
+{"id":13098,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",4400]]}
+{"id":13099,"name":"of the Gorilla","allocations":[["Intellect",5666],["Strength",5666]]}
+{"id":13100,"name":"of the Falcon","allocations":[["Agility",5666],["Intellect",5666]]}
+{"id":13101,"name":"of Magic","allocations":[["Intellect",8500],["SpellDamage",47500],["HealingPower",47500]]}
+{"id":13102,"name":"of Healing","allocations":[["Intellect",8500],["SpellDamage",29767],["HealingPower",89300]]}
+{"id":13103,"name":"of Defense","allocations":[["DefenseRating",5667]]}
+{"id":13104,"name":"of the Sorcerer","allocations":[["Intellect",6460],["Stamina",4306],["SpellDamage",47500],["HealingPower",47500]]}
+{"id":13105,"name":"of the Elder","allocations":[["Intellect",6460],["SpellDamage",47500],["HealingPower",47500],["Spirit",4306]]}
+{"id":13106,"name":"of the Channeler","allocations":[["SpellDamage",47500],["HealingPower",47500],["Spirit",4306],["Stamina",6460]]}
+{"id":13107,"name":"of the Physician","allocations":[["SpellDamage",29767],["HealingPower",89300],["Intellect",4306],["Stamina",6460]]}
+{"id":13108,"name":"of the Prophet","allocations":[["Intellect",6460],["SpellDamage",29767],["HealingPower",89300],["Spirit",4306]]}
+{"id":13109,"name":"of the Hierophant","allocations":[["SpellDamage",29767],["HealingPower",89300],["Spirit",4306],["Stamina",5666]]}
+{"id":13138,"name":"of the Eagle","allocations":[["Intellect",5200],["Stamina",5200]]}
+{"id":13139,"name":"of the Whale","allocations":[["Spirit",5200],["Stamina",5200]]}
+{"id":13140,"name":"of the Owl","allocations":[["Intellect",5200],["Spirit",5200]]}
+{"id":13141,"name":"of the Monkey","allocations":[["Agility",5200],["Stamina",5200]]}
+{"id":13142,"name":"of the Bear","allocations":[["Stamina",5200],["Strength",5200]]}
+{"id":13143,"name":"of the Falcon","allocations":[["Agility",5200],["Intellect",5200]]}
+{"id":13144,"name":"of the Gorilla","allocations":[["Intellect",5200],["Strength",5200]]}
+{"id":13145,"name":"of the Boar","allocations":[["Spirit",5200],["Strength",5200]]}
+{"id":13146,"name":"of the Wolf","allocations":[["Agility",5200],["Spirit",5200]]}
+{"id":13147,"name":"of the Tiger","allocations":[["Agility",5200],["Strength",5200]]}
+{"id":13148,"name":"of Agility","allocations":[["Agility",7800]]}
+{"id":13149,"name":"of Intellect","allocations":[["Intellect",7800]]}
+{"id":13150,"name":"of Spirit","allocations":[["Spirit",7800]]}
+{"id":13151,"name":"of Stamina","allocations":[["Stamina",7800]]}
+{"id":13152,"name":"of Strength","allocations":[["Strength",7800]]}
+{"id":13153,"name":"of Power","allocations":[["AttackPower",15600],["RangedAttackPower",15600]]}
+{"id":13154,"name":"of Magic","allocations":[["SpellDamage",9126],["HealingPower",9126]]}
+{"id":13155,"name":"of Healing","allocations":[["SpellDamage",5720],["HealingPower",17160]]}
+{"id":13156,"name":"of Defense","allocations":[["DefenseRating",5200]]}
+{"id":13157,"name":"of Arcane Resistance","allocations":[["ArcaneResistance",5200],["Stamina",5200]]}
+{"id":13158,"name":"of Fire Protection","allocations":[["FireResistance",5200],["Stamina",5200]]}
+{"id":13159,"name":"of Frost Protection","allocations":[["FrostResistance",5200],["Stamina",5200]]}
+{"id":13160,"name":"of Nature Protection","allocations":[["NatureResistance",5200],["Stamina",5200]]}
+{"id":13161,"name":"of Shadow Protection","allocations":[["ShadowResistance",5200],["Stamina",5200]]}
+{"id":13162,"name":"of Arcane Wrath","allocations":[["ArcaneDamage",11154]]}
+{"id":13163,"name":"of Nature's Wrath","allocations":[["NatureDamage",11154]]}
+{"id":13164,"name":"of the Sorcerer","allocations":[["Intellect",4912],["Stamina",2775],["SpellDamage",2518],["HealingPower",2518]]}
+{"id":13165,"name":"of the Elder","allocations":[["Intellect",4912],["SpellDamage",2518],["HealingPower",2518],["Spirit",2775]]}
+{"id":13166,"name":"of the Channeler","allocations":[["SpellDamage",2518],["HealingPower",2518],["Spirit",2775],["Stamina",4912]]}
+{"id":13167,"name":"of the Physician","allocations":[["SpellDamage",1582],["HealingPower",4748],["Intellect",2775],["Stamina",4912]]}
+{"id":13168,"name":"of the Prophet","allocations":[["Intellect",4912],["SpellDamage",1582],["HealingPower",4748],["Spirit",2775]]}
+{"id":13169,"name":"of the Hierophant","allocations":[["SpellDamage",1582],["HealingPower",4748],["Spirit",2775],["Stamina",4912]]}
+{"id":13170,"name":"of the Bandit","allocations":[["Agility",2158],["AttackPower",5551],["RangedAttackPower",5551],["Stamina",4912]]}
+{"id":13171,"name":"of the Beast","allocations":[["Agility",2775],["Stamina",4912],["Strength",2158]]}
+{"id":13172,"name":"of the Champion","allocations":[["DefenseRating",1439],["Stamina",4912],["Strength",2775]]}
+{"id":13177,"name":"of Arcane Protection","allocations":[["ArcaneResistance",5666],["Stamina",5666]]}
+{"id":13178,"name":"of Fire Protection","allocations":[["FireResistance",5666],["Stamina",5666]]}
+{"id":13179,"name":"of Frost Protection","allocations":[["FrostResistance",5666],["Stamina",5666]]}
+{"id":13180,"name":"of Nature Protection","allocations":[["NatureResistance",5666],["Stamina",5666]]}
+{"id":13181,"name":"of Shadow Protection","allocations":[["ShadowResistance",5666],["Stamina",5666]]}
+{"id":13182,"name":"of the Knight","allocations":[["SpellDamage",2744],["HealingPower",2744],["Stamina",5352],["Strength",3024]]}
+{"id":13188,"name":"of the Eagle","allocations":[["Intellect",3666],["Stamina",3666]]}
+{"id":13189,"name":"of the Whale","allocations":[["Spirit",3666],["Stamina",3666]]}
+{"id":13190,"name":"of the Monkey","allocations":[["Agility",3666],["Stamina",3666]]}
+{"id":13191,"name":"of the Bear","allocations":[["Stamina",3666],["Strength",3666]]}
+{"id":13192,"name":"of the Gorilla","allocations":[["Intellect",3666],["Strength",3666]]}
+{"id":13193,"name":"of the Boar","allocations":[["Spirit",3666],["Strength",3666]]}
+{"id":13194,"name":"of the Tiger","allocations":[["Agility",3666],["Strength",3666]]}
+{"id":13195,"name":"of the Beast","allocations":[["Agility",1957],["Stamina",3463],["Strength",1522]]}
+{"id":13196,"name":"of the Knight","allocations":[["SpellDamage",1775],["HealingPower",1775],["Stamina",3463],["Strength",1957]]}
+{"id":13197,"name":"of Defense","allocations":[["DefenseRating",3667]]}
+{"id":13198,"name":"of the Champion","allocations":[["DefenseRating",1014],["Stamina",3463],["Strength",1957]]}
+{"id":13199,"name":"of the Defender","allocations":[["DefenseRating",1304],["SpellDamage",1775],["HealingPower",1775],["Stamina",3463]]}
+{"id":13200,"name":"of the Eagle","allocations":[["Intellect",3000],["Stamina",3000]]}
+{"id":13201,"name":"of the Whale","allocations":[["Spirit",3000],["Stamina",3000]]}
+{"id":13202,"name":"of the Owl","allocations":[["Intellect",3000],["Spirit",3000]]}
+{"id":13203,"name":"of Intellect","allocations":[["Intellect",4500]]}
+{"id":13204,"name":"of Spirit","allocations":[["Spirit",4500]]}
+{"id":13205,"name":"of Eluding","allocations":[["Agility",1666]],"stats":[["DodgeRating",12]]}
+{"id":13777,"name":"of the Gorilla","allocations":[["Intellect",5000],["Strength",5000]]}
+{"id":13778,"name":"of the Falcon","allocations":[["Agility",5000],["Intellect",5000]]}
+{"id":13779,"name":"of Fire Protection","allocations":[["FireResistance",5000],["Stamina",5000]]}
+{"id":13780,"name":"of Frost Protection","allocations":[["FrostResistance",5000],["Stamina",5000]]}
+{"id":13781,"name":"of Nature Protection","allocations":[["NatureResistance",5000],["Stamina",5000]]}
+{"id":13782,"name":"of Shadow Protection","allocations":[["ShadowResistance",5000],["Stamina",5000]]}
+{"id":13783,"name":"of Nature's Wrath","allocations":[["NatureDamage",10714]]}
+{"id":13784,"name":"of the Knight","allocations":[["SpellDamage",2421],["HealingPower",2421],["Stamina",4723],["Strength",2669]]}
