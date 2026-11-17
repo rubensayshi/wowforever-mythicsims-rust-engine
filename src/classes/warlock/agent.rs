@@ -120,6 +120,8 @@ pub(crate) struct WarlockAgent {
     /// Go agony.go `wholeTickAmp`: the Amplify Curse factor each target's Bane of Agony snapshot
     /// spent, indexed by the target's dot (patch 177).
     pub(crate) agony_whole_tick_amp: Vec<f64>,
+    /// The ramp third each target's Bane of Agony tick last dealt at.
+    pub(crate) agony_ramp_level: Vec<i32>,
     siphon_life: Option<SiphonLife>,
     bane_of_doom_dot: Option<DotId>,
     drain_life: Option<DrainLife>,
@@ -463,16 +465,14 @@ impl WarlockAgent {
                     ramp_every_ticks,
                     ..
                 } => {
+                    // The prepared ramp_every_ticks stays in the contract; the ramp now
+                    // follows thirds of the duration, which is four ticks of an unhasted Agony.
                     if *ramp_every_ticks <= 0 {
                         return Err("Bane of Agony ramps every nonpositive tick count".into());
                     }
                     let dot = bind_snapshot_dot(&mut fight, *spell_id, *tick_base, *tick_can_crit)?;
-                    fight.agent.bane_of_agony = Some(BaneOfAgony::new(
-                        dot,
-                        *tick_base,
-                        *ramp_share,
-                        *ramp_every_ticks,
-                    ));
+                    fight.agent.bane_of_agony =
+                        Some(BaneOfAgony::new(dot, *tick_base, *ramp_share));
                 }
                 Effect::CurseOfRecklessness {
                     aura, armor_delta, ..

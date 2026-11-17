@@ -116,8 +116,7 @@ impl Warlock {
     }
 
     /// Forever renamed Curse of Agony to Bane of Agony and moved it onto the bane slot. It
-    /// ramps: the snapshot pays half the tick, and the other half is added back every four
-    /// ticks.
+    /// ramps by thirds of its duration: half the tick, the whole tick, then one and a half.
     pub(super) fn register_curse_of_agony(&mut self, sim: &mut Sim, unit: UnitId) {
         let rank = spell_data().bane_of_agony.highest();
         let tick = rank.periodic_effect();
