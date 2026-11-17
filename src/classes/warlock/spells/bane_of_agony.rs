@@ -1,6 +1,8 @@
 //! Bane of Agony (11713), from Go sim/warlock/agony.go. Forever moved Curse of Agony onto
-//! the bane slot, which it takes from Bane of Doom. The dot ramps: the snapshot pays a share of the tick, and every few
-//! ticks that share is added back to the stored amount. Amplify Curse raises the whole tick,
+//! the bane slot, which it takes from Bane of Doom. The dot ramps by the time since it landed, in thirds of
+//! its duration: half the tick, then the whole tick, then one and a half. Forever combat logs
+//! show the extra ticks of a Wrack channel take the share of the third they land in, so the
+//! ramp follows time, not the tick count. Amplify Curse raises the whole tick,
 //! the ramping base and the spell power share alike (Go `AmplifyCurseWholeTick`, patch 177):
 //! the factor the snapshot spends is kept for the target and applied to each tick's damage.
 
@@ -14,7 +16,6 @@ pub(crate) struct BaneOfAgony {
     pub(crate) dot: DotId,
     tick_base: f64,
     ramp_share: f64,
-    ramp_every_ticks: i32,
     /// Go's `rampStep`, the share of the tick the last snapshot stored.
     ramp_step: f64,
     /// Amplify Curse's aura and the factor its snapshot spends it for.
@@ -22,12 +23,11 @@ pub(crate) struct BaneOfAgony {
 }
 
 impl BaneOfAgony {
-    pub(crate) fn new(dot: DotId, tick_base: f64, ramp_share: f64, ramp_every_ticks: i32) -> Self {
+    pub(crate) fn new(dot: DotId, tick_base: f64, ramp_share: f64) -> Self {
         Self {
             dot,
             tick_base,
             ramp_share,
-            ramp_every_ticks,
             ramp_step: 0.0,
             amplify: None,
         }
@@ -67,14 +67,41 @@ pub(crate) fn apply(fight: &mut Fight<WarlockAgent>, spell: SpellId, target: Sid
         fight.agent.bane_of_agony = Some(agony);
         fight.dots[dot].tick_base = Some(agony.ramp_step);
         fight.apply_dot(dot);
+        let levels = &mut fight.agent.agony_ramp_level;
+        if levels.len() <= dot {
+            levels.resize(dot + 1, 0);
+        }
+        levels[dot] = 0;
     }
     fight.deal_damage(spell, result, false);
 }
 
-/// `OnTick`: the snapshot tick raised by the Amplify Curse factor its snapshot spent, then every
-/// `ramp_every_ticks` ticks the ramp step is added to the stored amount.
+/// `OnTick`: the stored amount moved to the ramp third this tick lands in, then the snapshot
+/// tick raised by the Amplify Curse factor its snapshot spent.
 pub(crate) fn tick(fight: &mut Fight<WarlockAgent>, dot: DotId) {
     let agony = state(fight);
+    // The ramp follows the time since the curse landed, in thirds of its duration, a tick on a
+    // third's end taking that third's share: half the base, then the base, then one and a half.
+    // Wrack's added ticks deal the share of the third they land in.
+    let aura = fight.dots[dot].aura;
+    if fight.aura(aura).active {
+        let duration = fight.aura(aura).duration;
+        let elapsed = duration - (fight.aura(aura).expires - fight.now);
+        let level: i32 = if 3 * elapsed <= duration {
+            0
+        } else if 3 * elapsed <= 2 * duration {
+            1
+        } else {
+            2
+        };
+        let levels = &mut fight.agent.agony_ramp_level;
+        if levels.len() <= dot {
+            levels.resize(dot + 1, 0);
+        }
+        let delta = level - levels[dot];
+        levels[dot] = level;
+        fight.dots[dot].snapshot_base += f64::from(delta) * agony.ramp_step;
+    }
     let mut result = fight.snapshot_dot_tick_calc(dot);
     let amp = fight
         .agent
@@ -85,10 +112,4 @@ pub(crate) fn tick(fight: &mut Fight<WarlockAgent>, dot: DotId) {
     let spell = fight.dots[dot].spell;
     fight.scale_damage(spell, &mut result, amp);
     fight.deal_damage(spell, result, true);
-    // The ramp ends with the curse's own ticks: the extra ticks a Wrack channel adds (Forever's
-    // rules since 11 November 2026) deal the amount reached and raise it no further.
-    let ticks = fight.dots[dot].tick_count();
-    if ticks % agony.ramp_every_ticks == 0 && ticks < fight.dots[dot].base_tick_count {
-        fight.dots[dot].snapshot_base += agony.ramp_step;
-    }
 }

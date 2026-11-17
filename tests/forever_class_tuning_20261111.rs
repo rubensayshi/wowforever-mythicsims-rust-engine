@@ -7,12 +7,11 @@
 //!   0.2002 of spell power a tick), was 86 with 0.286. Its 10% more damage from the warlock's
 //!   other Shadow dots is gone. Instead, "While channeling, your Siphon Life, Corruption, and
 //!   Bane of Agony effects on the target deal their periodic damage 100% faster."
-//! - That line is a server-side script. The engine reads it as a dot under the channel ticking
-//!   twice as often and lasting as long, so it deals twice the ticks while the channel is on
-//!   it. It is provisional: the other reading, a dot that runs out in half the time with the
-//!   ticks it had, costs Affliction about 14% on its best rotation, where Blizzard's post says
-//!   the change comes "without affecting Affliction Warlocks' total damage output". Combat logs
-//!   of a dot under the channel settle it.
+//! - That line is a server-side script. Forever combat logs (forever.warcraftlogs.com reports
+//!   GbPa1DmnMKT7fqY9 and jnm1dPFg7avAJ3tQ) show how: a dot keeps the tick grid it landed on,
+//!   and while the channel is on its target the half points between its ticks tick too, each a
+//!   full tick, with the expiry unchanged. Bane of Agony's ramp follows the time since it
+//!   landed, so a half point tick takes the share of the third it lands in.
 //! - Summon Hawk and Arcane Shot cost 11% of base mana at every rank.
 //! - The Imp's Firebolt ranks 1 to 4 deal more (`levels_demons_20261109.rs` holds the ranks).
 
@@ -118,10 +117,11 @@ fn wrack_prepares_the_live_row() {
     assert!(rated >= go["dot_spells"].as_array().unwrap().len());
 }
 
-/// Corruption under a Wrack channel ticks twice as often and lasts as long. Cast when it is
+/// Corruption under a Wrack channel ticks its half points too and lasts as long. Cast when it is
 /// down with Wrack channelled otherwise, it is cast no more often than alone (less, as a
-/// channel under way when it runs out is finished first), and a cast that lands deals close to
-/// twelve ticks where it deals six alone, each as large as before.
+/// channel under way when it runs out is finished first), and a cast that lands deals well over
+/// six ticks, each as large as before. Not twelve: a recast of the channel lands a moment after
+/// the last one ends, often just past a half point, and that point does not tick.
 #[test]
 fn corruption_ticks_twice_as_often_under_the_channel() {
     let alone = affliction(vec![cast_when_down(CORRUPTION)]);
@@ -134,10 +134,10 @@ fn corruption_ticks_twice_as_often_under_the_channel() {
     // Alone each cast has its six ticks; only the last one of the fight loses some.
     let per_cast = ticks / casts;
     assert!(per_cast > 5.4 && per_cast <= 6.0, "{per_cast} ticks a cast");
-    // Under the channel all but the cast's own 1.5 seconds tick at twice the rate.
+    // Under the channel the half points tick too, less those the gaps between channels miss.
     let per_cast = fast_ticks / fast_casts;
     assert!(
-        per_cast > 10.0 && per_cast <= 12.0,
+        per_cast > 9.0 && per_cast <= 12.0,
         "{per_cast} ticks a cast"
     );
     // The channel changes when a tick lands, not what it deals.
