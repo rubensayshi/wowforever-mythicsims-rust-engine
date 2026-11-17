@@ -646,12 +646,18 @@ set_stats!(
 /// Chance on Hit: immobilizes the target and lowers their armor by 100 for 10 sec; master applies
 /// the -100 armor to the wearer, which is kept so the engines agree.
 fn spiders_kiss_2(env: &mut Environment, aura: AuraId) {
+    // The 5% as a fixed chance manager on melee hits, which the stat proc export reads
+    // (export_items.rs `set_stat_proc_effects`).
+    let dpm = Rc::new(
+        env.sim
+            .new_fixed_proc_chance_manager(env.player, 0.05, ProcMask::MELEE),
+    );
     set_stat_proc(
         env,
         aura,
         ProcTrigger {
             outcome: HitOutcome::LANDED,
-            proc_chance: 0.05,
+            dpm: Some(dpm),
             ..trigger(
                 "Spider's Kiss",
                 17333,

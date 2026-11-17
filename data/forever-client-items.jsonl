@@ -515,6 +515,7 @@
 {"id":275864,"name":"Putridus Wall","type":"ItemTypeWeapon","weapon_type":"WeaponTypeShield","hand_type":"HandTypeOffHand","scaling_options":{"0":{"stats":{"2":10,"25":5,"27":29,"30":1739,"38":8},"ilvl":50}}}
 {"id":275916,"name":"Glaive","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOffHand","weapon_speed":1.5,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":1,"ilvl":1}}}
 {"id":276071,"name":"The Black Helm","type":"ItemTypeHead","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":13,"2":25,"25":8,"30":501},"ilvl":59}}}
+{"id":276073,"name":"Band of the Damned","type":"ItemTypeFinger","scaling_options":{"0":{"stats":{"3":11,"4":15,"5":15,"16":6},"ilvl":61}},"unique":true}
 {"id":276188,"name":"Eluvi'ana","type":"ItemTypeWeapon","weapon_type":"WeaponTypeSword","hand_type":"HandTypeOneHand","weapon_speed":2.5,"scaling_options":{"0":{"weapon_damage_min":13,"weapon_damage_max":26,"stats":{"1":0},"ilvl":15}},"unique":true}
 {"id":276394,"name":"Luxurious Smoking Jacket","type":"ItemTypeChest","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"3":18,"4":17,"5":17,"30":84,"36":20},"ilvl":59}}}
 {"id":276395,"name":"Grimm's Packing Gloves","type":"ItemTypeHands","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"2":20,"20":10,"30":52},"ilvl":59}}}
