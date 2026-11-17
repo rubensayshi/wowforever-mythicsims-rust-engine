@@ -623,6 +623,58 @@ fn a_tanks_swap_that_changes_defense_runs() {
     assert!(value["enemy"]["rolls"].as_array().unwrap().len() > 1);
 }
 
+/// A Tauren Bear's Manual Crowd Pummeler opener with Hibernal Armor (a Droptimizer candidate):
+/// Bear Form's health bonus is 1302 on the reset and 1301.999999999999 on the swapped set, a
+/// rounding step the runtime follows, so the request runs.
+#[test]
+fn a_bears_swap_that_rounds_the_health_bonus_runs() {
+    let (value, _) = run("feral-bear-druid-swap-health-bonus");
+    let bear = effects(&value, "bear_form");
+    assert_eq!(bear.len(), 1);
+    let reset = bear[0]["health_bonus"].as_f64().unwrap();
+    let swap = effects(&value, "item_swap");
+    let swapped = swap[0]["swapped"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|change| {
+            change["path"]
+                .as_str()
+                .is_some_and(|path| path.ends_with("/health_bonus"))
+        })
+        .expect("the swapped set states its own health bonus")["value"]
+        .as_f64()
+        .unwrap();
+    assert_ne!(reset.to_bits(), swapped.to_bits());
+    assert!((reset - swapped).abs() < 1e-9, "{reset} against {swapped}");
+}
+
+/// A swapped set whose Bear Form health bonus really differs is still refused: the runtime keeps
+/// the reset's bonus for the whole fight.
+#[test]
+fn a_bears_swap_that_changes_the_health_bonus_is_refused() {
+    let mut value = prepared("feral-bear-druid-swap-health-bonus", Rules::Forever);
+    let effects = value["effects"].as_array_mut().unwrap();
+    let swap = effects
+        .iter_mut()
+        .find(|effect| effect["kind"] == "item_swap")
+        .unwrap();
+    let change = swap["swapped"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|change| {
+            change["path"]
+                .as_str()
+                .is_some_and(|path| path.ends_with("/health_bonus"))
+        })
+        .unwrap();
+    change["value"] = json!(change["value"].as_f64().unwrap() + 10.0);
+    let prepared: PreparedV2 = serde_json::from_value(value).unwrap();
+    let refusal = format!("{:?}", check_prepared(&prepared).unwrap_err());
+    assert!(refusal.contains("health_bonus"), "{refusal}");
+}
+
 /// Mark of the Champion against an Undead target: its 150 attack power against Undead and
 /// Demons is the player's while the item is worn.
 #[test]
