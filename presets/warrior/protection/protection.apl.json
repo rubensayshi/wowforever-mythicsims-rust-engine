@@ -114,15 +114,6 @@
       "action": {
         "castSpell": {
           "spellId": {
-            "spellId": 1329555
-          }
-        }
-      }
-    },
-    {
-      "action": {
-        "castSpell": {
-          "spellId": {
             "spellId": 2687
           }
         },
