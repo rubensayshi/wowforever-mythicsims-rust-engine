@@ -4,7 +4,8 @@
 //!   rows (Wowhead Forever, 15 November 2026): 10610 deals weapon damage with a 100 ms cooldown
 //!   and applies no attack power aura, and the party aura 10612 carries the 246 attack power as
 //!   a dummy. The strike rolls the special attack table, grants no charges, gives Maelstrom
-//!   Weapon no stack, and an Execute rolls the totem from its cast attack as well as its damage.
+//!   Weapon no stack. (An Execute rolled the totem from its cast attack as well as its damage
+//!   until the hotfixes of 16 November 2026; forever_rules_20261116.rs.)
 //! - A damage shield answers no hit blocked in full.
 //! - A direct hit taken of a school other than Physical gives twice the rage.
 //! - Live item rows from the Forever tooltips of 15 November 2026.
@@ -109,22 +110,6 @@ fn windfury_totem_proc_is_a_weapon_strike() {
         .is_none());
     let swings = action(&run(&reference), totem_strike);
     assert!(count(&swings, "glances") > 0, "{swings}");
-}
-
-/// Combat logs taken after the hotfix of 14 November 2026: the totem's strike followed 267 of
-/// 846 landed Executes (31.6%, where one roll gives 20%) and 35 of 185 dodged ones (18.9%), so
-/// the cast's own attack rolls it as well as the damage.
-#[test]
-fn execute_rolls_the_totem_from_its_cast_attack() {
-    let forever = production("production-warrior", FURY, Rules::Forever);
-    assert_eq!(
-        effect(&forever, "execute")["cast_attack_rolls_windfury_totem"],
-        json!(true)
-    );
-    let reference = production("production-warrior", FURY, Rules::GoReference);
-    assert!(effect(&reference, "execute")
-        .get("cast_attack_rolls_windfury_totem")
-        .is_none());
 }
 
 /// Combat logs taken after the hotfixes of 13 November 2026: the totem's strike gave Maelstrom

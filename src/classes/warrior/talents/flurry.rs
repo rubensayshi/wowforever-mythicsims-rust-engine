@@ -1,7 +1,8 @@
 //! Flurry (12319, buff 12966): a landed melee crit grants melee speed for a number of charges.
 //! Under Forever's rules every white swing spends one whatever its outcome (hit, glance, miss,
-//! dodge or parry), a Heroic Strike or Cleave spends one only when it misses, and a crit of
-//! Whirlwind's off hand strike starts it as any other strike's does. Go's `registerFlurry`,
+//! dodge or parry), a Heroic Strike or Cleave spends one a cast whatever its outcome and however
+//! many targets it hits (the hotfixes of 16 November 2026), and a crit of Whirlwind's off hand
+//! strike starts it as any other strike's does. Go's `registerFlurry`,
 //! which `--go-rules` keeps, spends one on each landed white hit, Heroic Strike and Cleave
 //! included, and never starts it from Whirlwind's off hand strike.
 //!
@@ -11,9 +12,15 @@
 //! 25/25, 24/24 and 23/23; missed Heroic Strikes 9/9, 4/4 and 10/10; landed Heroic Strikes
 //! 0/109 and 0/74 (and 3/82, each sharing its moment with a white swing), dodged or parried
 //! ones 0/38. The logs hold one Cleave, so Cleave following Heroic Strike is an assumption.
+//! Heroic Strike and Cleave since the hotfixes of 16 November 2026 (the buff's row now procs on
+//! melee abilities, ProcFlags 0x14): public Forever reports on forever.warcraftlogs.com of 17
+//! November (QDVfcwHpjZRzL94q, Wy6TdamAk4ZxJ8MC, 1g2QAZPJrLTjCz3m and six more, nine Fury
+//! warriors) show a charge spent by 94 of 94 landed and 12 of 12 avoided Heroic Strikes and 372
+//! of 372 Cleaves with Flurry up, and one charge by 327 of 328 Cleaves that hit two targets.
 //! Combat logs of client 1.60.1.70888 hold 97 Whirlwinds of eight warriors: 16 of the 18 whose
 //! off hand strike alone crit started Flurry.
 
+use crate::classes::warrior::agent::WarriorAgent;
 use crate::core::fight::{Agent, AuraRef, Fight, SpellId, SpellResult, OUTCOME_MISS};
 
 #[derive(Clone, Copy, Debug)]
@@ -26,11 +33,14 @@ pub(crate) struct Flurry {
     /// Forever's rules: a crit of Whirlwind's off hand strike starts Flurry. Without them, as
     /// in Go, that strike never does.
     pub(crate) whirlwind_off_hand_starts: bool,
+    /// Forever's rules since the hotfixes of 16 November 2026: a Heroic Strike or Cleave spends
+    /// one charge a cast whatever its outcome. Without it, only a miss spends one.
+    pub(crate) strikes_spend_once: bool,
 }
 
 /// The trigger's OnSpellHitDealt, which acts at once.
-pub(crate) fn on_hit<A: Agent>(
-    fight: &mut Fight<A>,
+pub(crate) fn on_hit(
+    fight: &mut Fight<WarriorAgent>,
     params: Flurry,
     spell: SpellId,
     result: &SpellResult,
@@ -43,6 +53,19 @@ pub(crate) fn on_hit<A: Agent>(
     if class_spell == Some("whirlwind_off_hand") && !params.whirlwind_off_hand_starts {
         return;
     }
+    let strike = matches!(class_spell, Some("heroic_strike" | "cleave"));
+    let white_hit = state.white_hit;
+    if params.strikes_spend_once && strike {
+        // One charge a cast, before a crit starts Flurry again: a Cleave deals each target's
+        // hit at the same moment, and only the first spends.
+        let cast = Some((spell, fight.now));
+        if fight.agent.flurry_strike_spent != cast {
+            fight.agent.flurry_strike_spent = cast;
+            if fight.aura(params.aura).active {
+                fight.remove_stack(params.aura);
+            }
+        }
+    }
     if result.crit() {
         fight.activate_aura(params.aura);
         fight.set_stacks(params.aura, params.charges);
@@ -54,11 +77,11 @@ pub(crate) fn on_hit<A: Agent>(
     // Heroic Strike and Cleave carry the main hand's auto mask too (ProcMask::MELEE_MH), so
     // they are told apart from the white swing by name.
     let spends = if !params.every_swing_spends {
-        state.white_hit
-    } else if matches!(class_spell, Some("heroic_strike" | "cleave")) {
-        result.outcome & OUTCOME_MISS != 0
+        white_hit
+    } else if strike {
+        !params.strikes_spend_once && result.outcome & OUTCOME_MISS != 0
     } else {
-        state.white_hit
+        white_hit
     };
     if spends {
         fight.remove_stack(params.aura);

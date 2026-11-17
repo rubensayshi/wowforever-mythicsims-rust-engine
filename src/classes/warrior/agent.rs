@@ -212,6 +212,9 @@ pub(crate) struct WarriorAgent {
     /// Go `struck` in `registerDeepWounds`: the crit that casts the bleed came from the off hand
     /// weapon of a dual wielder, for the one cast the trigger makes.
     deep_wounds_off_hand: bool,
+    /// Flurry under Forever's rules: the Heroic Strike or Cleave cast, by spell and moment, that
+    /// last spent a charge, so a Cleave's second target spends none.
+    pub(crate) flurry_strike_spent: Option<(SpellId, i64)>,
     /// Whether each spell's proc mask holds a bit of a hand that wields a sword.
     sword_mask: Vec<bool>,
     /// With an item swap, Weaponmaster's sword mask for each set, Main then Swap1: the hands
@@ -1123,6 +1126,7 @@ impl WarriorAgent {
                     spell_id,
                     proc_chance,
                     rage,
+                    strikes_proc,
                     ..
                 } => {
                     let metrics = rage_metrics(&mut fight, *spell_id);
@@ -1131,6 +1135,7 @@ impl WarriorAgent {
                         proc_chance: *proc_chance,
                         rage: *rage,
                         metrics,
+                        strikes_proc: *strikes_proc,
                     });
                 }
                 Effect::RecklessSwings {
@@ -1160,6 +1165,7 @@ impl WarriorAgent {
                     charges,
                     every_swing_spends,
                     whirlwind_off_hand_starts,
+                    strikes_spend_once,
                     ..
                 } => {
                     fight.agent.flurry = Some(Flurry {
@@ -1168,6 +1174,7 @@ impl WarriorAgent {
                         charges: *charges,
                         every_swing_spends: *every_swing_spends,
                         whirlwind_off_hand_starts: *whirlwind_off_hand_starts,
+                        strikes_spend_once: *strikes_spend_once,
                     })
                 }
                 Effect::AngerManagement {
@@ -1889,6 +1896,7 @@ impl Agent for WarriorAgent {
             anger_management::reset(fight, params);
         }
         fight.agent.sword_rolled_at.fill(None);
+        fight.agent.flurry_strike_spent = None;
         let queue = &mut fight.agent.queue;
         queue.current = None;
         queue.queued.iter_mut().for_each(|queued| *queued = false);

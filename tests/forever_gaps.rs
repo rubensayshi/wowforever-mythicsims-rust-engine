@@ -751,8 +751,9 @@ fn warrior_strikes_and_freezing_trap_run() {
         // the main hand (12 November 2026). 530 since weapon procs do not hear Shield Slam or
         // Shield Bash (13 November 2026). 529 since Ironfoe's Fury of Forgewright rolls 3%. 531
         // since every ability's main hand strike rolls Windfury Totem, the shield strikes too
-        // (hotfixes of 13 November 2026).
-        ("protection-warrior-shield-bash", 1672, 531.0),
+        // (hotfixes of 13 November 2026). 530 since Shield Slam and Shield Bash no longer roll
+        // it (hotfixes of 16 November 2026).
+        ("protection-warrior-shield-bash", 1672, 530.0),
         // 78 since the notes of 2 November (Two-Handed Weapon Specialization 6%, Slam on 15 sec)
         // changed the rage a fight has (77 after #183 and #184).
         // 77 since the 11 November live rows of Truestrike Shoulders and Battleborn Armbraces.

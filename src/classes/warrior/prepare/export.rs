@@ -202,9 +202,11 @@ impl Warrior {
             // Combat logs of client 1.60.1.70862: 36 of 36 avoided Executes keep the extra rage
             // and get none of the cost back (spells/execute.rs).
             execute_effect["extra_rage_on_landed"] = json!(true);
-            // Combat logs taken after the hotfix of 14 November 2026: Windfury Totem's strike
-            // follows 267 of 846 landed Executes and 35 of 185 dodged ones (spells/execute.rs).
-            execute_effect["cast_attack_rolls_windfury_totem"] = json!(true);
+            // Combat logs taken between the hotfixes of 14 and 16 November 2026 had Windfury
+            // Totem's strike follow 267 of 846 landed Executes and 35 of 185 dodged ones: the
+            // cast rolled the totem as well as its hit. The hotfixes of 16 November 2026 took
+            // that second roll away ("Fixed an issue where Mutilate and Execute would have an
+            // extra attempt to activate Windfury Totem"), so Execute rolls once, on its hit.
         }
         effects.push(execute_effect);
         // hamstring.go
@@ -404,13 +406,16 @@ impl Warrior {
         // talents_fury.go registerUnbridledWrath: white hits, not melee specials
         if talent("unbridled_wrath") > 0 {
             let trigger = data.unbridled_wrath_triggered.highest();
-            effects.push(
-                json!({"kind": "unbridled_wrath", "trigger_aura": "Unbridled Wrath",
+            let mut unbridled = json!({"kind": "unbridled_wrath", "trigger_aura": "Unbridled Wrath",
                 "spell_id": trigger.id,
                 "proc_chance": data.unbridled_wrath.fraction_at(talent("unbridled_wrath")),
                 "rage": trigger.energize_effect().tenths(),
-                "delay_ns": SPELL_BATCH_WINDOW}),
-            );
+                "delay_ns": SPELL_BATCH_WINDOW});
+            // The hotfixes of 16 November 2026: Heroic Strike and Cleave proc it too.
+            if sim.rules == Rules::Forever {
+                unbridled["strikes_proc"] = json!(true);
+            }
+            effects.push(unbridled);
         }
         if talent("flurry") > 0 {
             let buff = data.flurry_triggered.highest();
@@ -423,6 +428,9 @@ impl Warrior {
             if sim.rules == Rules::Forever {
                 flurry["every_swing_spends"] = json!(true);
                 flurry["whirlwind_off_hand_starts"] = json!(true);
+                // The hotfixes of 16 November 2026: a Heroic Strike or Cleave spends one charge
+                // a cast whatever its outcome (flurry.rs).
+                flurry["strikes_spend_once"] = json!(true);
             }
             effects.push(flurry);
         }

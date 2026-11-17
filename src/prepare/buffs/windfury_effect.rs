@@ -92,6 +92,11 @@ fn proc_trigger_spells(env: &Environment, trigger: &ProcTrigger) -> Vec<usize> {
 /// a seal's proc, Windfury Weapon's strikes and the Sweeping Strikes hit, each a Passive Spell.
 /// Whether the game rolls the totem on those is not stated and needs a log taken after the
 /// hotfix, as does the chance, which stays the autos' 20% for abilities.
+///
+/// The hotfixes of 16 November 2026 take Shield Slam and Shield Bash back out ("Fixed an issue
+/// where Shield Slam, Shield Bash, and Shieldsworn empowered Holy Strikes could attempt to
+/// activate Windfury Totem"). Shieldsworn's Holy Strike stays in: the notes do not say which
+/// Holy Strikes count as empowered, and no board takes the totem with it.
 pub(crate) fn windfury_trigger_spells(env: &Environment, trigger: &ProcTrigger) -> Vec<usize> {
     let forever = env.sim.rules == Rules::Forever;
     let mut trigger = trigger.clone();
@@ -114,6 +119,9 @@ pub(crate) fn windfury_trigger_spells(env: &Environment, trigger: &ProcTrigger) 
             }
             if forever {
                 let row = find(spell.action_id.spell_id);
+                if matches!(row.name.as_str(), "Shield Slam" | "Shield Bash") {
+                    return false;
+                }
                 // Every ability's main hand strike since the hotfixes of 13 November 2026. A
                 // triggered hit, which carries Passive Spell, still needs the row's flags.
                 return spell.proc_mask.matches(ProcMask::MELEE_MH_AUTO)

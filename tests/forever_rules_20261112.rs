@@ -232,8 +232,8 @@ fn shield_slam_and_shield_bash_strike_with_the_main_hand() {
     // level 48, 229 at 54): 255.
     assert_eq!(spell(&forever, SHIELD_SLAM).1["flat_threat_bonus"], 255.0);
     assert_eq!(spell(&reference, SHIELD_SLAM).1["flat_threat_bonus"], 508.0);
-    // Windfury Totem rolls on them since the hotfixes of 13 November 2026 ("activated by all
-    // melee abilities even if it doesn't involve your main hand weapon"); it never did before.
+    // Windfury Totem rolled on them between the hotfixes of 13 November 2026 ("activated by all
+    // melee abilities") and those of 16 November 2026, which took the shield strikes back out.
     if let Some(totem) = forever["effects"]
         .as_array()
         .unwrap()
@@ -248,7 +248,7 @@ fn shield_slam_and_shield_bash_strike_with_the_main_hand() {
                     .as_array()
                     .unwrap()
                     .iter()
-                    .any(|spell| spell.as_u64() == Some(position)),
+                    .all(|spell| spell.as_u64() != Some(position)),
                 "{triggers}"
             );
         }

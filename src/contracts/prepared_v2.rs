@@ -4664,6 +4664,10 @@ pub enum Effect {
         proc_chance: f64,
         rage: f64,
         delay_ns: i64,
+        /// Forever's rules since the hotfixes of 16 November 2026: Heroic Strike and Cleave
+        /// proc it as white swings do.
+        #[serde(default, skip_serializing_if = "is_false")]
+        strikes_proc: bool,
     },
     /// The Warrior's Flurry: a melee crit grants melee speed for a few white swings.
     WarriorFlurry {
@@ -4680,6 +4684,10 @@ pub enum Effect {
         /// in Go, that strike never does.
         #[serde(default, skip_serializing_if = "is_false")]
         whirlwind_off_hand_starts: bool,
+        /// Forever's rules since the hotfixes of 16 November 2026: a Heroic Strike or Cleave
+        /// spends one charge a cast whatever its outcome, in place of only when it misses.
+        #[serde(default, skip_serializing_if = "is_false")]
+        strikes_spend_once: bool,
     },
     /// Reckless Swings (Forever's rules, the notes of 2 November 2026): a cast for a share of
     /// base health that gives the aura `charges` stacks, each landed white swing a spell batch
