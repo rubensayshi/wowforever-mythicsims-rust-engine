@@ -1222,6 +1222,20 @@ fn swap_change_limit(
         {
             None
         }
+        // Bear Form's health bonus, which the runtime reads once from the reset. Each set's is a
+        // difference of two health totals, so a swap that leaves the bonus as it was can still
+        // land a rounding step away (1302 against 1301.999999999999 on a Tauren bear's
+        // Manual Crowd Pummeler opener): the runtime follows a bonus within that rounding.
+        ["effects", index, "health_bonus"]
+            if index.parse::<usize>().ok().is_some_and(|index| {
+                matches!(prepared.effects.get(index), Some(Effect::BearForm { health_bonus, .. })
+                    if change.value.as_f64().is_some_and(|value| {
+                        (value - health_bonus).abs() <= 1e-12 * health_bonus.abs()
+                    }))
+            }) =>
+        {
+            None
+        }
         // The melee speed after the reset, which the item and enchant speed auras the swap
         // switches multiply in as they are gained and divide out as they fade.
         ["melee", "melee_speed_multiplier"] => {

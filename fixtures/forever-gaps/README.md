@@ -94,3 +94,4 @@ checks the gate passes and runs it.
 | `enhancement-shaman-serpentbane-crown` | Serpentbane Crown (274609), a Forever item whose use (a Fire hit and damage over time) has encrypted client rows, on a level 41 Enhancement Shaman (9 November 2026) |
 | `warrior-bigger-rock-on-bigger-stick` | Bigger Rock on Bigger Stick (279480), a Forever two-hand mace whose chance on hit is a physical damage over time, on a level 46 Arms Warrior (9 November 2026) |
 | `feral-druid-bigger-rock-on-bigger-stick` | the same weapon on a level 43 Feral Druid in Cat Form (9 November 2026) |
+| `feral-bear-druid-swap-health-bonus` | a Tauren Bear's Manual Crowd Pummeler opener whose swapped set states Bear Form's health bonus a rounding step from the reset's (a level 60 Droptimizer candidate, Hibernal Armor, 18 November 2026) |
