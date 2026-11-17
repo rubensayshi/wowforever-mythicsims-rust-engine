@@ -18,6 +18,7 @@ A level 60 request without these fields prepares exactly as before.
 
 - `character_level()` replaced the `CHARACTER_LEVEL` constant: the caster level spell amounts scale to (`Effect::average`), the player unit's level, pets' level and the default target's.
 - `Ladder::highest()` and `highest_for()` resolve to the highest rank the character knows: the highest rank the spellbook lists, or, for a ladder the spellbook lists none of (a talent, an item's spell or a triggered effect) and for a request without a spellbook, the highest rank whose spell level is at or below the character's level. At 60 that is every rank, so nothing changes there.
+- `levels::known_rank_at()` does the same for ranks whose levels the class states in place of the rows': a hotfix that moved them, or a rank the store lacks. The stated levels hold for the rest of the preparation, so the unlearned flags and the rotation rewrite read them too. Holy Shield is the one user under Forever's rules: ranks 1 to 3 at push 113554's 30/40/50 (the frozen rows state 40/50/60) and rank 4 (1239570, not in the store) at 60, as the live client's SpellLevels rows state; a levelling paladin registers only the rank it knows (18 Nov, `tests/levels_holy_shield_20261118.rs`).
 
 Base stats (`character::base_stats`) move to the level (`levels::base_stats_at_level`):
 
