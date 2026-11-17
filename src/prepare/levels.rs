@@ -90,6 +90,9 @@ pub(crate) struct Character {
     /// The spells a first preparation registered for the player and did not flag unlearned,
     /// with their class spell name: what a rotation can be pointed at ([`known_rank_of_name`]).
     pub registered: std::collections::BTreeMap<i32, String>,
+    /// The level a rank is learned at where the class states one in place of its row's
+    /// ([`known_rank_at`]): a live hotfix that moved the rank, or a rank the store lacks.
+    pub stated_levels: std::collections::BTreeMap<i32, i32>,
 }
 
 /// The attributes in the sheet's order.
@@ -189,6 +192,7 @@ impl Character {
             unlearned: BTreeSet::new(),
             known_as: std::collections::BTreeMap::new(),
             registered: std::collections::BTreeMap::new(),
+            stated_levels: std::collections::BTreeMap::new(),
         }
     }
 }
@@ -238,7 +242,7 @@ pub(crate) fn known_rank<'a>(ranks: &[&'a Spell]) -> Option<&'a Spell> {
         ranks
             .iter()
             .rev()
-            .find(|rank| i32::from(rank.spell_level) <= character.level)
+            .find(|rank| learned_at(&character, rank) <= character.level)
             .copied()
     })?;
     if ranks.len() > 1 {
@@ -254,6 +258,33 @@ pub(crate) fn known_rank<'a>(ranks: &[&'a Spell]) -> Option<&'a Spell> {
         });
     }
     Some(known)
+}
+
+/// Which of a ladder's ranks the character knows, as [`known_rank`] reads them, with the level
+/// each rank is learned at stated by the class rather than read off its row: a live hotfix moved
+/// the ranks to other levels than the frozen rows state, or a rank is not in the store at all.
+/// The stated levels hold for the rest of the preparation, so [`is_unlearned`] and the rotation
+/// rewrite read them too. When the character knows none, the first rank stands in, noted as
+/// unlearned ([`unlearned_rank`]).
+pub(crate) fn known_rank_at<'a>(ranks: &[(&'a Spell, i32)]) -> Option<&'a Spell> {
+    CURRENT.with(|current| {
+        let mut character = current.borrow_mut();
+        for (rank, level) in ranks {
+            character.stated_levels.insert(rank.id, *level);
+        }
+    });
+    let rows: Vec<&'a Spell> = ranks.iter().map(|(rank, _)| *rank).collect();
+    known_rank(&rows).or_else(|| unlearned_rank(&rows))
+}
+
+/// The level the character learns a rank at: the class's stated level where it gave one
+/// ([`known_rank_at`]), the row's spell level otherwise.
+fn learned_at(character: &Character, rank: &Spell) -> i32 {
+    character
+        .stated_levels
+        .get(&rank.id)
+        .copied()
+        .unwrap_or_else(|| i32::from(rank.spell_level))
 }
 
 /// A levelling character's rotations, naming the rank it knows wherever a rotation names
@@ -679,7 +710,7 @@ fn knows_rank(character: &Character, rank: &Spell) -> bool {
             return false;
         }
     }
-    i32::from(rank.spell_level) <= character.level
+    learned_at(character, rank) <= character.level
 }
 
 /// Every ranked row with this rank's name.

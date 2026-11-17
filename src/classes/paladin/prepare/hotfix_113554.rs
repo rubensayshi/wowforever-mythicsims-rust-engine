@@ -288,14 +288,31 @@ pub(crate) fn holy_shield_rank_4() -> &'static Spell {
     })
 }
 
+/// The levels Holy Shield's four ranks are learned at under Forever's rules: ranks 1 to 3 at
+/// push 113554's 30/40/50 ([`HOLY_SHIELD`]; the frozen rows still state 40/50/60), rank 4 at 60
+/// ([`holy_shield_rank_4`]). The live client's SpellLevels rows agree (wago.tools, product wowf,
+/// build 1.60.1.70959: 20925 at 30, 20927 at 40, 20928 at 50, 1239570 at 60).
+pub(crate) const HOLY_SHIELD_LEVELS: [i32; 4] = [30, 40, 50, 60];
+
 /// A Holy Shield rank's place in the spells it replaces: under Forever's rules a level 60 paladin
 /// has the four ranks, under the reference three.
+///
+/// A levelling paladin under Forever's rules has the one rank it knows, at the levels of
+/// [`HOLY_SHIELD_LEVELS`] or as its spellbook lists, and a rotation naming a higher rank casts
+/// that one ([`crate::prepare::levels::known_rank_at`]): a level 35 paladin's Holy Shield is
+/// rank 1, not rank 4, which the store has no row (and so no level) for.
 pub(crate) fn holy_shield_ranks(rules: crate::prepare::sim::Rules) -> Vec<&'static Spell> {
     use super::spell_data::spell_data;
+    use crate::prepare::levels;
     let mut ranks = Vec::new();
     spell_data().holy_shield.each(|_, rank| ranks.push(rank));
     if rules == crate::prepare::sim::Rules::Forever {
         ranks.push(holy_shield_rank_4());
+        if levels::character_level() != levels::MAX_LEVEL {
+            let stated: Vec<(&'static Spell, i32)> =
+                ranks.iter().copied().zip(HOLY_SHIELD_LEVELS).collect();
+            return levels::known_rank_at(&stated).into_iter().collect();
+        }
     }
     ranks
 }
