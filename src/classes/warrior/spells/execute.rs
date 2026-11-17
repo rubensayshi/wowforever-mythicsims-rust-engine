@@ -9,10 +9,12 @@
 //! warriors all keep the pool, for example 46.9 rage to 37.9 after a parry and one Bloodrage
 //! tick at a cost of 10.
 //!
-//! Under Forever's rules the cast also makes an attack of its own before the damage, and each
-//! of the two that lands rolls the party's Windfury Totem. Combat logs taken after the hotfix
-//! of 14 November 2026: the totem's strike followed 267 of 846 landed Executes (31.6%, where
-//! one roll gives 20%) and 35 of 185 dodged ones (18.9%, where the damage rolled nothing).
+//! Between the hotfixes of 14 and 16 November 2026 the cast also made an attack of its own
+//! before the damage, and each of the two that landed rolled the party's Windfury Totem: the
+//! totem's strike followed 267 of 846 landed Executes (31.6%, where one roll gives 20%) and 35
+//! of 185 dodged ones. The hotfixes of 16 November 2026 removed that extra attempt, so Forever's
+//! rules no longer turn `cast_attack_rolls_windfury_totem` on; the Execute's hit rolls the
+//! totem as any ability's does.
 
 use crate::core::fight::{melee::PhysicalOutcome, Agent, Fight, Side, SpellId};
 

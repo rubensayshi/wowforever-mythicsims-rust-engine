@@ -77,8 +77,14 @@ impl Warrior {
             &ProcTrigger {
                 name: "Unbridled Wrath".to_string(),
                 proc_mask: ProcMask::MELEE_WHITE_HIT,
-                // Heroic Strike and Cleave replace a main-hand swing but never proc it.
-                proc_mask_exclude: ProcMask::MELEE_SPECIAL,
+                // Heroic Strike and Cleave replace a main-hand swing and, as in Go, never proc
+                // it; under Forever's rules since the hotfixes of 16 November 2026 they do
+                // (unbridled_wrath.rs keeps them and drops other melee abilities).
+                proc_mask_exclude: if sim.rules == Rules::Forever {
+                    ProcMask::UNKNOWN
+                } else {
+                    ProcMask::MELEE_SPECIAL
+                },
                 proc_chance: spell_data().unbridled_wrath.fraction_at(rank),
                 require_damage_dealt: true,
                 outcome: HitOutcome::LANDED,
@@ -381,10 +387,10 @@ impl Warrior {
     }
 
     /// Reckless Swings (1329555, notes of 2 November 2026): for 25% of base health, the next 4
-    /// melee swings give 5 Rage each for 8 sec, on a 15 sec cooldown. The row's proc is each
-    /// melee auto attack, so only landed white swings that dealt damage count, as for Unbridled
-    /// Wrath: Heroic Strike and Cleave take a swing's place but are melee abilities. The Rage
-    /// and the spent charge come a spell batch window after the swing, as a proc handler's do.
+    /// melee swings give 5 Rage each for 8 sec, on a 15 sec cooldown. Landed white swings that
+    /// dealt damage count, and since the hotfixes of 16 November 2026 Heroic Strike and Cleave
+    /// too (reckless_swings.rs). The Rage and the spent charge come a spell batch window after
+    /// the swing, as a proc handler's do.
     fn register_reckless_swings(&self, sim: &mut Sim, unit: UnitId) {
         if !self.has_talent("reckless_swings") {
             return;
@@ -407,7 +413,8 @@ impl Warrior {
             &ProcTrigger {
                 name: "Reckless Swings - Trigger".to_string(),
                 proc_mask: ProcMask::MELEE_WHITE_HIT,
-                proc_mask_exclude: ProcMask::MELEE_SPECIAL,
+                // Heroic Strike and Cleave carry the main hand's auto mask too; the handler
+                // keeps them and drops other melee abilities.
                 require_damage_dealt: true,
                 outcome: HitOutcome::LANDED,
                 callback: CallbackMask::ON_SPELL_HIT_DEALT,
