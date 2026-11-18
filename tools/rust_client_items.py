@@ -28,8 +28,8 @@ the same line of a Classic item. A line that changes nothing in a fight (mount s
 profession, quest text, a use that only controls an enemy; NO_FIGHT_EFFECT) is left out of the
 row. So is a use, chance on hit or equip line the engine models by hand (ENGINE_EFFECT:
 Serpentbane Crown's use, the two Rock on Stick weapons' bash, Toofbreaker's bash, Dreadfrost
-Saber's Frost damage, Totem of Rage's shock damage, Maw of Min'loth's leech when struck), a use
-the engine never presses (UNPRESSED_USE: Zarla's Snack Pouch's whelp, whose damage no row
+Saber's Frost damage, Totem of Rage's shock damage, Totem of Sustaining's Water Shield globe,
+Maw of Min'loth's leech when struck), a use the engine never presses (UNPRESSED_USE: Zarla's Snack Pouch's whelp, whose damage no row
 states, and Behemoth Bones' heal), an equip proc whose chance no row states (UNSTATED_PROC:
 Claymore of Two Moons), and an equip line that acts only when the wearer is struck, which the engine refuses on the
 character it can reach (Zealot Plate's mana, Girdle of Extracted Answers' damage on block). A use
@@ -433,6 +433,9 @@ NO_FIGHT_EFFECT = [
         # Cliff Jumpers 284040, Brewmancer Nightcap 276877.
         r"Equip: Reduces damage from falling\.",
         r"Equip: Increases your effective stealth detection level by \d+\.",
+        # Filcher's Cowl 219343: its equip spell (443632) raises the stealth level and the range
+        # of Disarm Trap, Pick Pocket and Distract, none of which a fight reads.
+        r"Equip: Increases your effective stealth level by \d+\.",
         # Wicked Ritualist's Kris 273832; Razza's Heart, Skarr's Broken Gauntlet, Mushgog's Crown
         # of Thorns 277556 to 277558.
         r"Quest Item",
@@ -516,6 +519,12 @@ ENGINE_EFFECT = [
         "Chance on hit: Launch a boulder, dealing 98 Physical damage.",
         "Chance on hit: Assault the target with a dangerous toxin, dealing 50 to 76 Nature damage. "
         "Deals 3 times as much damage to Plants.",
+        # Weed Whacker 274270: the two-hand axe's larger Grass Killer (1293568).
+        "Chance on hit: Assault the target with a dangerous toxin, dealing 100 to 152 Nature "
+        "damage. Deals 3 times as much damage to Plants.",
+        # Totem of Sustaining 23200: a fourth Water Shield globe (the shaman package's
+        # prepare/items.rs).
+        "Equip: Increases the maximum number of charges on your Water Shield by 1.",
         # Bolt's Charged Eyeball 280032: Grounded Electroshocks (EQUIP_DAMAGE_PROC_ITEMS).
         "Equip: Dealing damage has a chance to deal 60 Nature damage to you or your current "
         "target. Deals 3 times as much damage to Dinosaurs. (Proc chance: 15%, 3s cooldown)",

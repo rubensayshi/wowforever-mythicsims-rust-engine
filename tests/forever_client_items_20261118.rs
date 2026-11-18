@@ -7,8 +7,8 @@
 //! - Spider's Kiss (2), "player aura Spider's Kiss 2P listens to combat events without an
 //!   effect" twice: Venomspitter (13183) and Fang of the Crystal Spider (13218) worn together.
 //!
-//! Left out, as their effects state no numbers the engine can use: Weed Whacker (274270, a
-//! chance on hit with no stated rate) and Totem of Sustaining (23200, Water Shield charges).
+//! Weed Whacker (274270) and Totem of Sustaining (23200) were left out here and are rows since
+//! `tests/forever_items_hotfix_20261117.rs`.
 
 use forever_engine::{
     check_prepared, contracts::prepared_v2::PreparedV2, prepare_json_with, simulate_prepared, Rules,

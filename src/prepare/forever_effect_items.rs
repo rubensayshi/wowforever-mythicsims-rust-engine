@@ -34,6 +34,8 @@
 //!   times as much damage to Plants" is never applied: the client has no Plant creature type and a
 //!   request can name none. Brush Cutter (274265), a one-hand axe, carries the same Grass Killer
 //!   (ItemEffect 233726) and is registered beside the blade.
+//!   Weed Whacker (274270), a two-hand axe, carries a Grass Killer row of its own (1293568,
+//!   ItemEffect 233728) of 100 to 152, registered the same way.
 //! - Dreadfrost Saber (274603) is a spell data damage proc (`NewSpellDataDamageProc`), as Fiery
 //!   Plate Gauntlets' "Adds 4 fire damage to your weapon attack" is in the reference: its equip
 //!   aura (1294939) hears the wearer's landed main hand melee hits and casts a Frost hit of 1
@@ -248,6 +250,20 @@ pub(crate) const CHANCE_ON_HIT_ITEMS: &[Registration] = &[
                 item_name: "Brush Cutter",
             },
         ],
+    ),
+    Registration::Proc(
+        ProcKind::Damage,
+        SpellDataProc {
+            buff_spell_id: 1293568,
+            is_weapon_proc: true,
+            trigger_spell_id: 1293568,
+            rateless: true,
+            ..SpellDataProc::EMPTY
+        },
+        &[ItemVariant {
+            item_id: 274270,
+            item_name: "Weed Whacker",
+        }],
     ),
 ];
 

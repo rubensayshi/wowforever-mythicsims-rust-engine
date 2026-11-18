@@ -17,6 +17,41 @@ use super::{flags, masks, Shaman};
 /// the 15 sec cooldown.
 pub(super) const WATER_SHIELD_SPELL_ID: i32 = 408510;
 pub(super) const WATER_SHIELD_GLOBES: i32 = 3;
+
+/// Totem of Sustaining (23200) under Forever's rules: "Equip: Increases the maximum number of
+/// charges on your Water Shield by 1." (Wowhead's Forever tooltip, 18 November 2026). Classic's
+/// totem added healing to Lesser Healing Wave; the live one is the charge. Its equip spell,
+/// Increased Water Shield Charges (28856, ItemEffect 104176, on equip), is readable in the live
+/// client (wago.tools `product=wowf`, build 1.60.1.70959, 18 November 2026):
+///
+/// - SpellEffect 705031: `A_ADD_FLAT_MODIFIER` (107) of 1 on `SPELLMOD_CHARGES` (misc 4), class
+///   mask words 0, 32, 0, 0, the bit Water Shield's row carries.
+///
+/// So the cast puts up four globes. The Go reference has no row for the item, and only Forever's
+/// rules read the client's.
+pub(crate) const TOTEM_OF_SUSTAINING: i32 = 23200;
+
+/// The globes a cast of Water Shield puts up for this character: three, and four with Totem of
+/// Sustaining worn under Forever's rules. The count is fixed for the fight, which an item swap
+/// that takes the totem off or puts it on cannot follow: a request whose swap moves the totem
+/// prepares with three, as Rage of the Storm's mod is left out of one that moves the mace.
+pub(super) fn water_shield_globes(sim: &Sim, unit: UnitId) -> i32 {
+    if sim.rules != Rules::Forever {
+        return WATER_SHIELD_GLOBES;
+    }
+    let worn = sim
+        .character(unit)
+        .equipment
+        .iter()
+        .any(|item| item.id == TOTEM_OF_SUSTAINING);
+    let moved = sim.item_swap(unit).is_some_and(|swap| {
+        swap.slots.iter().any(|&slot| {
+            swap.original_equip[slot].id == TOTEM_OF_SUSTAINING
+                || swap.swap_equip[slot].id == TOTEM_OF_SUSTAINING
+        })
+    });
+    WATER_SHIELD_GLOBES + i32::from(worn && !moved)
+}
 pub(super) const WATER_SHIELD_MANA_SPELL_ID: i32 = 408511;
 pub(super) const WATER_SHIELD_MANA_PERCENT: f64 = 2.0;
 pub(super) const WATER_SHIELD_ICD: crate::prepare::sim::Duration =
@@ -71,7 +106,7 @@ impl Shaman {
                 label: "Water Shield".to_string(),
                 action_id: Some(action_id.clone()),
                 duration: 10 * 60 * SECOND,
-                max_stacks: WATER_SHIELD_GLOBES,
+                max_stacks: water_shield_globes(sim, unit),
                 ..AuraConfig::default()
             },
         );
