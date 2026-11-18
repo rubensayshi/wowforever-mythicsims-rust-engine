@@ -105,6 +105,9 @@ struct Variants {
     /// The armor debuff procs whose weapon proc manager the swap rebuilds, as a swap onto Dark
     /// Iron Sunderer, by their position.
     armor_debuff_procs: Vec<(usize, [Vec<Option<f64>>; 2])>,
+    /// The heal procs whose proc manager the swap rebuilds, as Warrior's Resolve and Darkmoon
+    /// Card: Heroism's rates for the weapons in the hands, by their position.
+    health_rage_procs: Vec<(usize, [Vec<Option<f64>>; 2])>,
     /// The crit the player takes under either set, which a hit on the player reads.
     reduced_crit_taken: Option<[f64; 2]>,
     /// Damage procs whose effect roll reads the weapon in the hand (the party's Flametongue
@@ -509,6 +512,26 @@ impl<A: Agent> Fight<A> {
                 variants.armor_debuff_procs.push((index, [main, swapped]));
             }
         }
+        let health_rage_procs = |effects: &[Effect]| -> Vec<Vec<Option<f64>>> {
+            effects
+                .iter()
+                .filter_map(|effect| match effect {
+                    Effect::HealthRageProc { chances, .. } => {
+                        Some(super::chances_by_spell(chances, spells))
+                    }
+                    _ => None,
+                })
+                .collect()
+        };
+        for (index, (main, swapped)) in health_rage_procs(effects)
+            .into_iter()
+            .zip(health_rage_procs(&worn))
+            .enumerate()
+        {
+            if main != swapped {
+                variants.health_rage_procs.push((index, [main, swapped]));
+            }
+        }
         self.item_swap.as_mut().expect("bound").variants = variants;
     }
 
@@ -757,6 +780,9 @@ impl<A: Agent> Fight<A> {
         }
         for (proc, by_set) in variants.armor_debuff_procs {
             self.armor_debuff_procs[proc].chances = by_set[index].clone();
+        }
+        for (proc, by_set) in variants.health_rage_procs {
+            self.health_rage_procs[proc].chances = by_set[index].clone();
         }
         for (proc, by_set) in variants.damage_procs {
             let (trigger_spells, chances) = by_set[index].clone();

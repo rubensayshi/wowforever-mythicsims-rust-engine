@@ -854,6 +854,8 @@ const SWAP_EFFECT_FIELDS: &[(&str, &[&str])] = &[
     ("extra_attack_proc", &["chances"]),
     ("stacking_cd_on_use", &["chances"]),
     ("armor_debuff_proc", &["chances"]),
+    // Warrior's Resolve and Darkmoon Card: Heroism's proc managers, rebuilt likewise.
+    ("health_rage_proc", &["chances"]),
     (
         "rage_bar",
         &[
