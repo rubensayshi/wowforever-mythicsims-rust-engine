@@ -23,8 +23,8 @@ pub(crate) fn apply<A: Agent>(
     target: Side,
     damage: DamageRoll,
     twice_block_value: bool,
+    block_value: f64,
 ) {
-    let block_value = fight.player_block_damage_reduction();
     let base = if twice_block_value {
         roll(fight, damage) + 2.0 * block_value
     } else {

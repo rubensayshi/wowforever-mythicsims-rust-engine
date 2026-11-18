@@ -1,0 +1,533 @@
+{
+ "encounter": {
+  "duration": 120,
+  "durationVariation": 15,
+  "executeProportion20": 0.2,
+  "executeProportion25": 0.25,
+  "executeProportion35": 0.35,
+  "executeProportion45": 0.45,
+  "executeProportion90": 0.9,
+  "noHitSuppression": true,
+  "targets": [
+   {
+    "canCrush": true,
+    "damageSpread": 0.3333,
+    "id": 213336,
+    "level": 44,
+    "minBaseDamage": 3000,
+    "name": "Level 44",
+    "parryHaste": true,
+    "stats": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     805,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2606,
+     0,
+     127393,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "swingSpeed": 2
+   }
+  ]
+ },
+ "raid": {
+  "buffs": {},
+  "debuffs": {},
+  "parties": [
+   {
+    "buffs": {},
+    "players": [
+     {
+      "buffs": {},
+      "characterSheet": {
+       "armor": [
+        460,
+        3499
+       ],
+       "attackPower": [
+        424,
+        0,
+        0
+       ],
+       "attributeBuffs": [
+        74,
+        28,
+        88,
+        0,
+        9
+       ],
+       "attributeDebuffs": [
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       "attributes": [
+        159,
+        82,
+        166,
+        23,
+        47
+       ],
+       "auras": [
+        2580,
+        429959,
+        16609
+       ],
+       "base": [
+        85,
+        54,
+        78,
+        23,
+        38
+       ],
+       "block": 10.24,
+       "dodge": 6.185,
+       "equipment": {
+        "items": [
+         {
+          "id": 7719
+         },
+         {
+          "id": 10711
+         },
+         {
+          "id": 274607
+         },
+         {
+          "id": 279884
+         },
+         {
+          "id": 9866,
+          "randomSuffix": 12728
+         },
+         {
+          "id": 10333
+         },
+         {
+          "id": 10331
+         },
+         {
+          "id": 6742
+         },
+         {
+          "id": 9625
+         },
+         {
+          "id": 19509
+         },
+         {
+          "id": 278017
+         },
+         {
+          "id": 273032
+         },
+         {
+          "id": 280766
+         },
+         {
+          "id": 279887
+         },
+         {
+          "id": 275051
+         },
+         {
+          "id": 274160
+         }
+        ]
+       },
+       "healingPower": 0,
+       "health": 2495,
+       "level": 42,
+       "mana": 0,
+       "manaRegen": [
+        0,
+        0
+       ],
+       "meleeCrit": 7.865,
+       "meleeHit": 0,
+       "parry": 5.24,
+       "rangedAttackPower": [
+        186,
+        0,
+        0
+       ],
+       "rangedCrit": 3.265,
+       "spellCrit": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+       ],
+       "spellHit": 0,
+       "spellPower": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       "weaponSkill": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      "class": "ClassWarrior",
+      "consumables": {},
+      "dpsWarrior": {
+       "options": {
+        "classOptions": {
+         "defaultStance": "WarriorStanceBerserker",
+         "queueDelay": 250,
+         "useBattleShout": true
+        }
+       }
+      },
+      "equipment": {
+       "items": [
+        {
+         "id": 7719
+        },
+        {
+         "id": 10711
+        },
+        {
+         "id": 274607
+        },
+        {
+         "id": 279884
+        },
+        {
+         "id": 9866,
+         "randomSuffix": 12728
+        },
+        {
+         "id": 10333
+        },
+        {
+         "id": 10331
+        },
+        {
+         "id": 6742
+        },
+        {
+         "id": 9625
+        },
+        {
+         "id": 19509
+        },
+        {
+         "id": 278017
+        },
+        {
+         "id": 273032
+        },
+        {
+         "id": 280766
+        },
+        {
+         "id": 279887
+        },
+        {
+         "id": 275051
+        },
+        {
+         "id": 274160
+        }
+       ]
+      },
+      "knownSpells": [
+       71,
+       81,
+       107,
+       355,
+       676,
+       871,
+       1161,
+       1464,
+       1671,
+       2457,
+       2458,
+       2565,
+       2687,
+       2764,
+       3127,
+       5246,
+       5308,
+       6548,
+       6603,
+       7369,
+       7372,
+       7379,
+       7384,
+       7400,
+       8204,
+       8380,
+       11549,
+       11554,
+       11564,
+       12809,
+       12975,
+       18499,
+       20230,
+       20252,
+       20572,
+       20573,
+       21563,
+       23922,
+       33388,
+       402927,
+       1240288,
+       1293657,
+       1293712,
+       1299026,
+       1310185
+      ],
+      "level": 42,
+      "name": "Warrior",
+      "profession1": "Blacksmithing",
+      "profession2": "Mining",
+      "race": "RaceOrc",
+      "reactionTimeMs": 100,
+      "rotation": {
+       "prepullActions": [
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 2687
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-10s"
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "itemId": 20130
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-5s"
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "rank": 6,
+            "spellId": 25289
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-3.5s"
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 2457
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-3s"
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 20230
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-2s"
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 71
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-1s"
+          }
+         }
+        }
+       ],
+       "priorityList": [
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 1719
+           }
+          },
+          "condition": {
+           "const": {
+            "val": "false"
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 25289
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 2457
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 2687
+           }
+          },
+          "condition": {
+           "cmp": {
+            "lhs": {
+             "currentRage": {}
+            },
+            "op": "OpLt",
+            "rhs": {
+             "const": {
+              "val": "90"
+             }
+            }
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "autocastOtherCooldowns": {}
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 5308
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 23925
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 7384
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "rank": 8,
+            "spellId": 25286,
+            "tag": 1
+           }
+          }
+         }
+        }
+       ],
+       "type": "TypeAPL"
+      },
+      "talentsString": "-01-150033120331001351"
+     }
+    ]
+   }
+  ]
+ },
+ "simOptions": {
+  "iterations": 50,
+  "randomSeed": "42"
+ }
+}

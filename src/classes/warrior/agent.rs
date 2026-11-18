@@ -243,6 +243,9 @@ pub(crate) struct WarriorAgent {
     weaponmaster: Option<WeaponmasterSword>,
     revenge: Option<Revenge>,
     shield_slam: Option<(DamageRoll, bool)>,
+    /// Off the target's threat: the block value Shield Slam adds under each stat aura
+    /// combination. Empty for a tank, whose block value the target's rolls carry.
+    shield_slam_block_reductions: Vec<f64>,
     can_block: bool,
     thunder_clap: Option<ThunderClap>,
     /// Demoralizing Shout's debuff on the first target.
@@ -635,9 +638,11 @@ impl WarriorAgent {
                     damage,
                     can_block,
                     twice_block_value,
+                    block_reductions,
                     ..
                 } => {
                     fight.agent.shield_slam = Some((*damage, *twice_block_value));
+                    fight.agent.shield_slam_block_reductions = block_reductions.clone();
                     fight.agent.can_block = *can_block;
                 }
                 Effect::ImprovedHamstring {
@@ -1520,7 +1525,15 @@ impl Agent for WarriorAgent {
             WarriorSpell::ShieldSlam => {
                 let (damage, twice_block_value) =
                     fight.agent.shield_slam.expect("Shield Slam is bound");
-                shield_slam::apply(fight, spell, target, damage, twice_block_value);
+                // A tank's block value is in the target's rolls; off its threat the effect
+                // states it, by stat aura combination either way.
+                let block_value = if fight.agent.shield_slam_block_reductions.is_empty() {
+                    fight.player_block_damage_reduction()
+                } else {
+                    let reductions = &fight.agent.shield_slam_block_reductions;
+                    reductions[fight.stat_mask as usize % reductions.len()]
+                };
+                shield_slam::apply(fight, spell, target, damage, twice_block_value, block_value);
             }
             WarriorSpell::ThunderClap => {
                 let params = fight.agent.thunder_clap.expect("Thunder Clap is bound");
