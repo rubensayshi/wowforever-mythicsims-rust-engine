@@ -472,7 +472,7 @@ impl Shaman {
             use super::shields::*;
             effects.push(json!({
                 "kind": "water_shield", "spell_id": WATER_SHIELD_SPELL_ID,
-                "aura": sim.aura(aura).label, "globes": WATER_SHIELD_GLOBES,
+                "aura": sim.aura(aura).label, "globes": sim.aura(aura).max_stacks,
                 "icd_ns": nanos(WATER_SHIELD_ICD), "mana_percent": WATER_SHIELD_MANA_PERCENT,
                 "mana_spell_id": WATER_SHIELD_MANA_SPELL_ID,
                 "trigger_spells": proc_trigger_spells(env, &water_shield_crit_trigger()),

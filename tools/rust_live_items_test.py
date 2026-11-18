@@ -221,5 +221,38 @@ class ChangesTest(unittest.TestCase):
         self.assertEqual(reference["scaling_options"]["0"]["stats"], {"1": 15, "2": 4})
 
 
+class RefreshTest(unittest.TestCase):
+    # Soulforge Wristguards (226985) before and after the hotfixes of 17 November 2026: the
+    # tooltip no longer names Strength and states spell damage and healing.
+    REFERENCE = {0: 8, 2: 16, 3: 5, 25: 3}
+
+    def test_a_refreshed_row_is_the_reference_row_with_todays_tooltip(self):
+        new, change = live.refreshed_row(
+            row(self.REFERENCE),
+            live.read_tooltip(
+                tooltip(
+                    "Item Level 60",
+                    "296 Armor",
+                    "+16 Stamina",
+                    "+8 Intellect",
+                    "Equip: Increased Defense +3.",
+                    "Equip: Increases damage and healing done by magical spells and effects by up to 6.",
+                )
+            ),
+        )
+        self.assertEqual(change["stats"], {0: None, 3: 8, 4: 6, 5: 6, 30: 296})
+        self.assertEqual(
+            new["scaling_options"]["0"]["stats"],
+            {"2": 16, "3": 8, "4": 6, "5": 6, "25": 3, "30": 296},
+        )
+
+    def test_a_tooltip_that_agrees_with_the_reference_row_leaves_no_live_row(self):
+        new, change = live.refreshed_row(
+            row({0: 8, 2: 16}), live.read_tooltip(tooltip("Item Level 60", "+8 Strength", "+16 Stamina"))
+        )
+        self.assertIsNone(new)
+        self.assertEqual(change, {})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -391,7 +391,9 @@
 {"id":18584,"name":"Warglaive of Azzinoth (Left)","type":"ItemTypeWeapon","weapon_type":"WeaponTypeSword","hand_type":"HandTypeOneHand","weapon_speed":1,"scaling_options":{"0":{"weapon_damage_min":85,"weapon_damage_max":95,"stats":{"1":60,"2":50,"3":40,"35":50,"39":60},"ilvl":100}},"unique":true}
 {"id":20133,"name":"Skyfury Gauntlets","type":"ItemTypeHands","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"2":12,"4":14,"5":14,"20":10,"21":14,"30":249},"ilvl":62}},"class_allowlist":["ClassShaman"]}
 {"id":22395,"name":"Totem of Rage","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeTotem","scaling_options":{"0":{"ilvl":57}}}
+{"id":23200,"name":"Totem of Sustaining","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeTotem","scaling_options":{"0":{"ilvl":65}}}
 {"id":217727,"name":"Ward of the Dead","type":"ItemTypeTrinket","scaling_options":{"0":{"ilvl":1}},"unique":true}
+{"id":219343,"name":"Filcher's Cowl","type":"ItemTypeBack","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"1":11,"16":7,"30":36},"ilvl":50}}}
 {"id":227935,"name":"Hammer of the Fallen Thane","type":"ItemTypeWeapon","weapon_type":"WeaponTypeMace","hand_type":"HandTypeMainHand","weapon_speed":2.2,"scaling_options":{"0":{"weapon_damage_min":39,"weapon_damage_max":74,"stats":{"2":5,"3":10,"4":68,"5":68,"34":2},"ilvl":59}}}
 {"id":250101,"name":"Summit Guardian Polearm","type":"ItemTypeWeapon","weapon_type":"WeaponTypePolearm","hand_type":"HandTypeTwoHand","weapon_speed":0.5,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":1,"ilvl":1}}}
 {"id":250217,"name":"Purveyor of Light","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOneHand","weapon_speed":2,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":2,"ilvl":1}}}
@@ -441,6 +443,7 @@
 {"id":273822,"name":"Vengeance","type":"ItemTypeWeapon","weapon_type":"WeaponTypeSword","hand_type":"HandTypeOneHand","weapon_speed":1.4,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":1,"ilvl":1}}}
 {"id":273832,"name":"Wicked Ritualist's Kris","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeOneHand","weapon_speed":1.6,"scaling_options":{"0":{"weapon_damage_min":36,"weapon_damage_max":68,"ilvl":57}}}
 {"id":274265,"name":"Brush Cutter","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOneHand","weapon_speed":2.8,"scaling_options":{"0":{"weapon_damage_min":66,"weapon_damage_max":124,"stats":{"2":5},"ilvl":57}}}
+{"id":274270,"name":"Weed Whacker","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeTwoHand","weapon_speed":3.1,"scaling_options":{"0":{"weapon_damage_min":109,"weapon_damage_max":165,"stats":{"0":12},"ilvl":57}}}
 {"id":274271,"name":"Deadhead Blade","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeOneHand","weapon_speed":1.8,"scaling_options":{"0":{"weapon_damage_min":42,"weapon_damage_max":80,"stats":{"1":5},"ilvl":57}}}
 {"id":274380,"name":"Decaying Flesh Bands","type":"ItemTypeWrist","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"1":9,"2":-6,"16":-6,"30":27,"38":13},"ilvl":42}}}
 {"id":274431,"name":"Sandstorm Staff","type":"ItemTypeWeapon","weapon_type":"WeaponTypeStaff","hand_type":"HandTypeTwoHand","weapon_speed":3,"scaling_options":{"0":{"weapon_damage_min":72,"weapon_damage_max":108,"stats":{"2":13,"10":64,"34":8},"ilvl":46}}}
@@ -762,7 +765,7 @@
 {"id":287023,"name":"Iron-Wrought Cuffs","type":"ItemTypeWrist","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"2":8,"16":7,"25":8,"30":244},"ilvl":53}}}
 {"id":287024,"name":"Mark of Captivity","type":"ItemTypeNeck","scaling_options":{"0":{"stats":{"2":11,"17":15,"18":15,"25":5},"ilvl":52}}}
 {"id":287025,"name":"Enchantresses' Spire","type":"ItemTypeWeapon","weapon_type":"WeaponTypeStaff","hand_type":"HandTypeTwoHand","weapon_speed":2.4,"scaling_options":{"0":{"weapon_damage_min":66,"weapon_damage_max":100,"stats":{"2":21,"3":21,"4":62,"5":62},"ilvl":54}}}
-{"id":287026,"name":"Escape Plan","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeGun","weapon_speed":2.8,"scaling_options":{"0":{"weapon_damage_min":78,"weapon_damage_max":78,"stats":{"1":11},"ilvl":54}}}
+{"id":287026,"name":"Escape Plan","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeGun","weapon_speed":2.8,"scaling_options":{"0":{"weapon_damage_min":54,"weapon_damage_max":102,"stats":{"1":11},"ilvl":54}}}
 {"id":287028,"name":"Tormented Cuffs","type":"ItemTypeWrist","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"2":13,"4":9,"5":9,"30":36},"ilvl":58}}}
 {"id":287029,"name":"Nature Guardian's Legguards","type":"ItemTypeLegs","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"3":22,"10":24,"30":142,"34":7},"ilvl":57}}}
 {"id":287030,"name":"Blackmaw Bindings","type":"ItemTypeWrist","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"1":14,"4":10,"5":10,"16":6,"30":153},"ilvl":59}}}

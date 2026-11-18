@@ -42,7 +42,8 @@
 //!
 //! Nor are Jom-jom's Gabbar's Bolder'ok Boulder (1295736) and Deadhead Blade's Grass Killer
 //! (1293518): every field of theirs is the client's, read from wago.tools `product=wowf` with
-//! `build=1.60.1.70938` on 15 November 2026.
+//! `build=1.60.1.70938` on 15 November 2026. Weed Whacker's larger Grass Killer (1293568) is the
+//! same row with twice the damage, read from `build=1.60.1.70959` on 18 November 2026.
 //!
 //! Nor are Bolt's Charged Eyeball's Grounded Electroshocks (1311505) and the Grounded
 //! Electroshock it casts (1315996): every field of theirs is the client's, read from wago.tools
@@ -135,6 +136,7 @@ pub(crate) fn rows() -> Vec<Spell> {
         smite(),
         bolderok_boulder(),
         grass_killer(),
+        weed_whacker_grass_killer(),
         grounded_electroshocks(),
         grounded_electroshock(),
         zealot_plate_trigger(),
@@ -184,32 +186,47 @@ fn bolderok_boulder() -> Spell {
 /// Deadhead Blade's chance on hit (ItemEffect 233730, trigger type 2, no rate and no cooldown
 /// stated): "Assault the target with a dangerous toxin, dealing 50 to 76 Nature damage. Deals 3
 /// times as much damage to Plants." The row is its own trigger, a Nature hit on the magic table.
+/// SpellMisc 840948, SpellLevels 152075, SpellCategories 183662; SpellEffect 1314222 is the
+/// School Damage of 63 (49.77 to 76.23, the tooltip's 50 to 76) and 1314223 the Dummy.
 fn grass_killer() -> Spell {
+    grass_killer_row(1_293_518, [1_314_222, 1_314_223], 63.0)
+}
+
+/// Weed Whacker's chance on hit (ItemEffect 233728, trigger type 2, no rate and no cooldown
+/// stated): "Assault the target with a dangerous toxin, dealing 100 to 152 Nature damage. Deals 3
+/// times as much damage to Plants." Its own Grass Killer row, the blade's in every field but the
+/// damage. SpellMisc 840998, SpellLevels 152082, SpellCategories 183682; SpellEffect 1314320 is
+/// the School Damage of 126 (99.54 to 152.46, the tooltip's 100 to 152) and 1314321 the Dummy.
+fn weed_whacker_grass_killer() -> Spell {
+    grass_killer_row(1_293_568, [1_314_320, 1_314_321], 126.0)
+}
+
+/// A Grass Killer row: the spell, its two SpellEffect ids and the base points of its damage.
+fn grass_killer_row(id: i32, effect_ids: [i32; 2], damage: f64) -> Spell {
     let mut attr = [0; 17];
-    // SpellMisc 840948: Attributes_15 8192 and nothing else.
+    // SpellMisc: Attributes_15 8192 and nothing else.
     attr[15] = ATTR_15_BIT_13;
     Spell {
-        id: 1_293_518,
+        id,
         name: "Grass Killer".to_string(),
-        // SpellMisc 840948: SchoolMask 8, Nature.
+        // SpellMisc: SchoolMask 8, Nature.
         school: 8,
         attr,
-        // SpellLevels 152075: SpellLevel 58.
+        // SpellLevels: SpellLevel 58.
         spell_level: 58,
-        // SpellMisc 840948: RangeIndex 4, SpellRange's 30 yards.
+        // SpellMisc: RangeIndex 4, SpellRange's 30 yards.
         max_range: 30.0,
-        // SpellCategories 183662: magic. Its dispel type, poison (4), is not a field of the row.
+        // SpellCategories: magic. Its dispel type, poison (4), is not a field of the row.
         defense_type: 1,
         effects: vec![
-            // SpellEffect 1314222: School Damage (2) of 63 to the target (6), variance 0.42
-            // (49.77 to 76.23, the tooltip's 50 to 76), with no spell power or attack power
-            // coefficient.
+            // School Damage (2) to the target (6), variance 0.42, with no spell power or attack
+            // power coefficient.
             Effect {
-                id: 1_314_222,
-                spell_id: 1_293_518,
+                id: effect_ids[0],
+                spell_id: id,
                 index: 0,
                 effect_type: 2,
-                base_points: 63.0,
+                base_points: damage,
                 spell_level: 58,
                 variance: 0.42,
                 pvp_mult: 1.0,
@@ -217,12 +234,12 @@ fn grass_killer() -> Spell {
                 target: [6, 0],
                 ..Effect::default()
             },
-            // SpellEffect 1314223: a Dummy (3) with base points 3 on the target (6): the "3 times
-            // as much damage" to Plants, which the server applies. The client's creature types
-            // (CreatureType) have no Plant and a request names none, so nothing reads it.
+            // A Dummy (3) with base points 3 on the target (6): the "3 times as much damage" to
+            // Plants, which the server applies. The client's creature types (CreatureType) have
+            // no Plant and a request names none, so nothing reads it.
             Effect {
-                id: 1_314_223,
-                spell_id: 1_293_518,
+                id: effect_ids[1],
+                spell_id: id,
                 index: 1,
                 effect_type: 3,
                 base_points: 3.0,
