@@ -24,6 +24,8 @@ pub(crate) struct HealProc {
     outcome: u16,
     require_damage: bool,
     chance: f64,
+    /// A trigger spell's own chance, in place of `chance`.
+    cast_chances: Vec<Option<f64>>,
     spell: SpellId,
     /// The trigger hears casts instead of hits.
     pub(crate) casts: bool,
@@ -126,6 +128,7 @@ impl<A: Agent> Fight<A> {
                 outcome,
                 require_damage,
                 proc_chance,
+                cast_chances,
                 spell,
                 casts,
                 ..
@@ -135,6 +138,12 @@ impl<A: Agent> Fight<A> {
                 for &trigger in trigger_spells {
                     if let Some(slot) = mask.get_mut(trigger) {
                         *slot = true;
+                    }
+                }
+                let mut by_spell = vec![None; self.spells.len()];
+                for chance in cast_chances {
+                    if let Some(slot) = by_spell.get_mut(chance.spell) {
+                        *slot = Some(chance.chance);
                     }
                 }
                 let mut bits = 0;
@@ -147,6 +156,7 @@ impl<A: Agent> Fight<A> {
                     outcome: bits,
                     require_damage: *require_damage,
                     chance: *proc_chance,
+                    cast_chances: by_spell,
                     spell: *spell,
                     casts: *casts,
                 });
@@ -176,7 +186,10 @@ impl<A: Agent> Fight<A> {
         {
             return;
         }
-        let (chance, heal) = (state.chance, state.spell);
+        let chance = spell
+            .and_then(|spell| state.cast_chances[spell])
+            .unwrap_or(state.chance);
+        let heal = state.spell;
         let icd = self.aura(aura).icd;
         if let Some((timer, _)) = icd {
             if self.timers[timer] > self.now {

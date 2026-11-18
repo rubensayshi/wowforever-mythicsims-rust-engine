@@ -880,9 +880,13 @@ the Go goldens and exporter uses. The departures:
   on Regrowth's direct heal while a Rejuvenation of the druid's is up (read as "on a target
   under your Rejuvenation", since heals land on whoever needs them), Idol of Synthesis (a second
   off Swiftmend's cooldown for each heal over time up as it is cast), Garments of the Oracle (3:
-  a heal's 20% chance to heal the healer for 10% of it), Rotmender's Raiment (5: a heal's cast,
-  at most every 2 seconds, puts up Rotmending's 40 every 3 seconds for 15 seconds, counted at
-  once), The Earthshatterer (4: the party's Mana Spring 25% stronger; 8: Lightning Shield's 15
+  a heal's 20% chance to heal the healer for 10% of it), Rotmender's Raiment (5: a heal's cast
+  has a chance, at most every 2 seconds, to put up Rotmending's 40 every 3 seconds for 15
+  seconds, counted at once; the chance is 1.6 a minute of the heal's cast time, at least 1.5
+  seconds, so 4% for an instant and 8% for a 3 second cast, and a shield rolls nothing. The
+  trigger row states 100% beside a tooltip that says "a chance"; the rate is counted from public
+  combat logs of 15 to 18 November 2026, 261 procs in 5,230 heal casts of 27 wearers, 1.60 (1.42
+  to 1.79), `validation/2026-11-19-rotmending-rate.json`), The Earthshatterer (4: the party's Mana Spring 25% stronger; 8: Lightning Shield's 15
   mana per 5 seconds, read as kept up) and Redemption Armor (4: Lay on Hands 12 minutes sooner).
   On use, Blessed Prayer Beads heal for 648 and Enamored Water Spirit's totem restores 33 mana
   every 2 seconds for 24 seconds; Wushoolay's Charm of Spirits, a Lightning Shield trinket, is
