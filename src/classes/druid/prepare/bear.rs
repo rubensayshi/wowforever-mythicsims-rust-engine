@@ -34,10 +34,42 @@ const SWIPE_RANKS: [i32; 5] = [779, 780, 769, 9754, 9908];
 /// The Primal Bite rank a level 60 druid casts: rank 4 (1238073) in the frozen data, rank 3
 /// (1238070) under Forever's rules, where hotfix push 113531 removes rank 4 and gives rank 3 its
 /// level and its 77 flat damage.
+///
+/// Below level 60 it is the rank the druid has trained, at the levels the live client teaches
+/// them (40, 50 and 60; `hotfix_113554` patches ranks 1 and 2 to the client's rows): until 18 Nov
+/// 2026 a levelling bear cast rank 3's 77 flat damage, and after the spellbook rule could not cast
+/// it at all, rank 3 being one its spellbook leaves out.
 pub(super) fn primal_bite_rank(rules: Rules) -> &'static Spell {
     match rules {
-        Rules::Forever => hotfix_113554::row(rules, 1238070),
+        Rules::Forever => {
+            let ranks = [
+                (hotfix_113554::row(rules, 407995), 40),
+                (hotfix_113554::row(rules, 1238069), 50),
+                (hotfix_113554::row(rules, 1238070), 60),
+            ];
+            crate::prepare::levels::known_rank_at(&ranks).unwrap_or(ranks[2].0)
+        }
         Rules::GoReference => Ladder::ranked(&PRIMAL_BITE_RANKS).highest(),
+    }
+}
+
+/// Lacerate's ranks under Forever's rules: push 113531 adds the talent's own rank (1328617,
+/// level 25) and rank 2 (1328616, 34) below the frozen ladder (42, 50, 58), rows the store lacks
+/// (`hotfix_113554`). A level 36 bear with the talent ticks 6 a stack; it could not cast Lacerate
+/// before, the frozen ladder starting at 42.
+pub(super) fn lacerate_rank(rules: Rules) -> &'static Spell {
+    match rules {
+        Rules::Forever => {
+            let ranks = [
+                (hotfix_113554::row(rules, 1_328_617), 25),
+                (hotfix_113554::row(rules, 1_328_616), 34),
+                (hotfix_113554::row(rules, LACERATE_RANKS[0]), 42),
+                (hotfix_113554::row(rules, LACERATE_RANKS[1]), 50),
+                (hotfix_113554::row(rules, LACERATE_RANKS[2]), 58),
+            ];
+            crate::prepare::levels::known_rank_at(&ranks).unwrap_or(ranks[4].0)
+        }
+        Rules::GoReference => Ladder::ranked(&LACERATE_RANKS).highest(),
     }
 }
 
@@ -303,7 +335,7 @@ impl Druid {
         if sim.rules == Rules::Forever && !self.tal.lacerate {
             return;
         }
-        let rank = Ladder::ranked(&LACERATE_RANKS).highest();
+        let rank = lacerate_rank(sim.rules);
         let tick = rank.periodic_effect();
         let spell = self.register_spell(
             sim,

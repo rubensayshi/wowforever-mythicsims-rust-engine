@@ -372,12 +372,16 @@ fn known_rank_of_name(id: i32, character: &Character) -> Option<i32> {
 /// The group buffs a class casts on its raid and what a levelling caster casts instead when it
 /// has not learned the group version: Arcane Brilliance is learned at 56 from a book, and a level
 /// 21 mage buffs with its Arcane Intellect.
-const SINGLE_TARGET_OF: [(&str, &str); 5] = [
+const SINGLE_TARGET_OF: [(&str, &str); 8] = [
     ("Arcane Brilliance", "Arcane Intellect"),
     ("Prayer of Fortitude", "Power Word: Fortitude"),
     ("Prayer of Spirit", "Divine Spirit"),
     ("Prayer of Shadow Protection", "Shadow Protection"),
     ("Gift of the Wild", "Mark of the Wild"),
+    // A paladin below 52 has no Greater Blessing and blesses itself with the 5 min one.
+    ("Greater Blessing of Might", "Blessing of Might"),
+    ("Greater Blessing of Wisdom", "Blessing of Wisdom"),
+    ("Greater Blessing of Kings", "Blessing of Kings"),
 ];
 
 /// The rank of a buff a levelling character casts in place of `spell`, the level 60 row core's

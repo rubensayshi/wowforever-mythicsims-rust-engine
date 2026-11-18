@@ -455,6 +455,23 @@ fn build() -> HashMap<i32, &'static Spell> {
             effect.spell_level = top.spell_level;
         }
     });
+    // Primal Bite ranks 1 and 2 under the same push, as the live client's rows state them
+    // (client 70959): levels 40 and 50 (the frozen rows state 25 and 36) and 42 and 62 flat
+    // damage (SpellEffect 1071863 and 1235070, were 26 and 38). A levelling bear casts the rank
+    // it has trained (`druid::bear::primal_bite_rank`).
+    for (id, effect_id, level, points) in [
+        (407_995, 1_071_863, 40, 42.0),
+        (1_238_069, 1_235_070, 50, 62.0),
+    ] {
+        patch(id, &|row| {
+            row.spell_level = level;
+            row.base_level = level;
+            for effect in &mut row.effects {
+                effect.spell_level = level;
+            }
+            effect(row, effect_id).base_points = points;
+        });
+    }
     // Shifting Power: 16 sec cooldown to 8.
     patch(1322605, &|row| row.cooldown_ms = 8000);
     // Wild Growth, every rank: instant to a 3 sec cast.
@@ -594,10 +611,35 @@ fn build() -> HashMap<i32, &'static Spell> {
         });
     }
 
+    // Lacerate's two low ranks under push 113531, which the frozen store lacks (client 70959):
+    // the talent's own rank (1328617, level 25) and rank 2 (1328616, level 34) tick 4 and 6 a
+    // stack every 3 sec (SpellEffect 1367720 and 1367718), against 414644's 10 at 42. Cost,
+    // duration, attributes and the 10% weapon share a stack (1367721, 1367719) are 414644's.
+    for (id, effect_ids, level, tick, rank) in [
+        (1_328_617, [1_367_720, 1_367_721], 25, 4.0, "Rank 1"),
+        (1_328_616, [1_367_718, 1_367_719], 34, 6.0, "Rank 2"),
+    ] {
+        let mut row = must_find(LACERATE_FIRST_FROZEN_RANK).clone();
+        row.id = id;
+        row.rank = rank.to_string();
+        row.spell_level = level;
+        row.base_level = level;
+        for (effect, effect_id) in row.effects.iter_mut().zip(effect_ids) {
+            effect.id = effect_id;
+            effect.spell_id = id;
+            effect.spell_level = level;
+        }
+        row.effects[0].base_points = tick;
+        rows.insert(id, row);
+    }
+
     rows.into_iter()
         .map(|(id, row)| (id, &*Box::leak(Box::new(row))))
         .collect()
 }
+
+/// The frozen store's first Lacerate rank (level 42), which push 113531's two low ranks copy.
+const LACERATE_FIRST_FROZEN_RANK: i32 = 414_644;
 
 /// The effect with this SpellEffect ID. Panics when the row has none: the patch names a row the
 /// frozen data does not have.
