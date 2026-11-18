@@ -1761,6 +1761,53 @@ const SPELL_DATA_HEAL_PROCS: [(&str, i32, i32); 2] = [
     ("Truesilver Breastplate", 9778, 9777),
 ];
 
+/// Dreadmist Raiment (5) under Forever's rules: a completed cast of a magic spell has a 5%
+/// chance to cast Dark Reward on the wearer at once, a heal of 270 to 330 that no spell power
+/// adds to (`forever_item_sets::dreadmist_raiment_5`). Without this the bonus aura listened to
+/// casts with nothing to run them, and the gate refused every character wearing five pieces.
+fn dark_reward_effects(env: &Environment, unrepresented: &mut Vec<String>) -> Vec<Value> {
+    use super::forever_item_sets::{dark_reward_trigger, DARK_REWARD, DREADMIST_RAIMENT_5};
+    if env.sim.rules != super::sim::Rules::Forever {
+        return Vec::new();
+    }
+    let Some(aura) = aura_named(env, DREADMIST_RAIMENT_5) else {
+        return Vec::new();
+    };
+    let heal = must_find(DARK_REWARD);
+    let effect = heal.proc_heal_effect();
+    let position = spell_position(env, &ActionId::spell(heal.id));
+    let coefficient = position.map_or(0.0, |p| env.sim.spell(spell_at(env, p)).bonus_coefficient);
+    let (Some(position), true) = (
+        position,
+        effect.effect_type == dbcenums::E_HEAL && coefficient == 0.0,
+    ) else {
+        unrepresented.push(format!(
+            "{DREADMIST_RAIMENT_5}'s proc is not a direct heal on the wearer"
+        ));
+        return Vec::new();
+    };
+    let listener = dark_reward_trigger();
+    // The heal is no cast that rolls its own proc.
+    let trigger_spells: Vec<usize> = proc_trigger_spells(env, &listener)
+        .into_iter()
+        .filter(|&spell| spell != position)
+        .collect();
+    let player = env.player;
+    let pseudo = &env.sim.unit(player).pseudo_stats;
+    let level = env.sim.unit(player).level;
+    vec![json!({
+        "kind": "spell_data_heal_proc", "trigger_aura": env.sim.aura(aura).label,
+        "trigger_spells": trigger_spells, "outcome": [],
+        "require_damage": false, "proc_chance": listener.proc_chance, "spell": position,
+        "can_crit": !heal.cannot_crit(),
+        "healing_dealt_multiplier": pseudo.healing_dealt_multiplier,
+        "healing_taken_multiplier": pseudo.healing_taken_multiplier,
+        "table_healing_dealt_multiplier": env.attack_table(player, player).healing_dealt_multiplier,
+        "bonus_healing_taken": pseudo.bonus_healing_taken,
+        "average": effect.average(level), "variance": effect.variance, "casts": true,
+    })]
+}
+
 /// melee_procs.go `spellDataHealProcEffects`: a listener resolved from the trigger row that casts
 /// the heal row on the wearer at once. Only a direct heal, a share of maximum health or a rolled
 /// amount, is described.
@@ -2797,6 +2844,7 @@ pub(crate) fn melee_proc_effects(env: &Environment, unrepresented: &mut Vec<Stri
     effects.extend(set_melee_damage_proc_effects(env, unrepresented));
     effects.extend(defias_leather_effects(env, unrepresented));
     effects.extend(spell_data_heal_proc_effects(env, unrepresented));
+    effects.extend(dark_reward_effects(env, unrepresented));
     effects.extend(weapon_enchant_damage_proc_effects(env, unrepresented));
     effects.extend(proc_damage_item_effects(env, unrepresented));
     effects.extend(weapon_damage_proc_effects(env, unrepresented));

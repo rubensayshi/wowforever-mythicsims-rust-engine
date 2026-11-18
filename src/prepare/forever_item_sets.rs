@@ -15,8 +15,8 @@ use super::character::constants::{
 use super::env::Environment;
 use super::item_sets::ItemSet;
 use super::resolve_proc::{proc_trigger, stated_chance};
-use super::shared_items::spell_data_proc_damage_spell_config;
-use super::sim::{AuraId, Sim, SECOND};
+use super::shared_items::{spell_data_proc_damage_spell_config, spell_data_proc_heal_spell};
+use super::sim::{AuraId, Rules, Sim, SECOND};
 use super::spell::{school, DefenseType, ProcMask, SpellConfig, SpellFlag};
 use super::spelldata::must_find;
 use super::stats::{Stat, Stats};
@@ -542,20 +542,39 @@ fn the_elements_5(env: &mut Environment, aura: AuraId) {
 
 set_stats!(dreadmist_raiment_3, set_spell_power(18.0));
 
+/// Dark Reward, the heal Dreadmist Raiment (5) casts on its wearer.
+pub(crate) const DARK_REWARD: i32 = 450583;
+/// The aura Dreadmist Raiment's five pieces register, which carries the listener.
+pub(crate) const DREADMIST_RAIMENT_5: &str = "Dreadmist Raiment 5P";
+
+/// Dreadmist Raiment (5)'s listener, "S03 - Heal Proc on Cast - Dreadmist Raiment" (450585):
+/// the completed casts of magic spells, harmful and helpful (its SpellAuraOptions row 236875:
+/// ProcChance 5, ProcTypeMask 0x14000).
+pub(crate) fn dark_reward_trigger() -> ProcTrigger {
+    ProcTrigger {
+        proc_chance: 0.05,
+        ..trigger(
+            "Dark Reward",
+            450585,
+            CallbackMask::ON_CAST_COMPLETE,
+            ProcMask::SPELL_DAMAGE | ProcMask::SPELL_HEALING,
+        )
+    }
+}
+
 /// Spellcasts have a 5% chance to heal you for 270 to 330.
+///
+/// Under Forever's rules the heal is a spell the proc casts on the wearer (Dark Reward 450583,
+/// SpellEffect 1150582: a heal of 300 with variance 0.2 and no coefficient), described for the
+/// fight by `export_items::dark_reward_effects`. The reference registers the listener alone, so
+/// its gate refuses the five pieces.
 fn dreadmist_raiment_5(env: &mut Environment, aura: AuraId) {
-    env.sim.attach_proc_trigger(
-        aura,
-        &ProcTrigger {
-            proc_chance: 0.05,
-            ..trigger(
-                "Dark Reward",
-                450585,
-                CallbackMask::ON_CAST_COMPLETE,
-                ProcMask::SPELL_DAMAGE | ProcMask::SPELL_HEALING,
-            )
-        },
-    );
+    if env.sim.rules == Rules::Forever {
+        let unit = env.player;
+        let config = spell_data_proc_heal_spell(env, must_find(DARK_REWARD), true);
+        env.sim.register_spell(unit, config);
+    }
+    env.sim.attach_proc_trigger(aura, &dark_reward_trigger());
 }
 
 set_stats!(

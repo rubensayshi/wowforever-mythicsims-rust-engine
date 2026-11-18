@@ -1990,6 +1990,25 @@ the Go goldens and exporter uses. The departures:
   - Weed Whacker (274270) is a chance on hit weapon with no stated rate, as Deadhead Blade is,
     with a Grass Killer row of its own (1293568): 126 Nature with a variance of 0.42, the
     tooltip's 100 to 152 (`forever_effect_items.rs`).
+- Gear refused on 18 and 19 November 2026 (`tests/forever_refusals_20261119.rs`):
+  - Naturopathy Footpads (287038) and nine more items whose Wowhead Forever tooltips appeared
+    after the cache's answer of 12 November (Gravetoll Gavel 276069, Soulwoven Drape 276072,
+    Scales of the Devourer 282027, Ancient Giant's Gaze 284270, Silithid Queen's Husk 286590,
+    Cannibal's Cleaver 286641, Reforged Atal'ai Spear 286645, Tattered Explorer's Cuffs 287039,
+    Pylon Poker 287046) are rows of plain stats written by `tools/rust_client_items.py add`. A
+    tooltip answer of "not found" is not final: every candidate from id 240993 up that had one
+    was asked again on 19 November. The footpads' 18 health per 5 sec has no stat here.
+  - Dreadmist Raiment (5): "Your spellcasts have a 5% chance to heal you for 270 to 330."
+    ItemSetSpell 7909 gives ItemSet 183 the spell 450585 at five pieces. Its SpellAuraOptions
+    row (236875) states ProcChance 5 on ProcTypeMask 0x14000, the casts of magic spells, harmful
+    and helpful, and it casts Dark Reward (450583), whose one SpellEffect row (1150582) is a heal
+    of 300 with variance 0.2 and no coefficient (client 1.60.1.70959). The reference registers
+    the listener and nothing to run, so its gate refuses five pieces. Forever's rules register
+    Dark Reward as a spell the proc casts on the wearer at once, described by a
+    `spell_data_heal_proc` that hears completed casts (`export_items::dark_reward_effects`). A
+    proc's cast, the heal's own included, rolls nothing. The heal counts as healing on the
+    wearer and changes no damage. Deathmist Raiment (ItemSet 1681) lists the same spell at four
+    pieces in the client; that set registers no bonus here, as before.
 - Classic stats the live rows kept where the Wowhead Forever tooltip no longer states them
   (`tests/forever_live_items_20261115.rs`, 15 November 2026). `tools/rust_live_items.py` dropped
   a stat the tooltip does not state only for primary stats, resistances, spell penetration, mana
