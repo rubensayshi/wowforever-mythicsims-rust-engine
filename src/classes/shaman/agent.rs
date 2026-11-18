@@ -794,6 +794,7 @@ impl ShamanAgent {
                     melee_speed_multiplier,
                     charge_icd_ns,
                     can_proc_from_procs,
+                    totem_strike_spends_none,
                     ..
                 } => {
                     fight.agent.flurry = Some(flurry::bind(
@@ -803,6 +804,7 @@ impl ShamanAgent {
                         *melee_speed_multiplier,
                         *charge_icd_ns,
                         *can_proc_from_procs,
+                        *totem_strike_spends_none,
                     )?);
                 }
                 Effect::ElementalMastery {
@@ -1734,7 +1736,7 @@ impl Agent for ShamanAgent {
                 let state = fight.agent.flurry.expect("Flurry is bound");
                 let white = fight.agent.white[spell];
                 let mut icd = fight.agent.flurry_icd;
-                state.handle(fight, &result, white, &mut icd);
+                state.handle(fight, spell, &result, white, &mut icd);
                 fight.agent.flurry_icd = icd;
             }
             ShamanAura::ElementalDevastationTrigger => fight

@@ -4170,6 +4170,11 @@ pub enum Effect {
         max_stacks: i32,
         /// Whether a hit from a spell flagged Proc can trigger it.
         can_proc_from_procs: bool,
+        /// Forever's rules since the hotfixes of 17 November 2026: a Windfury Totem strike, the
+        /// party's or the shaman's own, spends no charge, though its crit starts Flurry.
+        /// Without it the strike spends one as a white swing.
+        #[serde(default, skip_serializing_if = "is_false")]
+        totem_strike_spends_none: bool,
     },
     /// Improved Stormstrike: Stormstrike may raise casting spirit regeneration; its cooldown
     /// reset hears only hits the player takes.
