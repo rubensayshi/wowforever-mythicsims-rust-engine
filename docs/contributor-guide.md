@@ -233,7 +233,8 @@ player on its own timer: `Fight::enemies` holds each target's swing at its posit
 own metrics and melee speed, and the weapon attack list runs the swings in unit index order.
 A hit the tank takes names the copy that swung in `SpellResult::attacker`, Go's `spell.Unit`.
 Reactive code answers that unit and never `Side::Target`: Holy Shield's damage, Eye for an
-Eye's reflection, Retaliation's strike, a struck item proc and Sulfuras' Immolation. A class
+Eye's reflection, Retaliation's strike, Lightning Shield's orb, a struck item proc and
+Sulfuras' Immolation. A class
 opts in through its gate's `tanks_several_targets`, once its listeners of hits taken do that
 and a tank of the class at 2 to 5 targets matches Go; a debuff on a copy, such as Thunder
 Clap's slow or Demoralizing Roar's attack power cut, is read from that copy's aura.
