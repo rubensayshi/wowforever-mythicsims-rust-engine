@@ -1748,6 +1748,11 @@ impl Agent for ShamanAgent {
                 .improved_stormstrike
                 .expect("Improved Stormstrike is bound")
                 .grant(fight),
+            ShamanAura::ImprovedStormstrikeReset => fight
+                .agent
+                .improved_stormstrike
+                .expect("Improved Stormstrike is bound")
+                .finish_cooldown(fight),
             ShamanAura::MaelstromWeaponTrigger => fight
                 .agent
                 .maelstrom

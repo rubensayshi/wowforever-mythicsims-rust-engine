@@ -67,6 +67,46 @@ fn damage_by_target(player: &Value, spell_id: i64) -> Vec<f64> {
     damage
 }
 
+/// A request of the comparison against the reference (validation/2026-11-19-shaman-tanking-
+/// several-targets) at 50 iterations, under the reference's rules: the player's DPS and threat.
+fn reference_run(name: &str) -> (f64, f64) {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(format!(
+        "validation/2026-11-19-shaman-tanking-several-targets/{name}.request.json"
+    ));
+    let mut request: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    request["simOptions"]["iterations"] = Value::from(50);
+    let prepared =
+        prepare_json_with(request.to_string().as_bytes(), "rust", Rules::GoReference).unwrap();
+    let result = run(&prepared);
+    let player = player(&result);
+    (
+        player["dps"]["avg"].as_f64().unwrap(),
+        player["threat"]["avg"].as_f64().unwrap(),
+    )
+}
+
+/// Improved Stormstrike's reset finishes Stormstrike's cooldown a spell batch window after the
+/// dodge or parry, as the reference's proc trigger handlers run, so the rotation casts it at its
+/// next look and not at the moment of the swing. The production Enhancement Shaman tanking one
+/// target matches the pinned Go engine to the last digit (Go a667dce84, 50 iterations, seed 42);
+/// with the reset at once it read 628.2467013509752 DPS.
+#[test]
+fn improved_stormstrikes_reset_waits_a_batch_window_as_the_reference() {
+    assert_eq!(
+        reference_run("tank-production-enhancement-shaman"),
+        (630.1411053692136, 801.2939713414228)
+    );
+}
+
+/// The same Shaman against four copies of the boss matches the reference likewise.
+#[test]
+fn a_shaman_tank_matches_the_reference_at_four_targets() {
+    assert_eq!(
+        reference_run("tank-production-enhancement-shaman-4-targets"),
+        (873.6317358729298, 1172.8378981902563)
+    );
+}
+
 /// The production request prepares, passes the gate and runs, and each of the four copies
 /// swings at the Shaman.
 #[test]
