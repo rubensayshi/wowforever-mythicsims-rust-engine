@@ -148,6 +148,30 @@ What was checked and left alone:
 - Time out of mana: casters and hunters solo run dry where level 60 ones do not (a level 31 hunter's 1,620 mana goes to Summon Hawk, Aimed and Arcane Shot within the first minute; level 60 ones have raid buffs, consumables and larger pools). With their own buffs, paladins and shamans run dry less (Retribution 19% to 11% of the fight).
 - DPS rises with level for every spec, and 224 level 60 requests and the 45 live board baselines are bit-identical to bundle-b05aa07.
 
+
+### Checked against public logs (18 Nov 2026)
+
+foreverlogs.gg's public reports gave 1,693 player rows from boss kills (875 requests at under one a second): each player's damage to the boss over the kill, with its pet's share in proportion, and its level as the highest trained rank it dealt damage with (`data/forever-trainer-spells.jsonl`). The sims are the 1,330 damage dealers above, re-run on bundle-84f457d with 45 sec fights (the kills last 25 to 90 sec). Sim median over the logs' 75th percentile, by class and level band with 5 or more logs: median 1.24, 0.62 to 1.54 except a 3 sim Warlock band at 10.
+
+| Band | Sim | Logs median, p75 | Sim / p75 |
+| --- | ---: | ---: | ---: |
+| Rogue 30s | 88 | 93, 125 | 0.71 |
+| Warrior 30s | 73 | 78, 104 | 0.70 |
+| Warrior 40s | 139 | 128, 148 | 0.94 |
+| Paladin 30s | 76 | 71, 88 | 0.86 |
+| Shaman 30s | 133 | 95, 121 | 1.10 |
+| Hunter 20s | 98 | 51, 77 | 1.28 |
+| Hunter 40s | 236 | 155, 184 | 1.28 |
+| Warlock 30s | 111 | 60, 81 | 1.37 |
+| Mage 30s | 123 | 59, 80 | 1.54 |
+
+Where a class sits on that range is the group around it, not its model:
+
+- Rogues of 32 to 46 split their damage as the sim does (auto attack 44% in the logs, 47% in the sim; Sinister Strike 27% and 29%; Eviscerate 6% and 7%; Shank 2% and 2%). The logs add a shaman's Windfury Totem (4%), blessings and Blade Flurry on adds, which a solo sim has none of; poisons are 3% of the logs and 12% of the sim.
+- Mages of 30 to 38 put 2% of their damage into the boss: Blizzard 30%, Flamestrike 9%, Cone of Cold 8% and Arcane Explosion 5% go to the adds, so their boss damage reads low. Warlocks' Hellfire the same.
+- Before #324 a hunter's pet was the level 60 one and the Hunter 20s band read 1.5 at 120 sec fights, the highest of the damage dealers; it reads 1.0 at 120 sec now.
+- Druid and Priest logs mix tanks and healers whose spec the logs do not name, so they are left out.
+
 ## Open
 
 - Spell coefficients below level 20: checked against public logs on 9 Nov (`docs/levels-logs-2026-11-09.md`). The client rows carry the low rank coefficients and the game takes them with no further penalty, which is what the engine does (`tests/levels_logs_20261109.rs`).
