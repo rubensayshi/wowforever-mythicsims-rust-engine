@@ -517,7 +517,9 @@
 {"id":275721,"name":"Rocketeer Leggings","type":"ItemTypeLegs","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"4":23,"5":23,"30":129,"36":12},"ilvl":57}}}
 {"id":275864,"name":"Putridus Wall","type":"ItemTypeWeapon","weapon_type":"WeaponTypeShield","hand_type":"HandTypeOffHand","scaling_options":{"0":{"stats":{"2":10,"25":5,"27":29,"30":1739,"38":8},"ilvl":50}}}
 {"id":275916,"name":"Glaive","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOffHand","weapon_speed":1.5,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":1,"ilvl":1}}}
+{"id":276069,"name":"Gravetoll Gavel","type":"ItemTypeWeapon","weapon_type":"WeaponTypeMace","hand_type":"HandTypeTwoHand","weapon_speed":3.3,"scaling_options":{"0":{"weapon_damage_min":99,"weapon_damage_max":149,"stats":{"2":16,"3":21,"4":127,"5":42,"16":13},"ilvl":59}}}
 {"id":276071,"name":"The Black Helm","type":"ItemTypeHead","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":13,"2":25,"25":8,"30":501},"ilvl":59}}}
+{"id":276072,"name":"Soulwoven Drape","type":"ItemTypeBack","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"2":8,"4":20,"5":7,"16":12,"30":43},"ilvl":61}}}
 {"id":276073,"name":"Band of the Damned","type":"ItemTypeFinger","scaling_options":{"0":{"stats":{"3":11,"4":15,"5":15,"16":6},"ilvl":61}},"unique":true}
 {"id":276188,"name":"Eluvi'ana","type":"ItemTypeWeapon","weapon_type":"WeaponTypeSword","hand_type":"HandTypeOneHand","weapon_speed":2.5,"scaling_options":{"0":{"weapon_damage_min":13,"weapon_damage_max":26,"stats":{"1":0},"ilvl":15}},"unique":true}
 {"id":276394,"name":"Luxurious Smoking Jacket","type":"ItemTypeChest","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"3":18,"4":17,"5":17,"30":84,"36":20},"ilvl":59}}}
@@ -669,6 +671,7 @@
 {"id":282014,"name":"Twisted Shadow Staff","type":"ItemTypeWeapon","weapon_type":"WeaponTypeStaff","hand_type":"HandTypeTwoHand","weapon_speed":2,"scaling_options":{"0":{"weapon_damage_min":46,"weapon_damage_max":69,"stats":{"2":21,"11":52},"ilvl":50}}}
 {"id":282020,"name":"Stonegaze Wand","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeWand","weapon_speed":1.5,"scaling_options":{"0":{"weapon_damage_min":44,"weapon_damage_max":83,"stats":{"2":6,"4":7},"ilvl":51}}}
 {"id":282021,"name":"Dreadscorn's Spaulders","type":"ItemTypeShoulder","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":7,"2":13,"30":421,"36":10},"ilvl":59}}}
+{"id":282027,"name":"Scales of the Devourer","type":"ItemTypeChest","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"0":15,"1":14,"2":18,"4":16,"5":16,"30":365},"ilvl":62}}}
 {"id":282049,"name":"Deathmaw's Guise","type":"ItemTypeHead","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"1":16,"2":6,"21":14,"30":117},"ilvl":55}}}
 {"id":282071,"name":"Shin Slicers","type":"ItemTypeFeet","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"1":7,"2":5,"21":14,"30":367},"ilvl":56}}}
 {"id":282085,"name":"Dragonblood Greatsword","type":"ItemTypeWeapon","weapon_type":"WeaponTypeSword","hand_type":"HandTypeTwoHand","weapon_speed":3.5,"scaling_options":{"0":{"weapon_damage_min":148,"weapon_damage_max":223,"stats":{"0":14,"2":26},"ilvl":62}}}
@@ -701,6 +704,7 @@
 {"id":284215,"name":"Ancient Lichen Vestments","type":"ItemTypeChest","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"3":16,"4":20,"5":20,"16":18,"30":165},"ilvl":58}}}
 {"id":284218,"name":"Slime-Coated Gloves","type":"ItemTypeHands","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"3":13,"4":6,"5":6,"30":43,"38":5},"ilvl":53}}}
 {"id":284231,"name":"Sayaad Charm","type":"ItemTypeTrinket","scaling_options":{"0":{"stats":{"39":20},"ilvl":63}},"unique":true}
+{"id":284270,"name":"Ancient Giant's Gaze","type":"ItemTypeHead","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":21,"2":16,"30":477,"31":108},"ilvl":56}}}
 {"id":284283,"name":"Horn of Antilos","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeOneHand","weapon_speed":2.6,"scaling_options":{"0":{"weapon_damage_min":37,"weapon_damage_max":70,"stats":{"2":5,"3":6,"4":44,"5":44},"ilvl":52}}}
 {"id":284587,"name":"Ankle Slicers","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeThrown","weapon_speed":1.8,"scaling_options":{"0":{"weapon_damage_min":51,"weapon_damage_max":96,"stats":{"2":9,"17":12,"18":12},"ilvl":63}}}
 {"id":284708,"name":"Demonstrike Emblem","type":"ItemTypeNeck","scaling_options":{"0":{"stats":{"1":6,"17":8,"18":8},"ilvl":42}}}
@@ -721,6 +725,7 @@
 {"id":286552,"name":"Sandcaster's Mantle","type":"ItemTypeShoulder","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"5":9,"16":14,"30":52},"ilvl":48}}}
 {"id":286570,"name":"Silithid Flesh Bindings","type":"ItemTypeWrist","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"0":8,"2":8,"30":60},"ilvl":52}}}
 {"id":286571,"name":"Silithid Hauberk","type":"ItemTypeChest","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"1":16,"3":12,"30":283},"ilvl":52}}}
+{"id":286590,"name":"Silithid Queen's Husk","type":"ItemTypeChest","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"2":23,"17":24,"18":24,"21":14,"30":637},"ilvl":61}}}
 {"id":286597,"name":"Calm Air Band","type":"ItemTypeFinger","scaling_options":{"0":{"stats":{"4":19,"5":6,"16":11},"ilvl":60}},"unique":true}
 {"id":286609,"name":"Krellack's Carapace","type":"ItemTypeWeapon","weapon_type":"WeaponTypeShield","hand_type":"HandTypeOffHand","scaling_options":{"0":{"stats":{"16":6,"25":7,"27":32,"30":1776},"ilvl":58}}}
 {"id":286612,"name":"Sand-Covered Silk Sash","type":"ItemTypeWaist","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"2":16,"30":43},"ilvl":59}}}
@@ -729,6 +734,8 @@
 {"id":286616,"name":"Matriarch's Prowlers","type":"ItemTypeFeet","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"1":11,"30":94},"ilvl":52}}}
 {"id":286618,"name":"Clutchmother's Guards","type":"ItemTypeHands","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"2":13,"20":10,"30":334},"ilvl":56}}}
 {"id":286619,"name":"Big Basher's Belt","type":"ItemTypeWaist","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"0":9,"30":80},"ilvl":54}},"pseudo_stats":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0]}
+{"id":286641,"name":"Cannibal's Cleaver","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeTwoHand","weapon_speed":3.6,"scaling_options":{"0":{"weapon_damage_min":125,"weapon_damage_max":188,"stats":{"2":19,"17":17,"18":17},"ilvl":50}},"pseudo_stats":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]}
+{"id":286645,"name":"Reforged Atal'ai Spear","type":"ItemTypeWeapon","weapon_type":"WeaponTypePolearm","hand_type":"HandTypeTwoHand","weapon_speed":3.8,"scaling_options":{"0":{"weapon_damage_min":132,"weapon_damage_max":198,"stats":{"0":19,"2":14,"21":14},"ilvl":50}}}
 {"id":286646,"name":"Gill's Gills","type":"ItemTypeTrinket","scaling_options":{"0":{"stats":{"17":12,"18":12,"37":10},"ilvl":40}},"unique":true}
 {"id":286649,"name":"Tidebound Dagger","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeMainHand","weapon_speed":1.7,"scaling_options":{"0":{"weapon_damage_min":21,"weapon_damage_max":40,"stats":{"3":7,"8":56,"16":6},"ilvl":40}}}
 {"id":286650,"name":"Pyromancer's Baton","type":"ItemTypeWeapon","weapon_type":"WeaponTypeMace","hand_type":"HandTypeOneHand","weapon_speed":2.4,"scaling_options":{"0":{"weapon_damage_min":46,"weapon_damage_max":86,"ilvl":40}}}
@@ -775,12 +782,15 @@
 {"id":287035,"name":"Demon Worshipper's Necklace","type":"ItemTypeNeck","scaling_options":{"0":{"stats":{"3":13,"4":11,"5":11},"ilvl":59}}}
 {"id":287036,"name":"Satyr's Touch","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeWand","weapon_speed":1.9,"scaling_options":{"0":{"weapon_damage_min":77,"weapon_damage_max":145,"stats":{"2":9,"20":5},"ilvl":59}}}
 {"id":287037,"name":"Shaper's Robe","type":"ItemTypeChest","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"3":15,"4":18,"5":18,"16":15,"30":85},"ilvl":60}}}
+{"id":287038,"name":"Naturopathy Footpads","type":"ItemTypeFeet","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"4":22,"5":7,"16":17,"30":58},"ilvl":59}}}
+{"id":287039,"name":"Tattered Explorer's Cuffs","type":"ItemTypeWrist","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"0":8,"2":13,"4":15,"5":5,"30":74},"ilvl":60}}}
 {"id":287040,"name":"Dinosaur Hide Belt","type":"ItemTypeWaist","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"1":12,"2":18,"30":97,"31":100},"ilvl":61}}}
 {"id":287041,"name":"Time-Forgotten Bindings","type":"ItemTypeWrist","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"2":13,"16":5,"20":10,"30":155},"ilvl":60}}}
 {"id":287042,"name":"Pauldrons of the Stone Guardian","type":"ItemTypeShoulder","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"2":12,"16":11,"17":24,"18":24,"25":6,"30":478},"ilvl":61}}}
 {"id":287043,"name":"Predaceous Band","type":"ItemTypeFinger","scaling_options":{"0":{"stats":{"2":14},"ilvl":60}}}
 {"id":287044,"name":"Predator's Shroud","type":"ItemTypeBack","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"1":9,"2":14,"17":11,"18":11,"30":43},"ilvl":60}}}
 {"id":287045,"name":"Ancient Mattock","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOneHand","weapon_speed":2.6,"scaling_options":{"0":{"weapon_damage_min":73,"weapon_damage_max":136,"stats":{"2":8,"16":8},"ilvl":61}}}
+{"id":287046,"name":"Pylon Poker","type":"ItemTypeWeapon","weapon_type":"WeaponTypeStaff","hand_type":"HandTypeTwoHand","weapon_speed":3.4,"scaling_options":{"0":{"weapon_damage_min":142,"weapon_damage_max":213,"stats":{"0":25,"16":16,"20":10},"ilvl":61}}}
 {"id":287072,"name":"Bladewhisper's Namesake","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeThrown","weapon_speed":2.1,"scaling_options":{"0":{"weapon_damage_min":31,"weapon_damage_max":59,"stats":{"2":4},"ilvl":42}}}
 {"id":287073,"name":"Orwin's Axe","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeThrown","weapon_speed":2,"scaling_options":{"0":{"weapon_damage_min":31,"weapon_damage_max":59,"stats":{"0":4,"2":4},"ilvl":43}}}
 {"id":287074,"name":"Lard's Lunch Slicer","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeThrown","weapon_speed":1.6,"scaling_options":{"0":{"weapon_damage_min":29,"weapon_damage_max":55,"stats":{"2":5},"ilvl":49}}}
