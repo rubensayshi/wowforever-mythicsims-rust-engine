@@ -153,6 +153,12 @@ pub(crate) trait PrepAgent: CloneAgent {
     fn stat_auras(&self, _sim: &Sim, _unit: UnitId) -> Vec<String> {
         Vec::new()
     }
+    /// The kind of the class effect that adds the player's block value to a hit, as a Warrior's
+    /// Shield Slam: off the target's threat the export states the value on that effect
+    /// (`block_value`), since no swing's rolls carry it. A class without one answers `None`.
+    fn block_value_effect(&self, _sim: &Sim, _unit: UnitId) -> Option<&'static str> {
+        None
+    }
     /// The exporter's `classExport.damageTakenModifiers`: how many of the target's dynamic
     /// damage taken modifiers the class effects describe.
     fn damage_taken_modifiers(&self) -> usize {

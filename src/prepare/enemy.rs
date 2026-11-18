@@ -162,17 +162,7 @@ pub(crate) fn enemy_values(env: &Environment, target: UnitId) -> Result<Enemy, R
     // A block takes off a whole number: the sheet's block value, floor(shield + Strength x 0.05 -
     // 1) (a 6 shield at 59 Strength blocks 7), with the multiplier an aura gives it. The reference
     // takes off the fraction.
-    let (block_value, block_value_multiplier) = if env.sim.rules == Rules::Forever {
-        (
-            (defender.stats[Stat::BlockValue] * pseudo.block_value_multiplier).floor(),
-            1.0,
-        )
-    } else {
-        (
-            defender.stats[Stat::BlockValue],
-            pseudo.block_value_multiplier,
-        )
-    };
+    let (block_value, block_value_multiplier) = player_block_value(env);
     let rolls = EnemyRolls {
         armor_multiplier,
         bonus_damage_taken: bonus_taken,
@@ -222,6 +212,25 @@ pub(crate) fn enemy_values(env: &Environment, target: UnitId) -> Result<Enemy, R
         school_damage_taken_auras: Vec::new(),
         attack_power_auras: Vec::new(),
     })
+}
+
+/// The player's block value and its multiplier as the simulation stands, whose product a
+/// blocked swing takes off and Shield Slam adds. Under Forever's rules the value is the sheet's
+/// whole number with the multiplier in it.
+pub(crate) fn player_block_value(env: &Environment) -> (f64, f64) {
+    let defender = env.sim.unit(env.player);
+    let pseudo = &defender.pseudo_stats;
+    if env.sim.rules == Rules::Forever {
+        (
+            (defender.stats[Stat::BlockValue] * pseudo.block_value_multiplier).floor(),
+            1.0,
+        )
+    } else {
+        (
+            defender.stats[Stat::BlockValue],
+            pseudo.block_value_multiplier,
+        )
+    }
 }
 
 /// spell_resistances.go `ResistanceMultiplier` for a swing that is not periodic: the armor

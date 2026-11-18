@@ -4830,6 +4830,14 @@ pub enum Effect {
         /// Forever's rules: the hit adds twice the block value.
         #[serde(default, skip_serializing_if = "is_false")]
         twice_block_value: bool,
+        /// Off the target's threat, where no swing's rolls carry it: the block value the hit
+        /// adds under each stat aura combination, or the one value without stat auras.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        block_reductions: Vec<f64>,
+        /// The player's auras outside the stat auras whose activation would change that
+        /// block value, which the runtime would not follow.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        block_value_auras: Vec<String>,
     },
     /// Thunder Clap: the row's average plus a share of attack power on the magic table; a
     /// landed clap slows the target by its bid.

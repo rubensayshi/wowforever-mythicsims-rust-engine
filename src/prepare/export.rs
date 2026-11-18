@@ -995,15 +995,41 @@ pub(crate) fn export_state(
     if tanking && !stat_auras.is_empty() {
         combos = Some(super::enemy::EnemyCombos::new(env, &layout)?);
     }
-    match combos.as_mut() {
-        Some(combos) => effects.extend(super::stat_auras::stat_auras_effect_reading(
+    // Off the target's threat a class effect that adds the player's block value reads it under
+    // every stat aura combination likewise (`block_value`).
+    let block_kind = env
+        .agent
+        .block_value_effect(&env.sim, player)
+        .filter(|kind| !tanking && effects.iter().any(|effect| effect["kind"] == *kind));
+    let mut block = block_kind.map(|_| super::block_value::BlockCombos::new(env, &layout));
+    match (combos.as_mut(), block.as_mut()) {
+        (Some(combos), _) => effects.extend(super::stat_auras::stat_auras_effect_reading(
             env,
             &layout,
             Some(&mut |mask, fresh, exact| combos.read(mask, fresh, exact)),
         )?),
-        None => effects.extend(super::stat_auras::stat_auras_effect_reading(
+        (None, Some(block)) => effects.extend(super::stat_auras::stat_auras_effect_reading(
+            env,
+            &layout,
+            Some(&mut |mask, fresh, exact| block.read(mask, fresh, exact)),
+        )?),
+        (None, None) => effects.extend(super::stat_auras::stat_auras_effect_reading(
             env, &layout, None,
         )?),
+    }
+    if let (Some(kind), Some(block)) = (block_kind, block) {
+        let reductions = if block.reductions.is_empty() {
+            vec![super::block_value::at_reset(env)]
+        } else {
+            block.reductions
+        };
+        let changing = super::block_value::changing_auras(env, &stat_auras);
+        for effect in effects.iter_mut().filter(|effect| effect["kind"] == kind) {
+            effect["block_reductions"] = json!(reductions);
+            if !changing.is_empty() {
+                effect["block_value_auras"] = json!(changing);
+            }
+        }
     }
     let tail = tail_effects(env, &mut unrepresented, &effects)?;
     effects.extend(tail);
