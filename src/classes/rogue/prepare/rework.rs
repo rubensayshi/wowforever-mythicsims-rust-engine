@@ -46,6 +46,39 @@ pub(crate) const DEATH_MARK_RANGE: f64 = 20.0;
 pub(crate) const DEATH_MARK_STORED_PER_POINT: f64 = 0.12;
 pub(crate) const DEATH_MARK_CAP_BASE: f64 = 156.0;
 pub(crate) const DEATH_MARK_CAP_PER_POINT: f64 = 245.0;
+/// The cap's base and per point amounts of ranks 1 to 3, as their tooltips state them (Wowhead
+/// Forever, 18 November 2026): (63, 102), (98, 158) and (138, 217). The rows of every rank are
+/// otherwise the same (cost, cooldown, the 6 sec mark).
+const DEATH_MARK_LOWER_CAPS: [(f64, f64); 3] = [(63.0, 102.0), (98.0, 158.0), (138.0, 217.0)];
+/// The levels ranks 1 to 4 are learned at (client SpellLevels).
+const DEATH_MARK_LEVELS: [i32; 4] = [40, 48, 56, 60];
+
+/// The cap's base and per point amounts of the Death Mark rank the rogue knows: the highest rank
+/// its spellbook lists, or without one the highest its level teaches. The engine registers rank 4
+/// and presses it through the lower ranks' aliases, so a level 48 rogue's mark stored up to rank
+/// 4's cap until 18 Nov 2026.
+pub(crate) fn death_mark_cap() -> (f64, f64) {
+    use crate::prepare::levels;
+    let ids = [
+        DEATH_MARK_LOWER_RANKS[0],
+        DEATH_MARK_LOWER_RANKS[1],
+        DEATH_MARK_LOWER_RANKS[2],
+        DEATH_MARK_SPELL_ID,
+    ];
+    let listed = ids.iter().rposition(|id| levels::spellbook_lists(*id));
+    let by_level = DEATH_MARK_LEVELS
+        .iter()
+        .rposition(|level| *level <= levels::character_level());
+    let rank = if levels::character_level() >= levels::MAX_LEVEL {
+        3
+    } else {
+        listed.or(by_level).unwrap_or(0)
+    };
+    DEATH_MARK_LOWER_CAPS
+        .get(rank)
+        .copied()
+        .unwrap_or((DEATH_MARK_CAP_BASE, DEATH_MARK_CAP_PER_POINT))
+}
 pub(crate) const DEATH_MARK_ATTACK_POWER_PER_POINT: f64 = 0.04;
 
 /// Poised's cost reduction, Energy: 1328826's effect.

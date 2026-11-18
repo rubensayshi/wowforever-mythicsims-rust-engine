@@ -145,14 +145,23 @@ const PET_OWNER_ATTACK_POWER_SHARE: f64 = 0.1;
 /// A tamed pet's swing spans a fifth either side of its average.
 const PET_SWING_SPREAD: f64 = 0.2;
 
-/// The creature auto attack dps the Forever pet and hawk models scale with.
+/// The creature auto attack dps the Forever pet and hawk models scale with: the row of the
+/// pet's level, which is its hunter's. Both models were read as shares of the level 30 row (the
+/// pet sheets of levels 11, 17 and 30, the level 30 Cat's and hawks' logs); until 18 Nov 2026 a
+/// levelling hunter's pet took the level 60 row at every level, and a level 15 pet swung for 49
+/// DPS, two thirds of its hunter's sim. Level 60 keeps the reference's constant.
 pub(super) fn creature_auto_attack_dps() -> f64 {
-    CREATURE_AUTO_ATTACK_DPS
+    let level = crate::prepare::levels::character_level();
+    if level >= crate::prepare::levels::MAX_LEVEL {
+        CREATURE_AUTO_ATTACK_DPS
+    } else {
+        crate::prepare::levels::creature_auto_attack_dps(level)
+    }
 }
 
 /// A tamed pet's own attack power under Forever's rules: 4.2 a point of the creature dps.
 pub(super) fn tamed_pet_attack_power() -> f64 {
-    PET_OWN_ATTACK_POWER_SHARE * ATTACK_POWER_PER_DPS * CREATURE_AUTO_ATTACK_DPS
+    PET_OWN_ATTACK_POWER_SHARE * ATTACK_POWER_PER_DPS * creature_auto_attack_dps()
 }
 
 /// A tamed pet's swing before attack power under Forever's rules, as (low, high) damage a
@@ -165,7 +174,7 @@ pub(super) fn tamed_pet_attack_power() -> f64 {
 /// the weapon puts 131 of those 152 outside the range. That the same shares hold at level 60 is
 /// an extrapolation: the client's creature dps row is the only level 60 input.
 pub(super) fn tamed_pet_weapon_dps() -> (f64, f64) {
-    let average = CREATURE_AUTO_ATTACK_DPS - tamed_pet_attack_power() / ATTACK_POWER_PER_DPS;
+    let average = creature_auto_attack_dps() - tamed_pet_attack_power() / ATTACK_POWER_PER_DPS;
     (
         average * (1.0 - PET_SWING_SPREAD),
         average * (1.0 + PET_SWING_SPREAD),
@@ -804,6 +813,22 @@ const _NEVER: i64 = NEVER_EXPIRES;
 
 #[cfg(test)]
 mod tests {
+
+    /// A tamed pet's own attack power is 4.2 a point of its level's creature dps, which the pet
+    /// sheets of a level 11, 17 and 30 pet read as 36, 61 and 103.
+    #[test]
+    fn a_levelling_pet_has_its_levels_attack_power() {
+        use crate::prepare::levels::{with_character, Character};
+        for (level, sheet) in [(11, 36.0), (17, 61.0), (30, 103.0)] {
+            let character = Character {
+                level,
+                ..Character::default()
+            };
+            let attack_power = with_character(character, tamed_pet_attack_power);
+            assert_eq!(attack_power.floor(), sheet, "level {level}");
+        }
+        assert_eq!(creature_auto_attack_dps(), CREATURE_AUTO_ATTACK_DPS);
+    }
     use super::*;
 
     /// The client's level 11, 17 and 30 creature rows, whose dps times 4.2 rounded down are the

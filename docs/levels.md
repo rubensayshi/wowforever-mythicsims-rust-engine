@@ -127,11 +127,32 @@ On 8 Nov all 34 reference builds at levels 10, 20, 30, 40 and 50 (170 requests) 
 
 On 9 Nov every reference build and the five healer references at eight levels each from 10 to 59 (312 requests), with and without a spellbook, and a levelling Droptimizer of every reference weapon, off hand and ranged weapon at levels 15, 27, 42 and 58 (1,980 sets), prepare, pass the gate and sim with no ranked spell cast or dealing damage above the level. `tests/levels_20261109.rs` keeps a build of every class, tanks and healers among them, and runs each at levels 10 to 58 the same way. Besides casts, check the damage of procs and pets: a proc row never shows a cast. The worker side of a levelling sim (solo, a caster filler at the end of the rotation, a dungeon boss two levels up) is the app's `worker/forever/levels.go`.
 
+
+## Every class at every level (18 Nov 2026)
+
+1,487 MythicSim levelling sims of 12 to 18 Nov (27 specs, levels 10 to 59, each a player's own request) were simmed on bundle-b05aa07 and checked four ways: no spell cast that the spellbook leaves out; spells a preset names that the character knows but never casts, against the same presets on 224 level 60 requests; time out of mana; and DPS by level. `tests/levels_class_audit_20261118.rs` keeps four of them (names removed).
+
+What the engine had wrong, now fixed:
+
+- **Lacerate below 42.** Push 113531 made Lacerate a talent with two new low ranks the store lacks: the talent's own rank (1328617, level 25, 4 a stack a tick) and rank 2 (1328616, level 34, 6). The ladder started at 414644 (42), so a bear of 25 to 41 had no Lacerate. `hotfix_113554` adds both rows as copies of 414644 with the client's ticks and levels, and `druid::bear::lacerate_rank` reads the five ranks at 25, 34, 42, 50 and 58.
+- **Primal Bite below 60.** It was always rank 3 (60), which the spellbook rule leaves out below 60, so a levelling bear never cast it. Ranks 1 and 2 take the client's levels (40, 50; the frozen rows state 25 and 36) and damage (42, 62; were 26, 38), and `primal_bite_rank` reads the rank the druid has trained. A level 42 bear with both goes from 53 to 115 DPS.
+- **Death Mark's cap.** The engine registers rank 4 and presses it through the lower ranks' aliases, so every rank stored up to rank 4's cap. Each rank's cap is now its tooltip's (Wowhead Forever): 63 + 102 a point, 98 + 158, 138 + 217, 156 + 245 (`rogue::rework::death_mark_cap`).
+- **A Hunter's pet and hawk.** Both models are shares of the creature auto attack dps, read at level 30 (the pet sheets of levels 11, 17 and 30, a level 30 Cat's 152 swings, four level 30 hawk logs), but the code used the level 60 row at every level: a level 15 pet swung for 49 DPS, two thirds of its hunter's sim. They now take the row of their level (`hunter::pet::creature_auto_attack_dps`); the pet's own attack power is 36, 61 and 103 at 11, 17 and 30, as the sheets read. Hunters in their 20s go from 116 to 79 median DPS, in their 50s from 268 to 253.
+- **A paladin's own blessing.** The app now gives a solo paladin its own blessing as the Greater Blessing row; `levels::known_buff_rank` maps Greater Blessings of Might, Wisdom and Kings to the 5 min blessing, so a level 26 paladin has Blessing of Wisdom rank 2 (19850).
+
+The app's side (`worker/forever/levels.go`, `withOwnBuffs`): a solo character keeps what it casts on itself at level 60, a Paladin's blessing (Wisdom for Holy, for Protection from 30 and Retribution from 40, Might below), a Shaman's Mana Spring Totem and a Druid's Mark of the Wild, each at the rank it has trained. On those players' requests: Retribution +5%, Protection +6%, Holy +10%, Enhancement +4%, Feral +3.5%, Balance +3%.
+
+What was checked and left alone:
+
+- Every spell a preset names and a levelling character knows but never casts is also never cast by the same preset at 60 (AoE lines gated on target count, openers from Stealth, Recklessness and Berserker Rage outside the fight's windows, Judgement's casts counted under the Judgement of each seal), or is the levelling filler's mana fallback.
+- Time out of mana: casters and hunters solo run dry where level 60 ones do not (a level 31 hunter's 1,620 mana goes to Summon Hawk, Aimed and Arcane Shot within the first minute; level 60 ones have raid buffs, consumables and larger pools). With their own buffs, paladins and shamans run dry less (Retribution 19% to 11% of the fight).
+- DPS rises with level for every spec, and 224 level 60 requests and the 45 live board baselines are bit-identical to bundle-b05aa07.
+
 ## Open
 
 - Spell coefficients below level 20: checked against public logs on 9 Nov (`docs/levels-logs-2026-11-09.md`). The client rows carry the low rank coefficients and the game takes them with no further penalty, which is what the engine does (`tests/levels_logs_20261109.rs`).
 - Dungeon boss armor: the worker scales the level 63 boss's 3731 armor by level. The client does not carry creature armor.
-- Spirit regen, weapon skill caps and pet stats below 60 follow the existing level formulas. A Hunter's pet still uses the level 60 creature row; a Warlock's demon follows the level (below).
+- Spirit regen and weapon skill caps below 60 follow the existing level formulas. A Hunter's pet and hawk follow the creature dps row of their level since 18 Nov (below); a Warlock's demon follows the level (below).
 - A cat druid below 20, who has not learned Cat Form, sims in it all the same (with autos only until Claw at 20).
 - Other class buffs and debuffs built from core's fixed rows (Shaman totems' triggered buffs resolve by level already; Sunder and Expose Armor, Hunter's Mark and the external raid rows have not been checked below 60). The worker sims a levelling character solo, so the external rows do not reach it, with one exception: since 12 November 2026 a levelling Hunter keeps its own Hunter's Mark on the target at the rank it has trained (a melee Survival Hunter needs it for Expose Prey, which opens Mongoose Bite).
 - A rotation that names a spell the character has not trained loses that line: a level 35 paladin's own Seal of Command twisting rotation runs without Seal of Command. The rotation check reports it ("does not know spell"), and the app's Rotation card leaves the line out of what ran; a custom rotation's warning says so.
