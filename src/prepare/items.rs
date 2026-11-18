@@ -214,9 +214,25 @@ fn item_from_row(row: std::rc::Rc<Message>) -> Item {
     }
 }
 
+/// Torch of Retribution (10515), a quest item a character holds in both hands. The reference
+/// row calls it a weapon of speed 0.5 that hits for 0 to 1; in the live client it is an item of
+/// the armor class (Item row: class 4, subclass 0, two-hand slot, build 1.60.1.70959) whose
+/// tooltip states no damage and no speed. It is the one reference weapon row that is no weapon
+/// in the client. Swung at 0.5 a seal lands four times as often as on a real two-hander, so a
+/// Retribution Paladin holding it read 36% above its reference weapon (18 November 2026).
+const TORCH_OF_RETRIBUTION: i32 = 10515;
+
 /// Go `NewItem` for one `ItemSpec`.
 pub(crate) fn new_item(spec: &Message, rules: Rules) -> Result<Item, Refusal> {
     let id = spec.i32("id");
+    if rules == Rules::Forever && id == TORCH_OF_RETRIBUTION {
+        return Err(Refusal::new(
+            "not_a_weapon",
+            "Torch of Retribution is a quest item, not a weapon: it has no damage or speed to \
+             sim. Equip your weapon and export again"
+                .to_string(),
+        ));
+    }
     let mut item = database_item_under(id, rules)
         .ok_or_else(|| Refusal::new("unknown_item", format!("no item with id {id}")))?;
     if !spec.ints("gems").iter().all(|gem| *gem == 0) {
