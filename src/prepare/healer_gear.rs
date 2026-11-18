@@ -339,8 +339,9 @@ fn apply_empty_set_bonuses(env: &mut Environment) {
                     share: 0.1,
                 });
             }
-            // Rotmending (1321587, 1321586): a heal's cast, at most every 2 sec, puts a heal over
-            // time of 40 every 3 sec for 15 sec on its target, counted at once as its five ticks.
+            // Rotmending (1321587, 1321586): a heal's cast has a chance (`ROTMENDING_PPM`), at
+            // most every 2 sec, to put a heal over time of 40 every 3 sec for 15 sec on its
+            // target, counted at once as its five ticks.
             "Rotmender's Raiment" if reached(5) => {
                 let unit = env.player;
                 let aura = forever_status_aura(env, &name, 5);
@@ -815,6 +816,36 @@ fn stacking_stat_auras(env: &Environment) -> Vec<String> {
 }
 
 /// The mana listeners' effects: Sudden Insight for any spec, and a healer's mana returns.
+/// How often Rotmending (Rotmender's Raiment 5) follows a heal's cast, in procs a minute of cast
+/// time. Its trigger row (1321587) states a ProcChance of 100 beside a tooltip that says "a
+/// chance", and no procs a minute row; public combat logs of 15 to 18 November 2026 (27 wearers,
+/// 261 procs in 5,230 heal casts with all five pieces on) read 1.60 (1.42 to 1.79), an instant's
+/// 3.8% against 7.8% for a 2.5 sec cast, where one flat chance fits far worse.
+/// `validation/2026-11-19-rotmending-rate.json` holds the counts.
+pub(crate) const ROTMENDING_PPM: f64 = 1.6;
+
+/// Rotmending's chance on each completed heal cast: the rate over a minute of the spell's cast
+/// time, at least 1.5 sec (an instant's 4%). A shield is no heal to it (Power Word: Shield, 0
+/// procs in 647 casts of the same logs), so a rank whose row only absorbs rolls nothing.
+fn rotmending_cast_chances(env: &Environment, listener: &ProcTrigger) -> Vec<Value> {
+    let book = &env.sim.unit(env.player).spellbook;
+    proc_trigger_spells(env, listener)
+        .into_iter()
+        .filter_map(|position| {
+            let spell = env.sim.spell(book[position]);
+            let row = super::spelldata::store::find(spell.action_id.spell_id);
+            let shield_only = !row.absorb_effect().is_nil()
+                && row.heal_effect().is_nil()
+                && row.periodic_effect().is_nil();
+            if shield_only {
+                return None;
+            }
+            let seconds = (spell.default_cast.cast_time as f64 / SECOND as f64).max(1.5);
+            Some(json!({"spell": position, "chance": ROTMENDING_PPM * seconds / 60.0}))
+        })
+        .collect()
+}
+
 fn mana_on_cast_effects(env: &Environment) -> Vec<Value> {
     let unit = env.player;
     let book = &env.sim.unit(unit).spellbook;
@@ -890,12 +921,15 @@ pub(crate) fn export_effects(env: &Environment, unrepresented: &mut Vec<String>)
             proc_mask: ProcMask::SPELL_HEALING,
             ..ProcTrigger::default()
         };
+        let cast_chances = rotmending_cast_chances(env, &listener);
+        let trigger_spells: Vec<&Value> = cast_chances.iter().map(|c| &c["spell"]).collect();
         let pseudo = &env.sim.unit(unit).pseudo_stats;
         if let Some(position) = position {
             effects.push(json!({
                 "kind": "spell_data_heal_proc", "trigger_aura": env.sim.aura(aura).label,
-                "trigger_spells": proc_trigger_spells(env, &listener), "outcome": [],
-                "require_damage": false, "proc_chance": 1.0, "spell": position, "can_crit": false,
+                "trigger_spells": trigger_spells, "outcome": [],
+                "require_damage": false, "proc_chance": 0.0, "cast_chances": cast_chances,
+                "spell": position, "can_crit": false,
                 "healing_dealt_multiplier": pseudo.healing_dealt_multiplier,
                 "healing_taken_multiplier": pseudo.healing_taken_multiplier,
                 "table_healing_dealt_multiplier": env.attack_table(unit, unit).healing_dealt_multiplier,

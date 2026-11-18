@@ -2972,6 +2972,10 @@ pub enum Effect {
         outcome: Vec<String>,
         require_damage: bool,
         proc_chance: f64,
+        /// A trigger spell listed here rolls its own chance in place of `proc_chance`: a proc
+        /// priced on each cast's time (Rotmender's Raiment's Rotmending under Forever's rules).
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        cast_chances: Vec<SpellChance>,
         spell: usize,
         can_crit: bool,
         healing_dealt_multiplier: f64,
