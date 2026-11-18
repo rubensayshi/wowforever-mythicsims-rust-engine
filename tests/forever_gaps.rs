@@ -1515,3 +1515,142 @@ fn dreadnaughts_cheat_death_goes_up_below_a_fifth_of_health() {
         "{refused:?}"
     );
 }
+
+/// The recorded request prepared under Forever's rules as it was sent: its talents are in the
+/// client's tree already.
+fn prepared_as_recorded(name: &str) -> Value {
+    prepare_json_with(
+        recorded(name).to_string().as_bytes(),
+        "rust",
+        Rules::Forever,
+    )
+    .unwrap()
+}
+
+/// The position of the first effect of this kind whose trigger aura has this label.
+fn effect_index(prepared: &Value, kind: &str, trigger_aura: &str) -> usize {
+    prepared["effects"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .position(|effect| effect["kind"] == kind && effect["trigger_aura"] == trigger_aura)
+        .unwrap_or_else(|| panic!("no {kind} of {trigger_aura}"))
+}
+
+/// A Protection Warrior in Battlegear of Heroism (4) with Annihilator as a swap weapon
+/// (production sim 55f29bc2, 18 November 2026): Warrior's Resolve rolls a one proc a minute
+/// manager, which the swap rebuilds for the weapon in the hand, 1.7 sec Felstriker's 0.0283 a
+/// hit against 2.4 sec Annihilator's 0.04. The gate refused the swapped chances.
+#[test]
+fn a_swap_rebuilds_warriors_resolve_for_the_weapon_in_hand() {
+    let name = "protection-warrior-swap-warriors-resolve";
+    let value = prepared_as_recorded(name);
+    let index = effect_index(&value, "health_rage_proc", "Battlegear of Heroism 4P");
+    let chance = |value: &Value| {
+        value["effects"][index]["chances"][0]["chance"]
+            .as_f64()
+            .unwrap()
+    };
+    assert_eq!(chance(&value), 1.7 / 60.0);
+    let swapped = effects(&value, "item_swap")[0]["swapped"].clone();
+    let swapped_chance = swapped
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|change| change["path"] == format!("/effects/{index}/chances/0/chance"))
+        .expect("the swapped set states its own chance")["value"]
+        .as_f64()
+        .unwrap();
+    assert_eq!(swapped_chance, 2.4 / 60.0);
+    // The player's rotation has no item swap line, so the fight never leaves Felstriker.
+    let player = |result: &Value| first_player(result).clone();
+    let resolve = |player: &Value| resource_gain(player, 450589, "ResourceTypeHealth");
+    let never_swaps = player(&run_prepared(&value));
+    assert!(resolve(&never_swaps) > 0.0);
+
+    // With a swap at the pull and the reset's chances zeroed, every proc is one the swapped
+    // chances rolled; without the swap the same input never procs.
+    let mut swaps = recorded(name);
+    let rotation = &mut swaps["raid"]["parties"][0]["players"][0]["rotation"]["priorityList"];
+    rotation.as_array_mut().unwrap().insert(
+        0,
+        json!({"action": {"itemSwap": {"swapSet": "Swap1"}, "condition": {"cmp": {
+            "lhs": {"currentTime": {}}, "op": "OpLt", "rhs": {"const": {"val": "1s"}}}}}}),
+    );
+    let zeroed = |mut value: Value| {
+        for chance in value["effects"][index]["chances"].as_array_mut().unwrap() {
+            chance["chance"] = json!(0.0);
+        }
+        value
+    };
+    let swaps = prepare_json_with(swaps.to_string().as_bytes(), "rust", Rules::Forever).unwrap();
+    assert_eq!(
+        effect_index(&swaps, "health_rage_proc", "Battlegear of Heroism 4P"),
+        index
+    );
+    assert_eq!(resolve(&player(&run_prepared(&zeroed(value)))), 0.0);
+    let after_swap = player(&run_prepared(&zeroed(swaps)));
+    assert!(resolve(&after_swap) > 0.0, "{}", resolve(&after_swap));
+    assert!(resource_gain(&after_swap, 450589, "ResourceTypeRage") > 0.0);
+}
+
+/// The same Warrior in Battlegear of Valor (5), whose Warrior's Resolve rolls the same manager:
+/// the swap rebuilds it likewise.
+#[test]
+fn a_swap_rebuilds_battlegear_of_valors_resolve() {
+    let mut request = recorded("protection-warrior-swap-warriors-resolve").to_string();
+    // Wrist, waist, shoulders, hands and feet of Heroism for Valor's.
+    for (heroism, valor) in [
+        (226865, 16735),
+        (226866, 16736),
+        (226867, 16733),
+        (226870, 16737),
+        (226871, 16734),
+    ] {
+        let from = format!(r#""id":{heroism}"#);
+        assert!(request.contains(&from), "{from}");
+        request = request.replace(&from, &format!(r#""id":{valor}"#));
+    }
+    let value = prepare_json_with(request.as_bytes(), "rust", Rules::Forever).unwrap();
+    let index = effect_index(&value, "health_rage_proc", "Battlegear of Valor 5P");
+    let swapped = effects(&value, "item_swap")[0]["swapped"].clone();
+    assert!(swapped
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|change| change["path"]
+            .as_str()
+            .unwrap()
+            .starts_with(&format!("/effects/{index}/chances"))));
+    let result = run_prepared(&value);
+    assert!(resource_gain(first_player(&result), 450589, "ResourceTypeHealth") > 0.0);
+}
+
+/// A Feral Bear's Manual Crowd Pummeler opener beside Darkmoon Card: Heroism (a Droptimizer
+/// candidate of production sim d8e1d281, 17 November 2026): the card's two procs a minute manager
+/// is one an item swap rebuilds, which preparation had not stated. The paw keeps its 2.5 sec
+/// speed under either set, so the chance stays 2 x 2.5 / 60 a hit and the card heals all fight.
+#[test]
+fn a_swap_beside_darkmoon_card_heroism_runs() {
+    let name = "feral-bear-druid-swap-darkmoon-card-heroism";
+    let value = prepared_as_recorded(name);
+    let index = effect_index(&value, "health_rage_proc", "Darkmoon Card: Heroism");
+    assert_eq!(
+        value["effects"][index]["chances"][0]["chance"],
+        json!(2.0 * 2.5 / 60.0)
+    );
+    let swap = effects(&value, "item_swap");
+    assert_eq!(swap.len(), 1);
+    assert!(!swap[0]["swapped"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|change| change["path"]
+            .as_str()
+            .unwrap()
+            .starts_with(&format!("/effects/{index}/"))));
+    let result = run_prepared(&value);
+    let player = first_player(&result);
+    assert!(player["dps"]["avg"].as_f64().unwrap() > 0.0);
+    assert!(resource_gain(player, 23682, "ResourceTypeHealth") > 0.0);
+}

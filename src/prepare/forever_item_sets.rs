@@ -566,7 +566,17 @@ set_stats!(
 /// Warrior's Resolve, moved down from 6 pieces: it now returns 10 Rage with the heal.
 fn battlegear_of_valor_5(env: &mut Environment, aura: AuraId) {
     let unit = env.player;
-    let dpm = Rc::new(env.sim.new_ppm_manager(unit, 1.0, ProcMask::MELEE));
+    // Go NewLegacyPPMManager, which an item swap rebuilds for the weapons in the hands.
+    let dpm = Rc::new(
+        env.sim
+            .new_ppm_manager(unit, 1.0, ProcMask::MELEE)
+            .rebuilt_by_swap(
+                &env.sim,
+                unit,
+                super::item_swap::ManagerChance::Ppm(1.0),
+                super::item_swap::ManagerMask::Static(ProcMask::MELEE),
+            ),
+    );
     env.sim.attach_proc_trigger(
         aura,
         &ProcTrigger {

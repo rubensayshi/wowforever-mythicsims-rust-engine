@@ -95,3 +95,5 @@ checks the gate passes and runs it.
 | `warrior-bigger-rock-on-bigger-stick` | Bigger Rock on Bigger Stick (279480), a Forever two-hand mace whose chance on hit is a physical damage over time, on a level 46 Arms Warrior (9 November 2026) |
 | `feral-druid-bigger-rock-on-bigger-stick` | the same weapon on a level 43 Feral Druid in Cat Form (9 November 2026) |
 | `feral-bear-druid-swap-health-bonus` | a Tauren Bear's Manual Crowd Pummeler opener whose swapped set states Bear Form's health bonus a rounding step from the reset's (a level 60 Droptimizer candidate, Hibernal Armor, 18 November 2026) |
+| `protection-warrior-swap-warriors-resolve` | a Protection Warrior in Battlegear of Heroism (4) carrying Annihilator as a swap weapon, whose Warrior's Resolve rolls a procs-per-minute manager the swap rebuilds for the weapon in the hand (18 November 2026) |
+| `feral-bear-druid-swap-darkmoon-card-heroism` | a Feral Bear's Manual Crowd Pummeler opener beside Darkmoon Card: Heroism, whose procs-per-minute manager an item swap rebuilds (a level 60 Droptimizer candidate, 17 November 2026) |
