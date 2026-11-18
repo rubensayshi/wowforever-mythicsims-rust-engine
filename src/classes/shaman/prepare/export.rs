@@ -261,7 +261,7 @@ impl Shaman {
         }
         if talent("flurry") > 0 {
             // talents_enhancement.go applyFlurry: a Go literal 500 ms charge cooldown.
-            effects.push(json!({
+            let mut flurry = json!({
                 "kind": "flurry", "trigger_aura": "Flurry Trigger", "aura": "Flurry",
                 "melee_speed_multiplier": crate::prepare::hotfix_113554::talent(sim.rules, 16256, 5)
                     .multiplier_at(talent("flurry")),
@@ -270,7 +270,13 @@ impl Shaman {
                 // Forever's rank 16256 lacks the bit: a hit from a spell flagged Proc does not
                 // trigger it.
                 "can_proc_from_procs": data.flurry.highest().can_proc_from_procs(),
-            }));
+            });
+            if sim.rules == Rules::Forever {
+                // The hotfixes of 17 November 2026: a Windfury Totem strike spends no charge
+                // (flurry.rs).
+                flurry["totem_strike_spends_none"] = json!(true);
+            }
+            effects.push(flurry);
         }
         if has("stormstrike") && talent("improved_stormstrike") > 0 {
             // talents_enhancement.go applyImprovedStormstrike

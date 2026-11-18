@@ -539,6 +539,21 @@ the Go goldens and exporter uses. The departures:
     to 6.6% (was 3.3%)" (applied since hotfix push 113718, above), Taran Icebreaker "now
     correctly behaves as a 2-handed Mace" (its live row is one) and Glimmering Mithril Insignia
     "no longer requires the ability to wear Mail armor" (no class is refused it).
+- The hotfixes of 17 November 2026 (Blizzard's hotfix post; Forever preparation only, the
+  reference keeps its own; `tests/hotfix_20261117.rs`):
+  - Shaman: "Fixed an issue where Flurry incorrectly lost stacks when Windfury totem attacks
+    landed." A Windfury Totem strike, the party's or the shaman's own, spends no charge of the
+    Shaman's Flurry and leaves the 500 ms charge cooldown alone (`totem_strike_spends_none` on
+    the prepared `flurry` effect). Until then the strike, a copy of the main hand auto with its
+    proc mask, spent one as a white swing does whenever the charge cooldown was ready: right
+    after a white crit that had just refreshed Flurry, and after a Stormstrike that fired the
+    totem. A white swing that spent a charge itself held the cooldown, so the strike it fired
+    spent none. On the Enhancement board request of 15 November 2026 (a two-hand weapon,
+    Windfury Weapon and the party's totem) the strike spent 6 of the 41 charges spent in the
+    first fight. One thing the post does not state: the strike's crit still starts Flurry, as
+    any melee crit does. The post speaks of lost stacks only, and a level 60 Fury warrior's
+    combat log of 16 November 2026 shows the same strike's crit starting the Warrior's Flurry 22
+    of 22 times. No Shaman log is counted yet.
 - The rest of the Shaman changes in the development notes of 2 November 2026 (Forever
   preparation, the reference keeps the frozen rows; the rows are in `prepare::hotfix_113554`).
   The damage rows are Wowhead's Forever tooltips of 4 November 2026 (the live client's, rows the
