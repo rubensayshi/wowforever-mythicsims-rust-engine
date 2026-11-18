@@ -519,8 +519,25 @@ fn create_weapon_proc_spell(
     itemhelpers::create_weapon_proc_spell(env, item_id, name, ppm, |env| Some(spell(env)));
 }
 
+/// Under Forever's rules, the weapons of [`WEAPON_DAMAGE_PROCS`] whose rate combat logs have
+/// measured, by item, in procs a minute of the weapon's speed.
+///
+/// - Stinging Viper (6472), 1291663: 1,328 procs in 16,295 isolated landed hits of paladins,
+///   shamans and warriors in 30 public Forever reports (client 1.60.1.70938, 14 and 15 November
+///   2026), 1.75 (1.66 to 1.84) a minute, in place of the reference's 3.2.
+/// - Skullforge Reaver (13361), 17484 before the brand's own hit roll, resisted and missed brands
+///   counted: 1,861 procs in 23,089 main hand white swings and melee casts of 6 wearers in public
+///   Forever reports (client 1.60.1.70938, 14 and 15 November 2026), 1.93 (1.85 to 2.02) a minute,
+///   1.95 in place of the reference's 1.7. Off hand swings (12 in 12,870) and ranged type hits (0
+///   in 579) do not roll it, as the main hand proc already rolls.
+const FOREVER_WEAPON_DAMAGE_PPM: &[(i32, f64)] = &[(6472, 1.75), (13361, 1.95)];
+
 fn weapon_damage_proc(env: &mut Environment, proc: &WeaponDamageProc) {
-    create_weapon_proc_spell(env, proc.item_id, proc.name, proc.ppm, |env| {
+    let ppm = FOREVER_WEAPON_DAMAGE_PPM
+        .iter()
+        .find(|(item, _)| *item == proc.item_id && env.sim.rules == super::sim::Rules::Forever)
+        .map_or(proc.ppm, |(_, ppm)| *ppm);
+    create_weapon_proc_spell(env, proc.item_id, proc.name, ppm, |env| {
         let unit = env.player;
         let config = spell_data_proc_damage_spell_config(env, must_find(proc.spell_id));
         env.sim.get_or_register_spell(unit, config)
@@ -616,9 +633,16 @@ fn blade_of_hanna(env: &mut Environment) {
     }
 }
 
-/// items_weapons.go Flurry Axe.
+/// items_weapons.go Flurry Axe. Under Forever's rules its extra attack rolls 1.65 times a minute:
+/// 1,187 procs in 28,418 landed hits of the wearers in public Forever reports (client
+/// 1.60.1.70938, 14 and 15 November 2026), 1.67 a minute, in place of the reference's 1.9.
 fn flurry_axe(env: &mut Environment) {
-    create_weapon_proc_spell(env, 871, "Flurry Axe", 1.9, |env| {
+    let ppm = if env.sim.rules == super::sim::Rules::Forever {
+        1.65
+    } else {
+        1.9
+    };
+    create_weapon_proc_spell(env, 871, "Flurry Axe", ppm, |env| {
         let unit = env.player;
         env.sim.get_or_register_spell(
             unit,

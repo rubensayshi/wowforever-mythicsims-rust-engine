@@ -630,9 +630,12 @@ impl PaladinAgent {
         for effect in effects {
             match effect {
                 Effect::JudgementRefresh {
-                    judgement_auras, ..
+                    judgement_auras,
+                    white_swings_only,
+                    ..
                 } => {
-                    let bound = judgement_refresh::bind(&fight, judgement_auras)?;
+                    let mut bound = judgement_refresh::bind(&fight, judgement_auras)?;
+                    bound.white_swings_only = *white_swings_only;
                     fight.agent.judgement_refresh = Some(Rc::new(bound));
                 }
                 Effect::Judgement { wake_delay_ns, .. } => {

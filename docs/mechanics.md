@@ -1413,6 +1413,29 @@ the Go goldens and exporter uses. The departures:
     Stamina, 5 mana per 5 sec and 17 Fire damage; the Darkspear Signets, Militant's Bands,
     Channeler's Ring, Bad Hat and Souvenir Sea Shell under the hotfixes of 13 November 2026
     above.
+- Forever's rules of 16 November 2026 (`tests/forever_rules_20261116_judgement_rates.rs`):
+  - Only a landed white swing or Windfury Totem's weapon strike refreshes a paladin's
+    judgement debuffs (Judgement of the Crusader, of Light, of Wisdom). Combat logs of a
+    Retribution paladin of levels 43 to 46 (client 1.60.1.70938, after the hotfix of 14 November
+    2026), counting a refresh line within 120 ms of a hit with no other hit of the paladin's
+    within 150 ms: 396 of 404 white swings and 12 of 12 in a second log, 13 of 13 totem strikes,
+    and none of 173 Holy Strikes, 69 Judgements of Command, 75 Judgements of Righteousness, 23
+    Judgements of Fury or 2 Hammers of Wrath. A swing whose Seal of Command hit follows logs one
+    refresh, not two. Sacred Arbiter's Holy Strike refresh is its own listener and is unchanged.
+    The reference refreshes on every landed melee hit that is not a proc.
+  - Measured chance on hit rates, from public Forever logs (709 reports of 14 and 15 November
+    2026, client 1.60.1.70938), counted on isolated hits: a landed hit of a wearer with no
+    off-hand weapon and no other landed hit close enough to have rolled the proc, white swings
+    and abilities pooled, the pooled rate rounded to the nearest 0.05 a minute of the weapon's
+    speed: Stinging Viper 1.75 (1,328 procs in 16,295 hits, in place of the reference's 3.2),
+    Toxic Revenger 1.8 (601 in 10,607), Meteor Shard 1.55 (192 in 4,152), Bite of Serra'kis 1.45
+    (99 in 3,101), Stoneslayer 1.95 (537 in 4,200), The Black Knight 0.6 (47 in 2,490) and
+    Heartseeking Crossbow 2.7 (105 in 747 ranged shots). The other rateless chance on hit items
+    keep the assumed 1.08.
+  - Drakefang Butcher's Rend (14118) deals twice its damage to Dragonkin: the tooltip's "Deals 2
+    times as much damage to Dragonkin." is the row's second effect, a dummy of 2 (SpellEffect
+    1324263, client 1.60.1.70938), applied as Lightcrest Hammer's against Undead is
+    (`CREATURE_TYPE_DAMAGE_ITEMS`).
 - Heroic Strike, Cleave and Slam add whole numbers of flat threat, from Forever combat logs on
   client 1.60.1.70862 (8 November 2026). Heroic Strike ranks 1 to 4 add 17, 28, 40 and 60 (Rank
   4 measured at 60.08 over 104 clean readings, Rank 3 at 39.99) and ranks 5 and up 2.5 a spell

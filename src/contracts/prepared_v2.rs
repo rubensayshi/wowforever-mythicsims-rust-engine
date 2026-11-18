@@ -2535,6 +2535,10 @@ pub enum Effect {
         trigger_aura: String,
         proc_mask: Vec<String>,
         judgement_auras: Vec<String>,
+        /// Forever's rules: only a landed white swing or Windfury Totem's weapon strike refreshes
+        /// the debuffs; a melee ability, a seal's hit or a judgement does not.
+        #[serde(default, skip_serializing_if = "is_false")]
+        white_swings_only: bool,
     },
     /// Paladin judgement.go: Judgement casts the active seal's judgement, then wakes the
     /// rotation a delay after its cooldown ends.

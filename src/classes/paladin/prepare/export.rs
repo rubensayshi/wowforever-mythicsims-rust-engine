@@ -226,17 +226,22 @@ impl Paladin {
             notes.push("Judgement of Command against a stunned target is unsupported".to_string());
         }
 
-        // judgement.go: every landed melee strike refreshes the active judgement debuffs.
+        // judgement.go: every landed melee strike refreshes the active judgement debuffs. Under
+        // Forever's rules only a white swing or Windfury Totem's strike does (docs/mechanics.md).
         let judgements: Vec<String> = self
             .judgement_auras
             .iter()
             .filter_map(|auras| auras.get(target_index).copied().flatten())
             .map(|aura| sim.aura(aura).label.clone())
             .collect();
-        effects.push(json!({
+        let mut refresh = json!({
             "kind": "judgement_refresh", "trigger_aura": format!("Judgement Refresh{label}"),
             "proc_mask": ProcMask::MELEE.names(), "judgement_auras": judgements,
-        }));
+        });
+        if sim.rules == crate::prepare::sim::Rules::Forever {
+            refresh["white_swings_only"] = json!(true);
+        }
+        effects.push(refresh);
         // judgement.go: the active seal's judgement, then a rotation wake a batch window after
         // the cooldown ends.
         let judgement = self

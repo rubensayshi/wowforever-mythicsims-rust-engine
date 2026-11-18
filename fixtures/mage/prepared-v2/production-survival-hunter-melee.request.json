@@ -1,0 +1,368 @@
+{
+  "raid": {
+    "buffs": {
+      "giftOfTheWild": true,
+      "prayerOfSpirit": true,
+      "arcaneBrilliance": true
+    },
+    "debuffs": {
+      "faerieFire": true,
+      "exposeArmor": true,
+      "huntersMark": true,
+      "sunderArmor": true,
+      "giftOfArthas": true,
+      "curseOfElements": true,
+      "judgementOfWisdom": true,
+      "curseOfRecklessness": true
+    },
+    "parties": [
+      {
+        "buffs": {
+          "battleShout": "TristateEffectRegular",
+          "moonkinAura": true,
+          "trueshotAura": true,
+          "windfuryTotem": true,
+          "graceOfAirTotem": true,
+          "leaderOfThePack": true,
+          "manaSpringTotem": "TristateEffectRegular",
+          "strengthOfEarthTotem": true
+        },
+        "players": [
+          {
+            "name": "survival-hunter-melee",
+            "race": "RaceNightElf",
+            "buffs": {
+              "greaterBlessingOfKings": true,
+              "greaterBlessingOfMight": true,
+              "greaterBlessingOfWisdom": true
+            },
+            "class": "ClassHunter",
+            "hunter": {
+              "options": {
+                "classOptions": {
+                  "ammo": "ThoriumShells",
+                  "petType": "PetNone",
+                  "petUptime": 1,
+                  "quiverBonus": "Speed15",
+                  "petAttackSpeed": "OneTwo"
+                }
+              }
+            },
+            "rotation": {
+              "type": "TypeAPL",
+              "priorityList": [
+                {
+                  "action": {
+                    "move": {
+                      "rangeFromTarget": {
+                        "const": {
+                          "val": "0"
+                        }
+                      }
+                    },
+                    "condition": {
+                      "cmp": {
+                        "op": "OpGt",
+                        "lhs": {
+                          "unitDistance": {}
+                        },
+                        "rhs": {
+                          "const": {
+                            "val": "5"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "autocastOtherCooldowns": {}
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "tag": 3,
+                        "spellId": 14266
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 14271
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 1317257
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 14305
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 14268
+                      }
+                    },
+                    "condition": {
+                      "cmp": {
+                        "op": "OpGt",
+                        "lhs": {
+                          "spellTimeToReady": {
+                            "spellId": {
+                              "spellId": 1317257
+                            }
+                          }
+                        },
+                        "rhs": {
+                          "const": {
+                            "val": "0.5s"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "prepullActions": [
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 1299447
+                      }
+                    }
+                  },
+                  "doAtValue": {
+                    "const": {
+                      "val": "-10s"
+                    }
+                  }
+                }
+              ]
+            },
+            "equipment": {
+              "items": [
+                {
+                  "id": 252605,
+                  "enchant": 2543
+                },
+                {
+                  "id": 15411,
+                  "enchant": 904
+                },
+                {
+                  "id": 271956
+                },
+                {
+                  "id": 13340,
+                  "enchant": 7667
+                },
+                {
+                  "id": 252483,
+                  "enchant": 1891
+                },
+                {
+                  "id": 19587,
+                  "enchant": 7656
+                },
+                {
+                  "id": 14551,
+                  "enchant": 931
+                },
+                {
+                  "id": 272397
+                },
+                {
+                  "id": 22748,
+                  "enchant": 2543
+                },
+                {
+                  "id": 13967,
+                  "enchant": 1887
+                },
+                {
+                  "id": 19325
+                },
+                {
+                  "id": 272408
+                },
+                {
+                  "id": 1728,
+                  "enchant": 1900
+                },
+                {
+                  "id": 12590,
+                  "enchant": 1900
+                },
+                {
+                  "id": 2100,
+                  "enchant": 664
+                }
+              ]
+            },
+            "bonusStats": {
+              "stats": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                40,
+                40,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "consumables": {
+              "potId": 250943,
+              "potions": [
+                250943
+              ],
+              "zanzaId": 8412,
+              "alcoholId": 21151,
+              "mhImbueId": 16138,
+              "ohImbueId": 16138,
+              "conjuredId": 12662,
+              "goblinSapper": true,
+              "conjuredItems": [
+                12662
+              ],
+              "battleElixirId": 250328,
+              "strengthBuffId": 12451,
+              "guardianElixirId": 250338,
+              "attackPowerBuffId": 12460,
+              "dragonbreathChili": true
+            },
+            "profession1": "Engineering",
+            "talentsString": "5-005005001-530200230250222151",
+            "reactionTimeMs": 100,
+            "distanceFromTarget": 5
+          }
+        ]
+      }
+    ]
+  },
+  "encounter": {
+    "targets": [
+      {
+        "id": 213336,
+        "name": "Level 60",
+        "level": 63,
+        "stats": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          805,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3731,
+          0,
+          127393,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "canCrush": true,
+        "parryHaste": true,
+        "swingSpeed": 2,
+        "damageSpread": 0.3333,
+        "minBaseDamage": 3000
+      }
+    ],
+    "duration": 120,
+    "noHitSuppression": true,
+    "durationVariation": 15,
+    "executeProportion20": 0.2,
+    "executeProportion25": 0.25,
+    "executeProportion35": 0.35,
+    "executeProportion45": 0.45,
+    "executeProportion90": 0.9
+  },
+  "simOptions": {
+    "iterations": 50,
+    "randomSeed": "1179769824",
+    "debugFirstIteration": false
+  }
+}

@@ -483,6 +483,24 @@ impl Hunter {
     fn register_raptor_strike_spell(&mut self, sim: &mut Sim) {
         let unit = self.unit;
         let rank = spell_data().raptor_strike.highest();
+        // Under Forever's rules Predator's Edge reaches Raptor Strike's crit damage bonus twice,
+        // compounded: (1 + share)² of the base bonus, 2.69x at 5/5. Its class mod adds the share
+        // once; this adds the rest. Measured from logs: 497 Raptor Strike crits of 30 level 60
+        // hunters at 5/5 read 2.690 (2.689 to 2.691) of the hit, 3/5 2.392 and 4/5 2.531, while
+        // the same hunters' Mongoose Bite and Strider Kick read 2.30 (the share once).
+        let predators_edge = self.t("predators_edge");
+        let crit_multiplier_additive = if sim.rules == Rules::Forever && predators_edge > 0 {
+            let share = spell_data()
+                .predators_edge
+                .effect(
+                    dbcenums::A_ADD_PCT_MODIFIER,
+                    dbcenums::SPELLMOD_CRIT_DAMAGE_BONUS,
+                )
+                .fraction_at(predators_edge);
+            share * (1.0 + share)
+        } else {
+            0.0
+        };
         self.raptor_strike_hit = Some(sim.register_spell(
             unit,
             SpellConfig {
@@ -500,6 +518,7 @@ impl Hunter {
                 damage_multiplier: 1.0,
                 threat_multiplier: 1.0,
                 bonus_coefficient: 1.0,
+                crit_multiplier_additive,
                 ..SpellConfig::default()
             },
         ));
