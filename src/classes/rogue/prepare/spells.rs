@@ -41,6 +41,24 @@ const ROGUE_BLEED_TAG: &str = "RogueBleed";
 /// 15), which a level 60 rogue knows; Flash of Steel adds to it.
 pub(crate) const SHANK_ENERGY_COST: i32 = 5;
 pub(crate) const SHANK_ENERGY_GAIN: f64 = 25.0;
+/// Rank 1's Energy (client 70959 SpellEffect 1368711 on 1329283; rank 2's 1369160 reads 25). The
+/// two ranks differ in nothing else: cost, cooldown, weapon share and attributes are the same.
+const SHANK_RANK_ONE_ENERGY_GAIN: f64 = 15.0;
+/// The level Shank rank 2 is taught at (client SpellLevels of 1329549).
+const SHANK_RANK_TWO_LEVEL: i32 = 44;
+
+/// The Energy the rank of Shank the rogue knows generates: rank 2's from level 44 when the
+/// spellbook does not leave it out, rank 1's otherwise. The engine registers rank 2 and presses it
+/// through rank 1's alias, so a level 30 rogue gained rank 2's 25 Energy until 18 Nov 2026.
+pub(crate) fn shank_energy_gain() -> f64 {
+    if character_level() < SHANK_RANK_TWO_LEVEL
+        || crate::prepare::levels::is_unlearned(SHANK_SPELL_ID)
+    {
+        SHANK_RANK_ONE_ENERGY_GAIN
+    } else {
+        SHANK_ENERGY_GAIN
+    }
+}
 /// Shank's weapon damage share, its cooldown and its Global Cooldown.
 const SHANK_WEAPON_SHARE: f64 = 0.5;
 const SHANK_COOLDOWN: Duration = 10 * SECOND;

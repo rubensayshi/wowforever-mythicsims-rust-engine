@@ -101,6 +101,9 @@ table!(
     RANDOM_ENCHANTMENT_ITEMS,
     "forever-random-enchantment-items.jsonl"
 );
+// The ranks the class trainer teaches that a levelling character's spellbook export lists, by
+// family (`tools/forever_trainer_spells.py`, `src/prepare/levels.rs`).
+table!(TRAINER_SPELLS, "forever-trainer-spells.jsonl");
 table!(ENCHANTS, "enchants.jsonl");
 table!(RAND_PROP_POINTS, "rand-prop-points.jsonl");
 table!(CONSUMABLES, "consumables.jsonl");
