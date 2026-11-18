@@ -64,6 +64,7 @@ checks the gate passes and runs it.
 | `protection-warrior-disarm` | Disarm in a Protection Warrior's rotation, in Defensive Stance |
 | `warrior-intercept` | Intercept from 25 yards by a Night Elf warrior who changes to Berserker Stance first, so the run takes the racial's 2% speed |
 | `arms-warrior-revenge` | Revenge in the rotation of an Arms Warrior off the target's threat, which nothing opens |
+| `dps-warrior-shield-slam-off-threat` | Shield Slam in the rotation of a level 42 Orc Warrior with a shield whom nothing swings at, so no target's rolls carry the block value the hit adds (17 November 2026) |
 | `hunter-freezing-trap` | Freezing Trap in a Hunter's rotation |
 | `feral-bear-druid-thorns` | a tank druid's own Thorns, first in the Bear reference build's rotation (its Crusader enchant and Swap1 set taken out), striking back a batch window after each swing it takes |
 | `balance-druid-thorns` | Thorns first in a Balance Druid's rotation, off the target's threat |
@@ -71,6 +72,7 @@ checks the gate passes and runs it.
 | `retribution-paladin-swap-ironfoe` | a Manual Crowd Pummeler opener that swaps back to Ironfoe, whose Fury of Forgewright follows the weapon (1 November 2026) |
 | `enhancement-shaman-beaststalker-armor` | Beaststalker Armor (5) on an Enhancement Shaman, whose mana proc only a Hunter's domain exported (2 November 2026) |
 | `enhancement-shaman-swap-swarmguard` | a Manual Crowd Pummeler opener beside Badge of the Swarmguard, whose rate the swap rebuilds for the weapon in the hand (1 November 2026) |
+| `enhancement-shaman-tank-four-targets` | an Enhancement Shaman with Rockbiter Weapon and Lightning Shield whom four copies of the boss swing at (17 November 2026) |
 | `retribution-paladin-swap-dark-iron-sunderer` | a Manual Crowd Pummeler opener that swaps onto Dark Iron Sunderer, whose Cleave Armor rolls only once it is in the hand (1 November 2026; its talents are in push 113554's tree already) |
 | `combat-rogue-self-casts-at-player` | a strict sequence casting Vanish, Adrenaline Rush and Blade Flurry at the player (1 November 2026) |
 | `protection-paladin-quel-serrar` | Quel'Serrar on a Protection Paladin tank, whose Sanctuary's Defense and Armor change the target's swings (1 November 2026; its talents are in push 113554's tree already) |
@@ -94,3 +96,6 @@ checks the gate passes and runs it.
 | `enhancement-shaman-serpentbane-crown` | Serpentbane Crown (274609), a Forever item whose use (a Fire hit and damage over time) has encrypted client rows, on a level 41 Enhancement Shaman (9 November 2026) |
 | `warrior-bigger-rock-on-bigger-stick` | Bigger Rock on Bigger Stick (279480), a Forever two-hand mace whose chance on hit is a physical damage over time, on a level 46 Arms Warrior (9 November 2026) |
 | `feral-druid-bigger-rock-on-bigger-stick` | the same weapon on a level 43 Feral Druid in Cat Form (9 November 2026) |
+| `feral-bear-druid-swap-health-bonus` | a Tauren Bear's Manual Crowd Pummeler opener whose swapped set states Bear Form's health bonus a rounding step from the reset's (a level 60 Droptimizer candidate, Hibernal Armor, 18 November 2026) |
+| `protection-warrior-swap-warriors-resolve` | a Protection Warrior in Battlegear of Heroism (4) carrying Annihilator as a swap weapon, whose Warrior's Resolve rolls a procs-per-minute manager the swap rebuilds for the weapon in the hand (18 November 2026) |
+| `feral-bear-druid-swap-darkmoon-card-heroism` | a Feral Bear's Manual Crowd Pummeler opener beside Darkmoon Card: Heroism, whose procs-per-minute manager an item swap rebuilds (a level 60 Droptimizer candidate, 17 November 2026) |

@@ -18,6 +18,7 @@ A level 60 request without these fields prepares exactly as before.
 
 - `character_level()` replaced the `CHARACTER_LEVEL` constant: the caster level spell amounts scale to (`Effect::average`), the player unit's level, pets' level and the default target's.
 - `Ladder::highest()` and `highest_for()` resolve to the highest rank the character knows: the highest rank the spellbook lists, or, for a ladder the spellbook lists none of (a talent, an item's spell or a triggered effect) and for a request without a spellbook, the highest rank whose spell level is at or below the character's level. At 60 that is every rank, so nothing changes there.
+- `levels::known_rank_at()` does the same for ranks whose levels the class states in place of the rows': a hotfix that moved them, or a rank the store lacks. The stated levels hold for the rest of the preparation, so the unlearned flags and the rotation rewrite read them too. Holy Shield is the one user under Forever's rules: ranks 1 to 3 at push 113554's 30/40/50 (the frozen rows state 40/50/60) and rank 4 (1239570, not in the store) at 60, as the live client's SpellLevels rows state; a levelling paladin registers only the rank it knows (18 Nov, `tests/levels_holy_shield_20261118.rs`).
 
 Base stats (`character::base_stats`) move to the level (`levels::base_stats_at_level`):
 
@@ -41,6 +42,19 @@ A ladder the character knows no rank of resolves to its first rank, noted as unl
 A trait-tree talent is never unlearned (`Ladder::talent`, `ladder::is_talent_row`): a class registers it only when the character has points in it, and most talent rows of client 1.60.1 state spell level 60. Read by level, Pursuit of Justice (26022) was unlearned for a level 27 Paladin, so its permanent aura had no duration, preparation panicked activating it and the gate refused the tank as if the talent changed the target's swings (9 Nov).
 
 The calibration pass collects every unlearned spell, and the real pass starts with that set, so every export of a spell (the item swap's included) flags it alike.
+
+### The spellbook decides what the trainer teaches
+
+Until 18 Nov the spellbook was read only for ladders of several ranks. A spell of one rank, or a rank the store has no row for, was known by its level row, and some rows are wrong for Forever: Shadowfiend (401977) reads level 1, Shank's rank 2 (1329549) has no row. Of 476 MythicSim levelling sims of 17 and 18 Nov, 46 Rogues below 44 cast Shank (12 below 24, where no rank is taught), 6 Priests cast Shadowfiend, Paladins cast Holy Shock ranks 3 and 4 at 40 to 47, and characters cast Evocation, Berserker Stance, Rapid Fire or Aspect of the Beast before buying them.
+
+Now, with a spellbook, a rank the class trainer teaches that the book does not list is unlearned, whatever its level row says (`levels::book_withholds`). The ranks are `data/forever-trainer-spells.jsonl`, written by `tools/forever_trainer_spells.py` from the client's SkillLineAbility rows on class skill lines with acquire method 0, grouped into families by skill line and name. A family is written only when a real addon export has listed one of its ranks (`tools/forever_trainer_spells_observed.json`, 1,384 levelling spellbooks of 12 to 18 Nov), or by name in the tool's `UNLISTED` (Shadowfiend: none of 38 levelling priests lists it). Everything else the trainer rows hold (passives, runes, pet spells) is not in the spellbook, and the level decides as before. A spell a talent grants (the Talent table or the trait tree) is never written: Swift Judgement sits on a trainer row and in the trait tree, and a level 35 paladin's talent string takes it while its book does not list it.
+
+- A ladder whose ranks the book withholds resolves to no rank, so its first rank stands in, unlearned.
+- A registered spell whose rank aliases the book lists is known through them: the engine registers Shank as rank 2 with rank 1 (1329283, level 24) as an alias, so a level 30 rogue with rank 1 presses it (`levels::is_unlearned_with_aliases`). The ranks differ only in the Energy they generate (client 70959: rank 1 15, rank 2 25), so the effect carries the known rank's (`rogue::spells::shank_energy_gain`): rank 1's below 44 or when the book leaves rank 2 out. Before, a level 30 rogue gained 25; its DPS falls 2.5 to 5%.
+- A rotation that names a withheld rank casts the highest rank of the same family the book lists that the first pass registered as the same class spell (`levels::known_family_rank`), next to the ladder and store mappings below.
+- Holy Shock registers each rank from a hand-written table, with each rank's heal as its own spell that no book lists: a withheld rank's heal is unlearned too, and a rotation naming either casts the trained rank's (`levels::note_known_as`).
+
+On the 476 sims (`tests/levels_spellbook_20261118.rs` keeps six of them, names removed) 35 change, each by a spell its book does not list: Shank, Shadowfiend (healers lose all their damage and some mana), Holy Shock, Evocation (a level 20 frost mage runs dry, -36%), Berserker Stance (+10%, it was a loss), Seal of Fury and Seal of Command in rotations that name them, Rapid Fire, Aspect of the Beast, Curse of the Elements, Faerie Fire, Magma Totem, Explosive Trap, Hammer of Wrath, Lesser Healing Wave, Enrage. No sim casts a trainer rank its book does not list. 224 level 60 requests of the same days are bit-identical: the rule needs a level below 60 and a spellbook.
 
 ## Ranks a rotation names
 
@@ -113,11 +127,58 @@ On 8 Nov all 34 reference builds at levels 10, 20, 30, 40 and 50 (170 requests) 
 
 On 9 Nov every reference build and the five healer references at eight levels each from 10 to 59 (312 requests), with and without a spellbook, and a levelling Droptimizer of every reference weapon, off hand and ranged weapon at levels 15, 27, 42 and 58 (1,980 sets), prepare, pass the gate and sim with no ranked spell cast or dealing damage above the level. `tests/levels_20261109.rs` keeps a build of every class, tanks and healers among them, and runs each at levels 10 to 58 the same way. Besides casts, check the damage of procs and pets: a proc row never shows a cast. The worker side of a levelling sim (solo, a caster filler at the end of the rotation, a dungeon boss two levels up) is the app's `worker/forever/levels.go`.
 
+
+## Every class at every level (18 Nov 2026)
+
+1,487 MythicSim levelling sims of 12 to 18 Nov (27 specs, levels 10 to 59, each a player's own request) were simmed on bundle-b05aa07 and checked four ways: no spell cast that the spellbook leaves out; spells a preset names that the character knows but never casts, against the same presets on 224 level 60 requests; time out of mana; and DPS by level. `tests/levels_class_audit_20261118.rs` keeps four of them (names removed).
+
+What the engine had wrong, now fixed:
+
+- **Lacerate below 42.** Push 113531 made Lacerate a talent with two new low ranks the store lacks: the talent's own rank (1328617, level 25, 4 a stack a tick) and rank 2 (1328616, level 34, 6). The ladder started at 414644 (42), so a bear of 25 to 41 had no Lacerate. `hotfix_113554` adds both rows as copies of 414644 with the client's ticks and levels, and `druid::bear::lacerate_rank` reads the five ranks at 25, 34, 42, 50 and 58.
+- **Primal Bite below 60.** It was always rank 3 (60), which the spellbook rule leaves out below 60, so a levelling bear never cast it. Ranks 1 and 2 take the client's levels (40, 50; the frozen rows state 25 and 36) and damage (42, 62; were 26, 38), and `primal_bite_rank` reads the rank the druid has trained. A level 42 bear with both goes from 53 to 115 DPS.
+- **Death Mark's cap.** The engine registers rank 4 and presses it through the lower ranks' aliases, so every rank stored up to rank 4's cap. Each rank's cap is now its tooltip's (Wowhead Forever): 63 + 102 a point, 98 + 158, 138 + 217, 156 + 245 (`rogue::rework::death_mark_cap`).
+- **A Hunter's pet and hawk.** Both models are shares of the creature auto attack dps, read at level 30 (the pet sheets of levels 11, 17 and 30, a level 30 Cat's 152 swings, four level 30 hawk logs), but the code used the level 60 row at every level: a level 15 pet swung for 49 DPS, two thirds of its hunter's sim. They now take the row of their level (`hunter::pet::creature_auto_attack_dps`); the pet's own attack power is 36, 61 and 103 at 11, 17 and 30, as the sheets read. Hunters in their 20s go from 116 to 79 median DPS, in their 50s from 268 to 253.
+- **A paladin's own blessing.** The app now gives a solo paladin its own blessing as the Greater Blessing row; `levels::known_buff_rank` maps Greater Blessings of Might, Wisdom and Kings to the 5 min blessing, so a level 26 paladin has Blessing of Wisdom rank 2 (19850).
+
+The app's side (`worker/forever/levels.go`, `withOwnBuffs`): a solo character keeps what it casts on itself at level 60, a Paladin's blessing (Wisdom for Holy, for Protection from 30 and Retribution from 40, Might below), a Shaman's Mana Spring Totem and a Druid's Mark of the Wild, each at the rank it has trained. On those players' requests: Retribution +5%, Protection +6%, Holy +10%, Enhancement +4%, Feral +3.5%, Balance +3%.
+
+What was checked and left alone:
+
+- Every spell a preset names and a levelling character knows but never casts is also never cast by the same preset at 60 (AoE lines gated on target count, openers from Stealth, Recklessness and Berserker Rage outside the fight's windows, Judgement's casts counted under the Judgement of each seal), or is the levelling filler's mana fallback.
+- Time out of mana: casters and hunters solo run dry where level 60 ones do not (a level 31 hunter's 1,620 mana goes to Summon Hawk, Aimed and Arcane Shot within the first minute; level 60 ones have raid buffs, consumables and larger pools). With their own buffs, paladins and shamans run dry less (Retribution 19% to 11% of the fight).
+- DPS rises with level for every spec, and 224 level 60 requests and the 45 live board baselines are bit-identical to bundle-b05aa07.
+
+
+### Checked against public logs (18 Nov 2026)
+
+foreverlogs.gg's public reports gave 1,693 player rows from boss kills (875 requests at under one a second): each player's damage to the boss over the kill, with its pet's share in proportion, and its level as the highest trained rank it dealt damage with (`data/forever-trainer-spells.jsonl`). The sims are the 1,330 damage dealers above, re-run on bundle-84f457d with 45 sec fights (the kills last 25 to 90 sec). Sim median over the logs' 75th percentile, by class and level band with 5 or more logs: median 1.24, 0.62 to 1.54 except a 3 sim Warlock band at 10.
+
+| Band | Sim | Logs median, p75 | Sim / p75 |
+| --- | ---: | ---: | ---: |
+| Rogue 30s | 88 | 93, 125 | 0.71 |
+| Warrior 30s | 73 | 78, 104 | 0.70 |
+| Warrior 40s | 139 | 128, 148 | 0.94 |
+| Paladin 30s | 76 | 71, 88 | 0.86 |
+| Shaman 30s | 133 | 95, 121 | 1.10 |
+| Hunter 20s | 98 | 51, 77 | 1.28 |
+| Hunter 40s | 236 | 155, 184 | 1.28 |
+| Warlock 30s | 111 | 60, 81 | 1.37 |
+| Mage 30s | 123 | 59, 80 | 1.54 |
+
+Where a class sits on that range is the group around it, not its model:
+
+- Rogues of 32 to 46 split their damage as the sim does (auto attack 44% in the logs, 47% in the sim; Sinister Strike 27% and 29%; Eviscerate 6% and 7%; Shank 2% and 2%). The logs add a shaman's Windfury Totem (4%), blessings and Blade Flurry on adds, which a solo sim has none of; poisons are 3% of the logs and 12% of the sim.
+- Mages of 30 to 38 put 2% of their damage into the boss: Blizzard 30%, Flamestrike 9%, Cone of Cold 8% and Arcane Explosion 5% go to the adds, so their boss damage reads low. Warlocks' Hellfire the same.
+- Before #324 a hunter's pet was the level 60 one and the Hunter 20s band read 1.5 at 120 sec fights, the highest of the damage dealers; it reads 1.0 at 120 sec now.
+- Druid and Priest logs mix tanks and healers whose spec the logs do not name, so they are left out.
+
 ## Open
 
 - Spell coefficients below level 20: checked against public logs on 9 Nov (`docs/levels-logs-2026-11-09.md`). The client rows carry the low rank coefficients and the game takes them with no further penalty, which is what the engine does (`tests/levels_logs_20261109.rs`).
 - Dungeon boss armor: the worker scales the level 63 boss's 3731 armor by level. The client does not carry creature armor.
-- Spirit regen, weapon skill caps and pet stats below 60 follow the existing level formulas. A Hunter's pet still uses the level 60 creature row; a Warlock's demon follows the level (below).
+- Spirit regen and weapon skill caps below 60 follow the existing level formulas. A Hunter's pet and hawk follow the creature dps row of their level since 18 Nov (below); a Warlock's demon follows the level (below).
 - A cat druid below 20, who has not learned Cat Form, sims in it all the same (with autos only until Claw at 20).
 - Other class buffs and debuffs built from core's fixed rows (Shaman totems' triggered buffs resolve by level already; Sunder and Expose Armor, Hunter's Mark and the external raid rows have not been checked below 60). The worker sims a levelling character solo, so the external rows do not reach it, with one exception: since 12 November 2026 a levelling Hunter keeps its own Hunter's Mark on the target at the rank it has trained (a melee Survival Hunter needs it for Expose Prey, which opens Mongoose Bite).
+- A rotation that names a spell the character has not trained loses that line: a level 35 paladin's own Seal of Command twisting rotation runs without Seal of Command. The rotation check reports it ("does not know spell"), and the app's Rotation card leaves the line out of what ran; a custom rotation's warning says so.
+- The app's levelling filler (`worker/forever/levels.go`) names rank 1 (Fireball, Frostbolt, Shadow Bolt, Wrath, Lightning Bolt), which every spellbook lists, so it casts rank 1. That is a mana fallback, not a stray rank: the presets already cast the top trained rank, and the filler fires only when that cast is out of reach. Naming the top rank in the filler instead (59 real requests, 18 Nov) lost 1 to 8% on average by class (an Arcane Mage 14%, Warlocks up to 10%) and gained only where rank 1 spent mana the top rank wanted (a level 20 Frost Mage +27%); top rank then rank 1 equals rank 1 alone. Left as it is.
 - No real levelling export has been simmed yet. The first ones (addon 0.4.0) check the sheet readers (`UnitStat` base without gear, `C_SpellBook` item types) and the calibration.

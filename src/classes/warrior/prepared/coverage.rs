@@ -256,11 +256,12 @@ fn limits(prepared: &PreparedV2, reachable: &[&Spell]) -> Vec<String> {
             "retaliation" if cast_by_hand.contains(&id) && !has("retaliation") => {
                 reasons.push(format!("rotation casts {id}, which has no behavior"));
             }
-            // The block value comes from the target's rolls, which only a tank's input has.
+            // The block value comes from the target's rolls, which only a tank's input has, or
+            // off the target's threat from the effect itself.
             "shield_slam" if prepared.enemy.is_none() => {
-                reasons.push(format!(
-                    "rotation reaches {id}, which reads the block value without a tanked target"
-                ));
+                if let Some(limit) = off_threat_block_value_limit(prepared) {
+                    reasons.push(format!("rotation reaches {id}, {limit}"));
+                }
             }
             "sunder_armor" if !sunder_blocked && !sunder_category => {
                 reasons.push(format!(
@@ -273,6 +274,38 @@ fn limits(prepared: &PreparedV2, reachable: &[&Spell]) -> Vec<String> {
     reasons.sort();
     reasons.dedup();
     reasons
+}
+
+/// Why Shield Slam cannot read the block value of a warrior nothing swings at, if it cannot:
+/// its effect states no value for each stat aura combination (the reference's rules state
+/// none), or an aura outside the stat auras would change the value, which the runtime holds
+/// as stated.
+fn off_threat_block_value_limit(prepared: &PreparedV2) -> Option<String> {
+    let unstated = || Some("which reads the block value without a tanked target".to_string());
+    let Some((reductions, auras)) = prepared.effects.iter().find_map(|effect| match effect {
+        Effect::ShieldSlam {
+            block_reductions,
+            block_value_auras,
+            ..
+        } => Some((block_reductions, block_value_auras)),
+        _ => None,
+    }) else {
+        return unstated();
+    };
+    let combinations = prepared
+        .effects
+        .iter()
+        .find_map(|effect| match effect {
+            Effect::StatAuras { combos, .. } => Some(combos.len()),
+            _ => None,
+        })
+        .unwrap_or(1);
+    if reductions.len() != combinations {
+        return unstated();
+    }
+    auras
+        .first()
+        .map(|aura| format!("whose block value {aura} would change off a tanked target"))
 }
 
 /// The stance a stance cast enters.

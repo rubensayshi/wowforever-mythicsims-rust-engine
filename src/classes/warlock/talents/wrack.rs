@@ -2,12 +2,13 @@
 //!
 //! Under Forever's rules since the class tuning of 11 November 2026, while the channel runs the
 //! warlock's Siphon Life, Corruption and Bane of Agony on the target "deal their periodic damage
-//! 100% faster" (`dot_rate` 2): each ticks twice as often and lasts as long, so it deals twice
-//! the ticks while the channel is on it. The effect is a server-side script, so that reading is
-//! provisional. The other one, a dot that runs out in half the time with the ticks it had,
-//! costs Affliction about 14% on its best rotation, where Blizzard's post says the change is
-//! made "without affecting Affliction Warlocks' total damage output"; this one keeps it within
-//! a few percent. Combat logs of a dot under the channel settle it.
+//! 100% faster" (`dot_rate` 2). Forever combat logs settle how: each dot keeps the tick grid it
+//! landed on, and while the channel is on its target the half points between its ticks tick
+//! too, each a full tick. Starting or ending the channel moves no tick, and a dot still runs out
+//! on a full tick at its expiry. Two public reports on forever.warcraftlogs.com
+//! (GbPa1DmnMKT7fqY9, jnm1dPFg7avAJ3tQ; 31 fights, 9,816 dot ticks): every tick after a
+//! channel started sat on the dot's half grid (3 of 4,422 off by more than 0.08 s), and
+//! the 1,916 half point ticks all fell while Wrack was on the target.
 //!
 //! The Go reference, from sim/warlock/wrack.go, is the capstone as it was before: while it runs
 //! the warlock's Corruption and Bane of Agony on the target take a dynamic damage taken bonus

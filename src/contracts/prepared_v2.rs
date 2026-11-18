@@ -2976,6 +2976,10 @@ pub enum Effect {
         outcome: Vec<String>,
         require_damage: bool,
         proc_chance: f64,
+        /// A trigger spell listed here rolls its own chance in place of `proc_chance`: a proc
+        /// priced on each cast's time (Rotmender's Raiment's Rotmending under Forever's rules).
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        cast_chances: Vec<SpellChance>,
         spell: usize,
         can_crit: bool,
         healing_dealt_multiplier: f64,
@@ -3780,9 +3784,10 @@ pub enum Effect {
         #[serde(default, skip_serializing_if = "is_zero")]
         spell_id: i32,
     },
-    /// MythicSim's healer sims under Forever's rules: a spell whose aura makes the next cast of
-    /// the spells it changes instant and is spent by that cast, as Nature's Swiftness. Each
-    /// change is one spell's mod while the aura is up, by spellbook position.
+    /// Forever's rules: a spell whose aura makes the next cast of the spells it changes instant
+    /// and is spent by that cast, as Nature's Swiftness (a healer's heals, a Shaman's Lightning
+    /// Bolt and Chain Lightning). Each change is one spell's mod while the aura is up, by
+    /// spellbook position.
     InstantCastAura {
         spell_id: i32,
         aura: String,
@@ -4169,6 +4174,11 @@ pub enum Effect {
         max_stacks: i32,
         /// Whether a hit from a spell flagged Proc can trigger it.
         can_proc_from_procs: bool,
+        /// Forever's rules since the hotfixes of 17 November 2026: a Windfury Totem strike, the
+        /// party's or the shaman's own, spends no charge, though its crit starts Flurry.
+        /// Without it the strike spends one as a white swing.
+        #[serde(default, skip_serializing_if = "is_false")]
+        totem_strike_spends_none: bool,
     },
     /// Improved Stormstrike: Stormstrike may raise casting spirit regeneration; its cooldown
     /// reset hears only hits the player takes.
@@ -4668,6 +4678,10 @@ pub enum Effect {
         proc_chance: f64,
         rage: f64,
         delay_ns: i64,
+        /// Forever's rules since the hotfixes of 16 November 2026: Heroic Strike and Cleave
+        /// proc it as white swings do.
+        #[serde(default, skip_serializing_if = "is_false")]
+        strikes_proc: bool,
     },
     /// The Warrior's Flurry: a melee crit grants melee speed for a few white swings.
     WarriorFlurry {
@@ -4684,6 +4698,10 @@ pub enum Effect {
         /// in Go, that strike never does.
         #[serde(default, skip_serializing_if = "is_false")]
         whirlwind_off_hand_starts: bool,
+        /// Forever's rules since the hotfixes of 16 November 2026: a Heroic Strike or Cleave
+        /// spends one charge a cast whatever its outcome, in place of only when it misses.
+        #[serde(default, skip_serializing_if = "is_false")]
+        strikes_spend_once: bool,
     },
     /// Reckless Swings (Forever's rules, the notes of 2 November 2026): a cast for a share of
     /// base health that gives the aura `charges` stacks, each landed white swing a spell batch
@@ -4825,6 +4843,14 @@ pub enum Effect {
         /// Forever's rules: the hit adds twice the block value.
         #[serde(default, skip_serializing_if = "is_false")]
         twice_block_value: bool,
+        /// Off the target's threat, where no swing's rolls carry it: the block value the hit
+        /// adds under each stat aura combination, or the one value without stat auras.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        block_reductions: Vec<f64>,
+        /// The player's auras outside the stat auras whose activation would change that
+        /// block value, which the runtime would not follow.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        block_value_auras: Vec<String>,
     },
     /// Thunder Clap: the row's average plus a share of attack power on the magic table; a
     /// landed clap slows the target by its bid.

@@ -854,6 +854,8 @@ const SWAP_EFFECT_FIELDS: &[(&str, &[&str])] = &[
     ("extra_attack_proc", &["chances"]),
     ("stacking_cd_on_use", &["chances"]),
     ("armor_debuff_proc", &["chances"]),
+    // Warrior's Resolve and Darkmoon Card: Heroism's proc managers, rebuilt likewise.
+    ("health_rage_proc", &["chances"]),
     (
         "rage_bar",
         &[
@@ -1218,6 +1220,20 @@ fn swap_change_limit(
             if index.parse::<usize>().ok().is_some_and(|index| {
                 matches!(prepared.effects.get(index), Some(Effect::PlayerMovement { speed_auras, .. })
                     if speed_auras.iter().all(|aura| switched.contains(&aura.as_str())))
+            }) =>
+        {
+            None
+        }
+        // Bear Form's health bonus, which the runtime reads once from the reset. Each set's is a
+        // difference of two health totals, so a swap that leaves the bonus as it was can still
+        // land a rounding step away (1302 against 1301.999999999999 on a Tauren bear's
+        // Manual Crowd Pummeler opener): the runtime follows a bonus within that rounding.
+        ["effects", index, "health_bonus"]
+            if index.parse::<usize>().ok().is_some_and(|index| {
+                matches!(prepared.effects.get(index), Some(Effect::BearForm { health_bonus, .. })
+                    if change.value.as_f64().is_some_and(|value| {
+                        (value - health_bonus).abs() <= 1e-12 * health_bonus.abs()
+                    }))
             }) =>
         {
             None

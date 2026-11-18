@@ -10,7 +10,8 @@ use super::{aura::AuraBehavior, Agent, AuraRef, Fight, ResourceKind, Side, Spell
 /// the roll's label, the heal range, the rage and their metrics.
 #[derive(Clone, Debug)]
 pub(crate) struct HealthRageProc {
-    chances: Vec<Option<f64>>,
+    /// Each spell's chance, which an item swap rebuilds for the weapons in the hands.
+    pub(crate) chances: Vec<Option<f64>>,
     rng_label: String,
     heal_min: f64,
     heal_max: f64,

@@ -539,6 +539,21 @@ the Go goldens and exporter uses. The departures:
     to 6.6% (was 3.3%)" (applied since hotfix push 113718, above), Taran Icebreaker "now
     correctly behaves as a 2-handed Mace" (its live row is one) and Glimmering Mithril Insignia
     "no longer requires the ability to wear Mail armor" (no class is refused it).
+- The hotfixes of 17 November 2026 (Blizzard's hotfix post; Forever preparation only, the
+  reference keeps its own; `tests/hotfix_20261117.rs`):
+  - Shaman: "Fixed an issue where Flurry incorrectly lost stacks when Windfury totem attacks
+    landed." A Windfury Totem strike, the party's or the shaman's own, spends no charge of the
+    Shaman's Flurry and leaves the 500 ms charge cooldown alone (`totem_strike_spends_none` on
+    the prepared `flurry` effect). Until then the strike, a copy of the main hand auto with its
+    proc mask, spent one as a white swing does whenever the charge cooldown was ready: right
+    after a white crit that had just refreshed Flurry, and after a Stormstrike that fired the
+    totem. A white swing that spent a charge itself held the cooldown, so the strike it fired
+    spent none. On the Enhancement board request of 15 November 2026 (a two-hand weapon,
+    Windfury Weapon and the party's totem) the strike spent 6 of the 41 charges spent in the
+    first fight. One thing the post does not state: the strike's crit still starts Flurry, as
+    any melee crit does. The post speaks of lost stacks only, and a level 60 Fury warrior's
+    combat log of 16 November 2026 shows the same strike's crit starting the Warrior's Flurry 22
+    of 22 times. No Shaman log is counted yet.
 - The rest of the Shaman changes in the development notes of 2 November 2026 (Forever
   preparation, the reference keeps the frozen rows; the rows are in `prepare::hotfix_113554`).
   The damage rows are Wowhead's Forever tooltips of 4 November 2026 (the live client's, rows the
@@ -880,9 +895,13 @@ the Go goldens and exporter uses. The departures:
   on Regrowth's direct heal while a Rejuvenation of the druid's is up (read as "on a target
   under your Rejuvenation", since heals land on whoever needs them), Idol of Synthesis (a second
   off Swiftmend's cooldown for each heal over time up as it is cast), Garments of the Oracle (3:
-  a heal's 20% chance to heal the healer for 10% of it), Rotmender's Raiment (5: a heal's cast,
-  at most every 2 seconds, puts up Rotmending's 40 every 3 seconds for 15 seconds, counted at
-  once), The Earthshatterer (4: the party's Mana Spring 25% stronger; 8: Lightning Shield's 15
+  a heal's 20% chance to heal the healer for 10% of it), Rotmender's Raiment (5: a heal's cast
+  has a chance, at most every 2 seconds, to put up Rotmending's 40 every 3 seconds for 15
+  seconds, counted at once; the chance is 1.6 a minute of the heal's cast time, at least 1.5
+  seconds, so 4% for an instant and 8% for a 3 second cast, and a shield rolls nothing. The
+  trigger row states 100% beside a tooltip that says "a chance"; the rate is counted from public
+  combat logs of 15 to 18 November 2026, 261 procs in 5,230 heal casts of 27 wearers, 1.60 (1.42
+  to 1.79), `validation/2026-11-19-rotmending-rate.json`), The Earthshatterer (4: the party's Mana Spring 25% stronger; 8: Lightning Shield's 15
   mana per 5 seconds, read as kept up) and Redemption Armor (4: Lay on Hands 12 minutes sooner).
   On use, Blessed Prayer Beads heal for 648 and Enamored Water Spirit's totem restores 33 mana
   every 2 seconds for 24 seconds; Wushoolay's Charm of Spirits, a Lightning Shield trinket, is
@@ -908,6 +927,11 @@ the Go goldens and exporter uses. The departures:
   October 2026 beta notes); the globes taken spell hits spend are not modelled, since the healer
   takes none. The prepared effects are `instant_cast_aura`, the shaman's `water_shield` and the
   heals' channel shapes (`tests/healer_spells.rs`).
+- Nature's Swiftness on a damage Shaman (client 16188, 1.60.1.70938): a rotation that casts it
+  makes the next Lightning Bolt or Chain Lightning instant, and that cast spends it. The row
+  lasts until spent (DurationIndex 21, one charge), so under Forever's rules the aura stays up
+  for an Elemental or Enhancement Shaman too; before, the gate refused such a rotation
+  (`tests/forever_rules_20261117.rs`).
 - A healer Priest's talents that read a heal's target or its history, from the client rows and
   tooltips: Divine Aegis (431622) turns each crit of a direct heal, Penance's bolts and Prayer of
   Mending's charges into an absorb of 5%, 10% or 15% of the heal, counted as the absorb aura's
@@ -1389,7 +1413,7 @@ the Go goldens and exporter uses. The departures:
     Stamina, 5 mana per 5 sec and 17 Fire damage; the Darkspear Signets, Militant's Bands,
     Channeler's Ring, Bad Hat and Souvenir Sea Shell under the hotfixes of 13 November 2026
     above.
-- Forever's rules of 16 November 2026 (`tests/forever_rules_20261116.rs`):
+- Forever's rules of 16 November 2026 (`tests/forever_rules_20261116_judgement_rates.rs`):
   - Only a landed white swing or Windfury Totem's weapon strike refreshes a paladin's
     judgement debuffs (Judgement of the Crusader, of Light, of Wisdom). Combat logs of a
     Retribution paladin of levels 43 to 46 (client 1.60.1.70938, after the hotfix of 14 November
@@ -1613,6 +1637,15 @@ the Go goldens and exporter uses. The departures:
   one resource tracking aura (SpellEffect 688737, aura 45; wago.tools `product=wowf`, client
   1.60.1.70888, 11 November 2026). The row has no armor, no stats and no effect, so wearing it is
   wearing nothing on the head, roll for roll. The reference's rules still refuse it as unknown.
+- Torch of Retribution (10515) is refused under Forever's rules
+  (`tests/forever_torch_of_retribution_20261118.rs`, 18 November 2026). The reference row is a
+  weapon of speed 0.5 that hits for 0 to 1; the live client's Item row is of the armor class
+  (class 4, subclass 0, two-hand slot, build 1.60.1.70959) and its tooltip states no damage and
+  no speed, the one reference weapon row that is no weapon in the client. Swung at 0.5 a seal
+  lands four times as often as on a real two-hander: a Retribution Paladin holding it read 1,351
+  DPS against 996 with its reference weapon. The application already refused it in Best Gear and
+  the Droptimizer; preparation now refuses it by name for every sim (`prepare/items.rs`). The
+  reference's rules keep the row.
 - Toofbreaker (286430), a Forever one-hand mace that refused a Combat Rogue's Quick Sims on 10
   November 2026 (`tests/forever_toofbreaker_20261111.rs`): item level 45, 40 to 75, speed 1.90,
   +7 Strength, +5 Stamina, "Chance on hit: Bash the target, causing 42 Physical damage. Deals 2
@@ -1928,6 +1961,35 @@ the Go goldens and exporter uses. The departures:
     prepares without the effect, as every request did before, since the runtime does not follow
     a swap that changes a spell's damage modifier. A character of another class holds the mace
     as a plain weapon.
+- Item rows of Blizzard's hotfixes of 17 November 2026 and three refused items
+  (`tests/forever_items_hotfix_20261117.rs`), from Wowhead's Forever tooltips of 18 November 2026
+  beside the client rows of build 1.60.1.70959 (the ItemSparse rows of these items are encrypted,
+  so the tooltip is the source of each stat):
+  - "Soulforge Armor (upgraded Dungeon Set for tanks) now has Spell Power (was Strength)": the
+    eight tank pieces of the reissued set (226985 to 226992, ItemSet 1673) lose their Strength,
+    hold as much Intellect as they held Strength, and state spell damage and healing (6, 12, 9,
+    16, 13, 12, 8 and 14, wrist to chest). Their live rows existed, so they were written anew
+    with `tools/rust_live_items.py refresh`, which reads the reference row and today's tooltip
+    for the items it is given. The Classic pieces (22086 to 22093), which the Paladin references
+    wear, already read as their tooltips do, Strength and spell power both.
+  - "Corrected Whiteout Staff and Crackling Staff so that they have the same stats": 25 Stamina,
+    25 Intellect and 74 spell damage and healing each (19101 had 16 Intellect; 19102 had no
+    Stamina and 99 spell damage and healing).
+  - "Escape Plan now has correct range and damage values": the gun (287026) is 54 to 102, where
+    its row had 78 to 78. Its use is Disarm (13534, combat range, 15 minutes), which no rotation
+    presses.
+  - "Shadow Priests can now hold a Night Watchman's Torch": the torch (280612) is an item of the
+    client's miscellaneous class with no equipment slot, so it has no row.
+  - Filcher's Cowl (219343) is a cloak of plain stats; its stealth level is a line no fight
+    reads.
+  - Totem of Sustaining (23200): "Equip: Increases the maximum number of charges on your Water
+    Shield by 1." Its equip spell (28856) is a flat modifier of 1 on the charges of Water
+    Shield's class mask (SpellEffect 705031: aura 107, misc 4), so the cast puts up four globes
+    (`classes::shaman::prepare::shields::water_shield_globes`). A request whose item swap moves
+    the totem keeps three.
+  - Weed Whacker (274270) is a chance on hit weapon with no stated rate, as Deadhead Blade is,
+    with a Grass Killer row of its own (1293568): 126 Nature with a variance of 0.42, the
+    tooltip's 100 to 152 (`forever_effect_items.rs`).
 - Classic stats the live rows kept where the Wowhead Forever tooltip no longer states them
   (`tests/forever_live_items_20261115.rs`, 15 November 2026). `tools/rust_live_items.py` dropped
   a stat the tooltip does not state only for primary stats, resistances, spell penetration, mana

@@ -555,7 +555,7 @@ fn idol_of_synthesis_cuts_swiftmend_per_heal_over_time() {
 }
 
 /// Garments of the Oracle (3): a heal's 20% chance to heal the healer for 10% of it.
-/// Rotmender's Raiment (5): a heal's cast puts Rotmending up, at most every 2 sec.
+/// Rotmender's Raiment (5): a heal's cast has a chance to put Rotmending up.
 #[test]
 fn oracle_and_rotmending_heal_on_the_healers_heals() {
     let oracle = [(0, 21348), (2, 21350), (4, 21351)];
@@ -582,6 +582,79 @@ fn oracle_and_rotmending_heal_on_the_healers_heals() {
     assert!(
         healing_on(&result, "spellId", 1321586) > 0.0,
         "no Rotmending"
+    );
+}
+
+/// Rotmender's Raiment (5): Rotmending rolls 1.6 times a minute of each heal's cast time, at
+/// least 1.5 sec, and a shield rolls nothing, as public combat logs of 15 to 18 November 2026
+/// count it (`validation/2026-11-19-rotmending-rate.json`: 261 procs in 5,230 heal casts, none
+/// in 647 Power Word: Shields). Before, every heal and shield cast put it up.
+#[test]
+fn rotmending_rolls_on_cast_time_and_no_shield_rolls_it() {
+    let rotmender = [
+        (4, 286978),
+        (6, 286979),
+        (7, 286980),
+        (8, 271207),
+        (9, 271214),
+    ];
+    let forever = prepared(&request("holy-priest", &rotmender), Rules::Forever);
+    let procs: Vec<&Value> = effects(&forever, "spell_data_heal_proc")
+        .into_iter()
+        .filter(|effect| effect["casts"] == true)
+        .collect();
+    assert_eq!(procs.len(), 1, "{procs:?}");
+    let proc = procs[0];
+    assert_eq!(proc["proc_chance"], 0.0);
+    let chance = |spell_id: i64| -> Option<f64> {
+        let position = positions(&forever, &[spell_id])[0];
+        proc["cast_chances"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|chance| chance["spell"] == position)
+            .map(|chance| chance["chance"].as_f64().unwrap())
+    };
+    let close = |chance: Option<f64>, expected: f64| (chance.unwrap() - expected).abs() < 1e-9;
+    // Renew, Prayer of Mending and Flash Heal's 1.5 sec: 1.6 x 1.5 / 60.
+    assert!(close(chance(10929), 0.04), "Renew {:?}", chance(10929));
+    assert!(close(chance(401859), 0.04), "Mending {:?}", chance(401859));
+    assert!(close(chance(10917), 0.04), "Flash Heal {:?}", chance(10917));
+    // Greater Heal's 2.5 sec with Divine Fury: 1.6 x 2.5 / 60.
+    assert!(
+        close(chance(10965), 1.6 * 2.5 / 60.0),
+        "Greater Heal {:?}",
+        chance(10965)
+    );
+    // Power Word: Shield heals nothing.
+    assert_eq!(chance(10901), None);
+    let shield = positions(&forever, &[10901])[0];
+    assert!(!proc["trigger_spells"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|spell| *spell == shield));
+
+    let result = heals(&forever);
+    let casts = |spell_id: i64| -> f64 {
+        result["raidMetrics"]["parties"][0]["players"][0]["actions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|action| action["id"]["spellId"] == spell_id)
+            .flat_map(|action| action["targets"].as_array().unwrap().iter())
+            .map(|target| target["casts"].as_f64().unwrap_or(0.0))
+            .sum()
+    };
+    let heal_casts = casts(10929) + casts(401859) + casts(10917) + casts(10965);
+    let rotmending = casts(1321586);
+    assert!(heal_casts > 500.0, "{heal_casts} heal casts");
+    assert!(rotmending > 0.0, "no Rotmending");
+    // About 4.6% of this rotation's heal casts; every one of them, and every shield, before.
+    let share = rotmending / heal_casts;
+    assert!(
+        (0.02..0.07).contains(&share),
+        "{rotmending} Rotmending in {heal_casts} heal casts"
     );
 }
 

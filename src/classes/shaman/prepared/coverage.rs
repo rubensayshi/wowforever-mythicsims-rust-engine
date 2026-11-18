@@ -13,7 +13,10 @@ pub(crate) const GATE: ClassGate = ClassGate {
     claims,
     limits,
     several_targets: Some(several_targets),
-    tanks_several_targets: false,
+    // What a Shaman does on a hit it takes answers the copy that swung or no target at all:
+    // Lightning Shield's orb strikes `result.attacker`, a Water Shield globe gives mana and
+    // Improved Stormstrike's reset finishes a cooldown.
+    tanks_several_targets: true,
     other_target_casts: Some(crate::engine::coverage::no_limits),
     // A totem that only places its aura takes no target, so a cast on the player drops it
     // as a cast at the target does (a healer's Mana Spring Totem cast at Self, 4 November

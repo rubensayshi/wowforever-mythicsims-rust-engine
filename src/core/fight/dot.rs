@@ -20,6 +20,9 @@ pub(crate) struct Dot {
     /// it lasts as long, so it deals more of them (Wrack on the warlock's other dots since the
     /// class tuning of 11 November 2026).
     pub(crate) tick_rate: f64,
+    /// When the tick rate last changed, so a change back at the same instant ticks no grid
+    /// point twice.
+    pub(crate) retimed_at: Option<i64>,
     pub(crate) remaining_ticks: i32,
     /// Go `Dot.ticksDone`: the periodic ticks since the dot was applied.
     pub(crate) ticks_done: i32,
@@ -70,6 +73,7 @@ impl Dot {
             base_tick_length: exported.base_tick_length_ns,
             tick_period: exported.base_tick_length_ns,
             tick_rate: 1.0,
+            retimed_at: None,
             remaining_ticks: exported.base_tick_count,
             ticks_done: 0,
             base_duration_multiplier: exported.base_duration_multiplier,
@@ -130,6 +134,7 @@ impl<A: Agent> Fight<A> {
         state.tick_period = period;
         // A dot applied anew ticks at its own rate; whatever sped it up says so again.
         state.tick_rate = 1.0;
+        state.retimed_at = None;
         state.ticks_done = 0;
         let ticks = state.base_duration() as f64 / state.base_tick_length as f64;
         state.remaining_ticks = ticks.round_ties_even() as i32;
@@ -161,6 +166,7 @@ impl<A: Agent> Fight<A> {
         state.tick_period = period;
         // A dot applied anew ticks at its own rate; whatever sped it up says so again.
         state.tick_rate = 1.0;
+        state.retimed_at = None;
         state.ticks_done = 0;
         let ticks = state.base_duration() as f64 / state.base_tick_length as f64;
         state.remaining_ticks = ticks.round_ties_even() as i32;
@@ -177,34 +183,45 @@ impl<A: Agent> Fight<A> {
     }
 
     /// Make the dot tick `rate` times as often as its own period from now on, until the rate is
-    /// set again or the dot is applied anew. A running dot keeps its expiry: the wait for its
-    /// next tick and its tick period shrink or stretch by the change, and the ticks it has left
-    /// are the ones that then fit before it runs out, so a dot at twice the rate deals twice the
-    /// ticks in the time it is sped up. A dot that is not running takes nothing.
+    /// set again or the dot is applied anew. The ticks stay on the dot's grid, its expiry less
+    /// whole periods: at twice the rate each normal tick stays and the half points between them
+    /// tick too, every tick full, and the dot still runs out on a full tick at its expiry. A grid
+    /// point only the new period has ticks at once when the change lands on it, unless the dot
+    /// was already re-timed at this instant; a tick already due now still lands. A dot that is
+    /// not running takes nothing.
     pub(crate) fn set_dot_tick_rate(&mut self, dot: DotId, rate: f64) {
         let aura = self.dots[dot].aura;
         let old = self.dots[dot].tick_rate;
         if old == rate || !self.aura(aura).active {
             return;
         }
+        let expires = self.aura(aura).expires;
+        if expires == crate::core::time::NEVER_EXPIRES {
+            return;
+        }
         let Some(handle) = self.dots[dot].tick_action.take() else {
             return;
         };
-        let factor = old / rate;
-        let scale = |span: i64| (span as f64 * factor) as i64;
-        let expires = self.aura(aura).expires;
+        let old_period = self.dots[dot].tick_period;
+        let period = ((old_period as f64 * old / rate).round() as i64).max(1);
+        let until_expiry = expires - self.now;
+        let retimed_now = self.dots[dot].retimed_at == Some(self.now);
+        let due_now = self.dots[dot].tick_next_at == self.now;
+        let new_point_now =
+            until_expiry % period == 0 && until_expiry % old_period != 0 && !retimed_now;
+        let ticks_left = (until_expiry + period - 1) / period;
+        let next_in = until_expiry - (ticks_left - 1) * period;
+        let at = if due_now || new_point_now {
+            self.now
+        } else {
+            self.now + next_in
+        };
         let state = &mut self.dots[dot];
         state.tick_rate = rate;
-        state.tick_period = scale(state.tick_period).max(1);
-        let at = self.now + scale(state.tick_next_at - self.now);
+        state.tick_period = period;
+        state.retimed_at = Some(self.now);
         state.tick_next_at = at;
-        if expires != crate::core::time::NEVER_EXPIRES {
-            state.remaining_ticks = if at > expires {
-                0
-            } else {
-                ((expires - at) / state.tick_period) as i32 + 1
-            };
-        }
+        state.remaining_ticks = ((expires - at) / period) as i32 + 1;
         self.queue.cancel(handle);
         let handle = self.schedule(at, PRIORITY_GCD, Action::DotTick(dot));
         self.dots[dot].tick_action = Some(handle);
@@ -417,7 +434,16 @@ impl<A: Agent> Fight<A> {
         let aura = self.dots[dot].aura;
         let state = &self.dots[dot];
         if self.aura(aura).active && (!state.channeled || state.remaining_ticks > 0) {
-            let at = self.now + state.tick_period;
+            let mut at = self.now + state.tick_period;
+            // A dot whose rate changed ticks on its expiry less whole periods: a tick the
+            // change left due off that grid takes the next point on it.
+            if state.retimed_at.is_some() {
+                let expires = self.aura(aura).expires;
+                if expires != crate::core::time::NEVER_EXPIRES && expires > self.now {
+                    let period = state.tick_period;
+                    at = expires - ((expires - self.now - 1) / period) * period;
+                }
+            }
             let handle = self.schedule(at, PRIORITY_GCD, Action::DotTick(dot));
             let state = &mut self.dots[dot];
             state.tick_action = Some(handle);

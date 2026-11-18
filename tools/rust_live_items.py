@@ -63,8 +63,16 @@ UNSTATED_DROPPABLE they still hold at the reference row's value is dropped by th
 yet stays: Rage of the Storm (280604) is the ItemSparse row of hotfix push 113886 (docs/mechanics.md). An item with a "+N" line this tool cannot read is left out
 and listed.
 
+A hotfix that changes an item whose live row already exists needs refresh, which names the items:
+it fetches their tooltips again, over what the cache holds, and writes each one's row anew from
+its reference row and that tooltip, as build writes a new row. A refreshed item whose tooltip now
+agrees with its reference row loses its live row. The tank pieces of Soulforge Armor (226985 to
+226992) were refreshed on 18 November 2026, after the hotfixes of 17 November took their
+Strength for spell damage and healing. Never refresh a row that is ahead of its tooltip.
+
     python3 tools/rust_live_items.py fetch --cache DIR [ID ...]
     python3 tools/rust_live_items.py build --cache DIR [--report FILE]
+    python3 tools/rust_live_items.py refresh --cache DIR [--report FILE] ID [ID ...]
     python3 tools/rust_live_items.py check
 
 fetch asks for every reference weapon and armor tooltip the cache lacks (the cache format is
@@ -152,12 +160,15 @@ def is_gear(row):
     return row.get("type") not in (None, "ItemTypeUnknown")
 
 
-def fetch(cache, ids=None):
-    """Fetch every reference weapon and armor tooltip the cache lacks, or the given ids'."""
+def fetch(cache, ids=None, again=False):
+    """Fetch every reference weapon and armor tooltip the cache lacks, or the given ids'; with
+    `again`, the given ids' whether the cache holds them or not."""
     Path(cache).mkdir(parents=True, exist_ok=True)
     live = live_rows()
     if ids:
-        wanted = [item_id for item_id in ids if not client.cache_path(cache, item_id).exists()]
+        wanted = [
+            item_id for item_id in ids if again or not client.cache_path(cache, item_id).exists()
+        ]
     else:
         wanted = [
             item_id
@@ -481,17 +492,57 @@ def live_row(row, change):
     return row
 
 
-def build(cache, report=None):
-    """Add the changed reference items to LIVE; returns (added, left_out) by id."""
+def refreshed_row(row, stated):
+    """The live row of a refreshed item: its reference row with what the tooltip states otherwise,
+    or None when the two agree. Returns (row or None, change)."""
+    change = changes(row, stated)
+    return (live_row(row, change) if change else None), change
+
+
+def build(cache, report=None, refresh=()):
+    """Add the changed reference items to LIVE, and write the rows of the ids in `refresh` anew;
+    returns (added, left_out) by id."""
     reference = reference_rows()
     live = live_rows()
     added, left_out = {}, {}
+    # A bonus row stays unless the cache holds its item's tooltip, which then decides it: a cache
+    # of a few items (refresh, or a fetch of given ids) leaves the other items' rows alone.
     bonuses = {}
+    if BONUSES.exists():
+        bonuses = {r["id"]: r for r in map(json.loads, BONUSES.read_text().splitlines())}
+
+    def keep_bonus(item_id, name, stated):
+        if bonus := bonus_row(item_id, name, stated):
+            bonuses[item_id] = bonus
+        else:
+            bonuses.pop(item_id, None)
+
+    unknown = sorted(set(refresh) - {item_id for item_id, row in reference.items() if is_gear(row)})
+    if unknown:
+        raise SystemExit(f"not weapon or armor rows of {ITEMS.name}: {unknown}")
     for item_id, row in sorted(reference.items()):
         if not is_gear(row):
             continue
         path = client.cache_path(cache, item_id)
         if not path.exists():
+            continue
+        if item_id in refresh:
+            try:
+                stated = read_tooltip(json.loads(path.read_text()))
+            except client.Unreadable as err:
+                left_out[item_id] = (row["name"], str(err))
+                continue
+            if stated is None:
+                left_out[item_id] = (row["name"], "no live tooltip")
+                continue
+            keep_bonus(item_id, row["name"], stated)
+            new, change = refreshed_row(row, stated)
+            if new != live.get(item_id):
+                added[item_id] = (row["name"], change or {"reference": True})
+            if new:
+                live[item_id] = new
+            else:
+                live.pop(item_id, None)
             continue
         if item_id in live:
             # A live row keeps what it has but its on use cooldown, weapon skills and classes.
@@ -501,8 +552,7 @@ def build(cache, report=None):
                 continue
             if not stated:
                 continue
-            if bonus := bonus_row(item_id, row["name"], stated):
-                bonuses[item_id] = bonus
+            keep_bonus(item_id, row["name"], stated)
             change = {}
             if cooldown := cooldown_change(live[item_id], stated):
                 change["cooldown_ms"] = cooldown
@@ -524,8 +574,7 @@ def build(cache, report=None):
             continue
         if stated is None:
             continue
-        if bonus := bonus_row(item_id, row["name"], stated):
-            bonuses[item_id] = bonus
+        keep_bonus(item_id, row["name"], stated)
         change = changes(row, stated)
         if change:
             added[item_id] = (row["name"], change)
@@ -583,7 +632,7 @@ def check():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("command", choices=["fetch", "build", "check"])
+    parser.add_argument("command", choices=["fetch", "build", "refresh", "check"])
     parser.add_argument("ids", nargs="*", type=int)
     parser.add_argument("--cache")
     parser.add_argument("--report")
@@ -593,6 +642,14 @@ def main():
     elif args.command == "build":
         added, left_out = build(args.cache, args.report)
         print(f"{len(added)} rows added, {len(left_out)} left out")
+    elif args.command == "refresh":
+        if not args.ids:
+            parser.error("refresh takes the ids of the items to write anew")
+        fetch(args.cache, args.ids, again=True)
+        added, left_out = build(args.cache, args.report, refresh=set(args.ids))
+        print(f"{len(added)} rows written, {len(left_out)} left out")
+        for item_id, (name, reason) in sorted(left_out.items()):
+            print(f"left out: {item_id} {name}: {reason}", file=sys.stderr)
     else:
         print(f"{check()} rows ok")
 

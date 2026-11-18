@@ -4,7 +4,8 @@
 //! refreshing the cached regeneration rates, so the buff only acts through a later refresh;
 //! under Forever's rule it acts at once (see [`CastingRegen`]).
 //! Its reset listens to the hits the shaman takes: a dodge or parry of a target's swing rolls the
-//! talent's chance to finish Stormstrike's cooldown (Go `Stormstrike.CD.Reset`).
+//! talent's chance to finish Stormstrike's cooldown (Go `Stormstrike.CD.Reset`), one spell batch
+//! window later as every proc trigger's handler runs.
 
 use crate::core::{
     fight::{
@@ -72,8 +73,9 @@ impl ImprovedStormstrike {
         fight.schedule_delayed_proc(self.trigger, spell, result);
     }
 
-    /// The reset's OnSpellHitTaken for a target's swing: a dodge or parry rolls the chance and
-    /// finishes Stormstrike's cooldown.
+    /// The reset's OnSpellHitTaken for a target's swing: a dodge or parry rolls the chance, and
+    /// the handler runs a spell batch window later (Go `AttachProcTriggerCallback` without
+    /// `TriggerImmediately`).
     pub(crate) fn on_enemy_hit_taken<A: Agent>(&self, fight: &mut Fight<A>, result: &SpellResult) {
         if result.outcome & (OUTCOME_DODGE | OUTCOME_PARRY) == 0 {
             return;
@@ -81,6 +83,11 @@ impl ImprovedStormstrike {
         if self.proc_chance != 1.0 && fight.random_for_aura(self.reset) > self.proc_chance {
             return;
         }
+        fight.schedule_delayed_proc(self.reset, 0, *result);
+    }
+
+    /// The reset's delayed handler: Stormstrike's cooldown is finished.
+    pub(crate) fn finish_cooldown<A: Agent>(&self, fight: &mut Fight<A>) {
         if let Some((timer, _)) = self.stormstrike.and_then(|spell| fight.spells[spell].cd) {
             fight.timers[timer] = STARTING_CD_TIME;
         }

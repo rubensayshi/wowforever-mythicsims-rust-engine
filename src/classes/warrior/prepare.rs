@@ -461,6 +461,12 @@ impl PrepAgent for Warrior {
         Vec::new()
     }
 
+    /// Shield Slam adds the warrior's block value. Under Forever's rules a warrior off the
+    /// target's threat still has the strike, so its effect states the value.
+    fn block_value_effect(&self, sim: &Sim, _unit: UnitId) -> Option<&'static str> {
+        (sim.rules == crate::prepare::sim::Rules::Forever).then_some("shield_slam")
+    }
+
     /// The Warrior auras whose gain and expiry change stats through `AddStatsDynamic`, and
     /// Shield Block's block chance when the rotation names it.
     fn stat_auras(&self, sim: &Sim, unit: UnitId) -> Vec<String> {

@@ -314,7 +314,17 @@ fn burst_of_knowledge(env: &mut Environment) {
 /// enemy in melee (23682). The rate is master's PPM.
 fn darkmoon_card_heroism(env: &mut Environment) {
     let unit = env.player;
-    let dpm = Rc::new(env.sim.new_ppm_manager(unit, 2.0, ProcMask::MELEE));
+    // Go `NewLegacyPPMManager`, which an item swap rebuilds for the weapons in the hands.
+    let dpm = Rc::new(
+        env.sim
+            .new_ppm_manager(unit, 2.0, ProcMask::MELEE)
+            .rebuilt_by_swap(
+                &env.sim,
+                unit,
+                super::item_swap::ManagerChance::Ppm(2.0),
+                super::item_swap::ManagerMask::Static(ProcMask::MELEE),
+            ),
+    );
     env.sim.make_proc_trigger_aura(
         unit,
         &ProcTrigger {

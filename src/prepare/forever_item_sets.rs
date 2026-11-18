@@ -566,7 +566,17 @@ set_stats!(
 /// Warrior's Resolve, moved down from 6 pieces: it now returns 10 Rage with the heal.
 fn battlegear_of_valor_5(env: &mut Environment, aura: AuraId) {
     let unit = env.player;
-    let dpm = Rc::new(env.sim.new_ppm_manager(unit, 1.0, ProcMask::MELEE));
+    // Go NewLegacyPPMManager, which an item swap rebuilds for the weapons in the hands.
+    let dpm = Rc::new(
+        env.sim
+            .new_ppm_manager(unit, 1.0, ProcMask::MELEE)
+            .rebuilt_by_swap(
+                &env.sim,
+                unit,
+                super::item_swap::ManagerChance::Ppm(1.0),
+                super::item_swap::ManagerMask::Static(ProcMask::MELEE),
+            ),
+    );
     env.sim.attach_proc_trigger(
         aura,
         &ProcTrigger {
@@ -646,12 +656,18 @@ set_stats!(
 /// Chance on Hit: immobilizes the target and lowers their armor by 100 for 10 sec; master applies
 /// the -100 armor to the wearer, which is kept so the engines agree.
 fn spiders_kiss_2(env: &mut Environment, aura: AuraId) {
+    // The 5% as a fixed chance manager on melee hits, which the stat proc export reads
+    // (export_items.rs `set_stat_proc_effects`).
+    let dpm = Rc::new(
+        env.sim
+            .new_fixed_proc_chance_manager(env.player, 0.05, ProcMask::MELEE),
+    );
     set_stat_proc(
         env,
         aura,
         ProcTrigger {
             outcome: HitOutcome::LANDED,
-            proc_chance: 0.05,
+            dpm: Some(dpm),
             ..trigger(
                 "Spider's Kiss",
                 17333,

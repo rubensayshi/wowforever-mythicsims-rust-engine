@@ -1,0 +1,957 @@
+{
+  "purpose": "The rate of Rotmending (1321586), Rotmender's Raiment's five piece bonus (trigger 1321587), under Forever's rules (src/prepare/healer_gear.rs ROTMENDING_PPM)",
+  "source": "forever.warcraftlogs.com public reports, zone 3000 (Dungeons), read through the site's own pages in a browser",
+  "fetched": "2026-11-19",
+  "window": {
+    "from": "2026-11-15",
+    "to": "2026-11-18",
+    "note": "the 856 most recent public reports listed for Ruins of Lordaeron (pages 1 to 3), Deadmines, Wailing Caverns, Shadowfang Keep, Blackfathom Deeps and the Stockades (page 1 each); 28 hold Rotmending heals, from 27 players"
+  },
+  "client_rows": {
+    "build": "1.60.1.70959",
+    "trigger": {
+      "spell_id": 1321587,
+      "ProcChance": 100,
+      "ProcCategoryRecovery": 2000,
+      "SpellProcsPerMinuteID": 0,
+      "ProcTypeMask": [
+        2114560,
+        0
+      ],
+      "description": "Grants your healing spells a chance to heal for an additional $1321586s1 Health every $1321586t1 sec for $1321586d."
+    },
+    "heal": {
+      "spell_id": 1321586,
+      "base_points": 40,
+      "period_ms": 3000,
+      "duration_ms": 15000,
+      "bonus_coefficient": 0
+    }
+  },
+  "method": "A proc is an applybuff or refreshbuff of 1321586 from the wearer. Each proc is matched to the wearer's cast that completed up to 400 ms before it (every one of the 314 procs in the reports has one, so no heal over time tick rolls it). A cast counts when the wearer's gear snapshot (combatantinfo, taken at each boss pull) before it shows five pieces of set 2133, is at most 30 minutes old, and the next snapshot, if any, shows five too. Casts within 2 s after a proc are left out (the row's proc recovery: no proc followed one of them, and the shortest gap between two procs is 2.12 s). mean_cast_ms is the time from begincast to cast, 0 for an instant. The rate is the maximum likelihood fit of chance = rate x max(cast time, 1.5 s) / 60 over the casts, with the interval where the log likelihood falls by 1.92.",
+  "result": {
+    "heal_casts": 5230,
+    "procs": 261,
+    "per_cast": 0.0499,
+    "procs_per_minute_of_cast_time": 1.6,
+    "interval": [
+      1.42,
+      1.79
+    ],
+    "log_likelihood": {
+      "cast_time_rate": -1023.27,
+      "one_flat_chance": -1036.76
+    },
+    "by_cast_time": [
+      {
+        "casts": "instant",
+        "procs": 96,
+        "of": 2518,
+        "share": 0.0381,
+        "expected_at_1.6": 100.7
+      },
+      {
+        "casts": "up to 1.6 s",
+        "procs": 12,
+        "of": 349,
+        "share": 0.0344,
+        "expected_at_1.6": 14.0
+      },
+      {
+        "casts": "1.6 to 2.1 s",
+        "procs": 22,
+        "of": 581,
+        "share": 0.0379,
+        "expected_at_1.6": 29.4
+      },
+      {
+        "casts": "2.1 to 2.45 s",
+        "procs": 46,
+        "of": 681,
+        "share": 0.0675,
+        "expected_at_1.6": 40.6
+      },
+      {
+        "casts": "2.45 to 2.8 s",
+        "procs": 82,
+        "of": 1047,
+        "share": 0.0783,
+        "expected_at_1.6": 72.1
+      },
+      {
+        "casts": "over 2.8 s",
+        "procs": 3,
+        "of": 54,
+        "share": 0.0556,
+        "expected_at_1.6": 4.4
+      }
+    ],
+    "by_class": [
+      {
+        "class": "Priest",
+        "reports": 18,
+        "procs": 162,
+        "casts": 2664,
+        "rate": 1.86
+      },
+      {
+        "class": "Druid",
+        "reports": 5,
+        "procs": 64,
+        "casts": 1939,
+        "rate": 1.2
+      },
+      {
+        "class": "Shaman",
+        "reports": 3,
+        "procs": 23,
+        "casts": 421,
+        "rate": 1.58
+      },
+      {
+        "class": "Paladin",
+        "reports": 2,
+        "procs": 12,
+        "casts": 206,
+        "rate": 1.49
+      }
+    ],
+    "note": "One Druid report (7NqcJQvyKpCd3YAt, 27 procs in 1,015 casts) reads 1.0 in each of its runs; without it the rest read 1.73. It is kept in."
+  },
+  "no_proc": {
+    "note": "casts of the same wearers in the same windows that no proc followed",
+    "Power Word: Shield": 647,
+    "Shoot": 3036,
+    "Shadow Word: Pain": 366,
+    "Moonfire": 342,
+    "Wrath": 182,
+    "Mind Blast": 134,
+    "Purify": 111,
+    "Earth Shock": 99
+  },
+  "not_counted": {
+    "Holy Nova": "6 procs in 20 casts: it heals several players a cast",
+    "Rejuvenation Potion": "1 proc in 3 uses"
+  },
+  "reports": [
+    {
+      "report": "1P8pyChw796LQd3Z",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 76,
+          "procs": 7,
+          "mean_cast_ms": 2316
+        },
+        {
+          "spell_id": 2055,
+          "spell": "Heal",
+          "casts": 90,
+          "procs": 9,
+          "mean_cast_ms": 2717
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 4,
+          "procs": 0,
+          "mean_cast_ms": 1625
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 147,
+          "procs": 8,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "TwkDVGfvbWBZMcRz",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 66,
+          "procs": 1,
+          "mean_cast_ms": 2225
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 8,
+          "procs": 0,
+          "mean_cast_ms": 1306
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 50,
+          "procs": 4,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "7NqcJQvyKpCd3YAt",
+      "class": "Druid",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 1430,
+          "spell": "Rejuvenation",
+          "casts": 159,
+          "procs": 4,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 2090,
+          "spell": "Rejuvenation",
+          "casts": 531,
+          "procs": 15,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 5188,
+          "spell": "Healing Touch",
+          "casts": 78,
+          "procs": 1,
+          "mean_cast_ms": 2569
+        },
+        {
+          "spell_id": 8938,
+          "spell": "Regrowth",
+          "casts": 224,
+          "procs": 6,
+          "mean_cast_ms": 1851
+        },
+        {
+          "spell_id": 8939,
+          "spell": "Regrowth",
+          "casts": 23,
+          "procs": 1,
+          "mean_cast_ms": 1802
+        }
+      ]
+    },
+    {
+      "report": "qhFK6CrAVTH932kt",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 1,
+          "procs": 0,
+          "mean_cast_ms": 3008
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 2,
+          "procs": 0,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "Z93Lwgxthc2rf7aq",
+      "class": "Priest",
+      "date": "2026-11-16",
+      "spells": [
+        {
+          "spell_id": 2052,
+          "spell": "Lesser Heal",
+          "casts": 63,
+          "procs": 4,
+          "mean_cast_ms": 2008
+        },
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 1,
+          "procs": 0,
+          "mean_cast_ms": 3004
+        },
+        {
+          "spell_id": 6074,
+          "spell": "Renew",
+          "casts": 34,
+          "procs": 4,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "zPJ2w1BrKA3Dv968",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 28,
+          "procs": 0,
+          "mean_cast_ms": 2237
+        },
+        {
+          "spell_id": 2055,
+          "spell": "Heal",
+          "casts": 14,
+          "procs": 2,
+          "mean_cast_ms": 2613
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 6,
+          "procs": 1,
+          "mean_cast_ms": 1312
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 78,
+          "procs": 2,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "dmJXPjcr2RqTYDFz",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 66,
+          "procs": 5,
+          "mean_cast_ms": 2176
+        },
+        {
+          "spell_id": 2055,
+          "spell": "Heal",
+          "casts": 38,
+          "procs": 4,
+          "mean_cast_ms": 2544
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 83,
+          "procs": 5,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "RVdt8jTnB6YFP7ZH",
+      "class": "Druid",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 1430,
+          "spell": "Rejuvenation",
+          "casts": 279,
+          "procs": 11,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 5188,
+          "spell": "Healing Touch",
+          "casts": 10,
+          "procs": 1,
+          "mean_cast_ms": 2501
+        },
+        {
+          "spell_id": 8938,
+          "spell": "Regrowth",
+          "casts": 69,
+          "procs": 2,
+          "mean_cast_ms": 2035
+        }
+      ]
+    },
+    {
+      "report": "CVpJaHzLwhx864YG",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 64,
+          "procs": 8,
+          "mean_cast_ms": 2186
+        },
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 15,
+          "procs": 0,
+          "mean_cast_ms": 2129
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 92,
+          "procs": 0,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "K7FhJTvDL2BzHYgd",
+      "class": "Paladin",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 647,
+          "spell": "Holy Light",
+          "casts": 59,
+          "procs": 5,
+          "mean_cast_ms": 2551
+        },
+        {
+          "spell_id": 1026,
+          "spell": "Holy Light",
+          "casts": 13,
+          "procs": 0,
+          "mean_cast_ms": 2505
+        }
+      ]
+    },
+    {
+      "report": "1XC3pA6qdzFR7YGL",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2052,
+          "spell": "Lesser Heal",
+          "casts": 5,
+          "procs": 1,
+          "mean_cast_ms": 2003
+        },
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 1,
+          "procs": 0,
+          "mean_cast_ms": 2181
+        },
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 48,
+          "procs": 4,
+          "mean_cast_ms": 2709
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 2,
+          "procs": 0,
+          "mean_cast_ms": 1404
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 99,
+          "procs": 2,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "1yRfkvrzHanTm32x",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 22,
+          "procs": 2,
+          "mean_cast_ms": 2613
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 2,
+          "procs": 0,
+          "mean_cast_ms": 1308
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 39,
+          "procs": 2,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "WxcQtwnGKRVXy6F4",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 91,
+          "procs": 5,
+          "mean_cast_ms": 2546
+        },
+        {
+          "spell_id": 2055,
+          "spell": "Heal",
+          "casts": 26,
+          "procs": 3,
+          "mean_cast_ms": 2504
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 9,
+          "procs": 0,
+          "mean_cast_ms": 1507
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 36,
+          "procs": 1,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "GKY7hCbaB8VAjRXN",
+      "class": "Shaman",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 8004,
+          "spell": "Healing Surge",
+          "casts": 175,
+          "procs": 4,
+          "mean_cast_ms": 1308
+        }
+      ]
+    },
+    {
+      "report": "Jvah3LbRk4mA8W1K",
+      "class": "Druid",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2090,
+          "spell": "Rejuvenation",
+          "casts": 89,
+          "procs": 1,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 5188,
+          "spell": "Healing Touch",
+          "casts": 9,
+          "procs": 2,
+          "mean_cast_ms": 2613
+        },
+        {
+          "spell_id": 8938,
+          "spell": "Regrowth",
+          "casts": 32,
+          "procs": 0,
+          "mean_cast_ms": 1794
+        }
+      ]
+    },
+    {
+      "report": "kt2T64crnHQNax9W",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 40,
+          "procs": 1,
+          "mean_cast_ms": 2243
+        },
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 61,
+          "procs": 2,
+          "mean_cast_ms": 2321
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 4,
+          "procs": 0,
+          "mean_cast_ms": 1796
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 26,
+          "procs": 0,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "ydb2wTpBFPgfWrCm",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 12,
+          "procs": 2,
+          "mean_cast_ms": 2506
+        },
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 4,
+          "procs": 0,
+          "mean_cast_ms": 3001
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 7,
+          "procs": 0,
+          "mean_cast_ms": 1512
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 52,
+          "procs": 0,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "ntHpB4gWzJfD1mkq",
+      "class": "Druid",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2090,
+          "spell": "Rejuvenation",
+          "casts": 161,
+          "procs": 8,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 5185,
+          "spell": "Healing Touch",
+          "casts": 19,
+          "procs": 0,
+          "mean_cast_ms": 1111
+        },
+        {
+          "spell_id": 5188,
+          "spell": "Healing Touch",
+          "casts": 2,
+          "procs": 0,
+          "mean_cast_ms": 2391
+        },
+        {
+          "spell_id": 8939,
+          "spell": "Regrowth",
+          "casts": 134,
+          "procs": 6,
+          "mean_cast_ms": 1924
+        },
+        {
+          "spell_id": 18562,
+          "spell": "Swiftmend",
+          "casts": 17,
+          "procs": 1,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "DYHKvmd6aANwWJL1",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 66,
+          "procs": 7,
+          "mean_cast_ms": 2374
+        },
+        {
+          "spell_id": 2055,
+          "spell": "Heal",
+          "casts": 30,
+          "procs": 2,
+          "mean_cast_ms": 2738
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 4,
+          "procs": 0,
+          "mean_cast_ms": 1444
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 49,
+          "procs": 3,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "G62p1FRrTcdnQvC3",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 8,
+          "procs": 1,
+          "mean_cast_ms": 2631
+        },
+        {
+          "spell_id": 6063,
+          "spell": "Heal",
+          "casts": 48,
+          "procs": 3,
+          "mean_cast_ms": 3044
+        },
+        {
+          "spell_id": 6076,
+          "spell": "Renew",
+          "casts": 142,
+          "procs": 7,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 9472,
+          "spell": "Flash Heal",
+          "casts": 19,
+          "procs": 2,
+          "mean_cast_ms": 1507
+        }
+      ]
+    },
+    {
+      "report": "7L16xtfAc4XrMh9B",
+      "class": "Priest",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 8,
+          "procs": 2,
+          "mean_cast_ms": 2618
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 1,
+          "procs": 0,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "dxmZH3wk6bDGqM9C",
+      "class": "Shaman",
+      "date": "2026-11-18",
+      "spells": [
+        {
+          "spell_id": 913,
+          "spell": "Healing Wave",
+          "casts": 68,
+          "procs": 4,
+          "mean_cast_ms": 2620
+        },
+        {
+          "spell_id": 939,
+          "spell": "Healing Wave",
+          "casts": 33,
+          "procs": 1,
+          "mean_cast_ms": 2616
+        }
+      ]
+    },
+    {
+      "report": "rRH4NM7KnZByz6tT",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 176,
+          "procs": 13,
+          "mean_cast_ms": 2178
+        },
+        {
+          "spell_id": 2055,
+          "spell": "Heal",
+          "casts": 24,
+          "procs": 5,
+          "mean_cast_ms": 2614
+        },
+        {
+          "spell_id": 2061,
+          "spell": "Flash Heal",
+          "casts": 39,
+          "procs": 1,
+          "mean_cast_ms": 1307
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 109,
+          "procs": 6,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "61fVW4Pxdt9Mn8jh",
+      "class": "Druid",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2090,
+          "spell": "Rejuvenation",
+          "casts": 77,
+          "procs": 3,
+          "mean_cast_ms": 0
+        },
+        {
+          "spell_id": 5188,
+          "spell": "Healing Touch",
+          "casts": 3,
+          "procs": 0,
+          "mean_cast_ms": 2177
+        },
+        {
+          "spell_id": 8939,
+          "spell": "Regrowth",
+          "casts": 23,
+          "procs": 2,
+          "mean_cast_ms": 1743
+        }
+      ]
+    },
+    {
+      "report": "FRxmtWLHr3wvB8Q1",
+      "class": "Priest",
+      "date": "2026-11-17",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 17,
+          "procs": 2,
+          "mean_cast_ms": 2179
+        },
+        {
+          "spell_id": 2054,
+          "spell": "Heal",
+          "casts": 7,
+          "procs": 0,
+          "mean_cast_ms": 2612
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 72,
+          "procs": 3,
+          "mean_cast_ms": 0
+        }
+      ]
+    },
+    {
+      "report": "xXtbFrdR4qKAQVB1",
+      "class": "Shaman",
+      "date": "2026-11-15",
+      "spells": [
+        {
+          "spell_id": 913,
+          "spell": "Healing Wave",
+          "casts": 118,
+          "procs": 13,
+          "mean_cast_ms": 2594
+        },
+        {
+          "spell_id": 8004,
+          "spell": "Healing Surge",
+          "casts": 27,
+          "procs": 1,
+          "mean_cast_ms": 1444
+        }
+      ]
+    },
+    {
+      "report": "bh8rC6p9L7FqBPjz",
+      "class": "Paladin",
+      "date": "2026-11-15",
+      "spells": [
+        {
+          "spell_id": 635,
+          "spell": "Holy Light",
+          "casts": 102,
+          "procs": 4,
+          "mean_cast_ms": 2482
+        },
+        {
+          "spell_id": 19750,
+          "spell": "Flash of Light",
+          "casts": 32,
+          "procs": 3,
+          "mean_cast_ms": 1505
+        }
+      ]
+    },
+    {
+      "report": "dQ4BY1N3cwMyvLhF",
+      "class": "Priest",
+      "date": "2026-11-15",
+      "spells": [
+        {
+          "spell_id": 2053,
+          "spell": "Lesser Heal",
+          "casts": 139,
+          "procs": 10,
+          "mean_cast_ms": 2516
+        },
+        {
+          "spell_id": 6075,
+          "spell": "Renew",
+          "casts": 94,
+          "procs": 6,
+          "mean_cast_ms": 0
+        }
+      ]
+    }
+  ]
+}

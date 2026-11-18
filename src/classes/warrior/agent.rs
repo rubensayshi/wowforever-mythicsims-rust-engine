@@ -212,6 +212,9 @@ pub(crate) struct WarriorAgent {
     /// Go `struck` in `registerDeepWounds`: the crit that casts the bleed came from the off hand
     /// weapon of a dual wielder, for the one cast the trigger makes.
     deep_wounds_off_hand: bool,
+    /// Flurry under Forever's rules: the Heroic Strike or Cleave cast, by spell and moment, that
+    /// last spent a charge, so a Cleave's second target spends none.
+    pub(crate) flurry_strike_spent: Option<(SpellId, i64)>,
     /// Whether each spell's proc mask holds a bit of a hand that wields a sword.
     sword_mask: Vec<bool>,
     /// With an item swap, Weaponmaster's sword mask for each set, Main then Swap1: the hands
@@ -240,6 +243,9 @@ pub(crate) struct WarriorAgent {
     weaponmaster: Option<WeaponmasterSword>,
     revenge: Option<Revenge>,
     shield_slam: Option<(DamageRoll, bool)>,
+    /// Off the target's threat: the block value Shield Slam adds under each stat aura
+    /// combination. Empty for a tank, whose block value the target's rolls carry.
+    shield_slam_block_reductions: Vec<f64>,
     can_block: bool,
     thunder_clap: Option<ThunderClap>,
     /// Demoralizing Shout's debuff on the first target.
@@ -632,9 +638,11 @@ impl WarriorAgent {
                     damage,
                     can_block,
                     twice_block_value,
+                    block_reductions,
                     ..
                 } => {
                     fight.agent.shield_slam = Some((*damage, *twice_block_value));
+                    fight.agent.shield_slam_block_reductions = block_reductions.clone();
                     fight.agent.can_block = *can_block;
                 }
                 Effect::ImprovedHamstring {
@@ -1123,6 +1131,7 @@ impl WarriorAgent {
                     spell_id,
                     proc_chance,
                     rage,
+                    strikes_proc,
                     ..
                 } => {
                     let metrics = rage_metrics(&mut fight, *spell_id);
@@ -1131,6 +1140,7 @@ impl WarriorAgent {
                         proc_chance: *proc_chance,
                         rage: *rage,
                         metrics,
+                        strikes_proc: *strikes_proc,
                     });
                 }
                 Effect::RecklessSwings {
@@ -1160,6 +1170,7 @@ impl WarriorAgent {
                     charges,
                     every_swing_spends,
                     whirlwind_off_hand_starts,
+                    strikes_spend_once,
                     ..
                 } => {
                     fight.agent.flurry = Some(Flurry {
@@ -1168,6 +1179,7 @@ impl WarriorAgent {
                         charges: *charges,
                         every_swing_spends: *every_swing_spends,
                         whirlwind_off_hand_starts: *whirlwind_off_hand_starts,
+                        strikes_spend_once: *strikes_spend_once,
                     })
                 }
                 Effect::AngerManagement {
@@ -1513,7 +1525,15 @@ impl Agent for WarriorAgent {
             WarriorSpell::ShieldSlam => {
                 let (damage, twice_block_value) =
                     fight.agent.shield_slam.expect("Shield Slam is bound");
-                shield_slam::apply(fight, spell, target, damage, twice_block_value);
+                // A tank's block value is in the target's rolls; off its threat the effect
+                // states it, by stat aura combination either way.
+                let block_value = if fight.agent.shield_slam_block_reductions.is_empty() {
+                    fight.player_block_damage_reduction()
+                } else {
+                    let reductions = &fight.agent.shield_slam_block_reductions;
+                    reductions[fight.stat_mask as usize % reductions.len()]
+                };
+                shield_slam::apply(fight, spell, target, damage, twice_block_value, block_value);
             }
             WarriorSpell::ThunderClap => {
                 let params = fight.agent.thunder_clap.expect("Thunder Clap is bound");
@@ -1889,6 +1909,7 @@ impl Agent for WarriorAgent {
             anger_management::reset(fight, params);
         }
         fight.agent.sword_rolled_at.fill(None);
+        fight.agent.flurry_strike_spent = None;
         let queue = &mut fight.agent.queue;
         queue.current = None;
         queue.queued.iter_mut().for_each(|queued| *queued = false);

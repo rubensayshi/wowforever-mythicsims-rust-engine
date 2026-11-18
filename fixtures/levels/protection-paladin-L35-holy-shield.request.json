@@ -1,0 +1,481 @@
+{
+ "encounter": {
+  "duration": 60,
+  "durationVariation": 0,
+  "executeProportion20": 0.2,
+  "executeProportion25": 0.25,
+  "executeProportion35": 0.35,
+  "executeProportion45": 0.45,
+  "executeProportion90": 0.9,
+  "noHitSuppression": true,
+  "targets": [
+   {
+    "canCrush": true,
+    "damageSpread": 0.3333,
+    "id": 213336,
+    "level": 37,
+    "minBaseDamage": 3000,
+    "name": "Level 37",
+    "parryHaste": true,
+    "stats": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     805,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1000,
+     0,
+     127393,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "swingSpeed": 2
+   }
+  ]
+ },
+ "raid": {
+  "buffs": {},
+  "debuffs": {},
+  "parties": [
+   {
+    "buffs": {},
+    "players": [
+     {
+      "buffs": {},
+      "characterSheet": {
+       "armor": [
+        229,
+        2614
+       ],
+       "attackPower": [
+        383,
+        0,
+        0
+       ],
+       "attributeBuffs": [
+        87,
+        21,
+        146,
+        13,
+        34
+       ],
+       "attributeDebuffs": [
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       "attributes": [
+        149,
+        63,
+        206,
+        57,
+        81
+       ],
+       "auras": [
+        2383,
+        10298,
+        2479,
+        20217,
+        460939
+       ],
+       "base": [
+        62,
+        42,
+        60,
+        44,
+        47
+       ],
+       "block": 5.36,
+       "dodge": 6.2701,
+       "equipment": {
+        "items": [
+         {
+          "id": 13127
+         },
+         {
+          "id": 13084
+         },
+         {
+          "id": 13131
+         },
+         {
+          "id": 13121
+         },
+         {
+          "enchant": 908,
+          "id": 3844
+         },
+         {
+          "enchant": 852,
+          "id": 10333
+         },
+         {
+          "enchant": 927,
+          "id": 9435
+         },
+         {
+          "id": 10329
+         },
+         {
+          "id": 273048
+         },
+         {
+          "enchant": 852,
+          "id": 13124
+         },
+         {
+          "id": 281304
+         },
+         {
+          "id": 11986,
+          "randomSuffix": 12753
+         },
+         {
+          "id": 280766
+         },
+         {
+          "id": 13025
+         },
+         {
+          "enchant": 852,
+          "id": 13081
+         }
+        ]
+       },
+       "healingPower": 0,
+       "health": 2661,
+       "level": 35,
+       "mana": 1427,
+       "manaRegen": [
+        18.376,
+        2.001
+       ],
+       "meleeCrit": 6.9101,
+       "meleeHit": 3,
+       "parry": 5.36,
+       "rangedAttackPower": [
+        0,
+        0,
+        0
+       ],
+       "rangedCrit": 4.6701,
+       "spellCrit": [
+        6.0846,
+        6.0846,
+        6.0846,
+        6.0846,
+        6.0846,
+        6.0846
+       ],
+       "spellHit": 3,
+       "spellPower": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       "weaponSkill": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      "class": "ClassPaladin",
+      "consumables": {},
+      "distanceFromTarget": 5,
+      "equipment": {
+       "items": [
+        {
+         "id": 13127
+        },
+        {
+         "id": 13084
+        },
+        {
+         "id": 13131
+        },
+        {
+         "id": 13121
+        },
+        {
+         "enchant": 908,
+         "id": 3844
+        },
+        {
+         "enchant": 852,
+         "id": 10333
+        },
+        {
+         "enchant": 927,
+         "id": 9435
+        },
+        {
+         "id": 10329
+        },
+        {
+         "id": 273048
+        },
+        {
+         "enchant": 852,
+         "id": 13124
+        },
+        {
+         "id": 281304
+        },
+        {
+         "id": 11986,
+         "randomSuffix": 12753
+        },
+        {
+         "id": 280766
+        },
+        {
+         "id": 13025
+        },
+        {
+         "enchant": 852,
+         "id": 13081
+        }
+       ]
+      },
+      "inFrontOfTarget": true,
+      "knownSpells": [
+       81,
+       107,
+       498,
+       635,
+       639,
+       642,
+       647,
+       678,
+       679,
+       680,
+       853,
+       879,
+       1022,
+       1026,
+       1042,
+       1044,
+       1152,
+       1866,
+       2800,
+       2878,
+       3127,
+       5502,
+       5573,
+       5588,
+       5599,
+       5614,
+       6603,
+       7328,
+       10291,
+       10298,
+       10322,
+       19740,
+       19742,
+       19746,
+       19750,
+       19834,
+       19835,
+       19836,
+       19850,
+       19852,
+       19939,
+       19940,
+       20116,
+       20162,
+       20163,
+       20164,
+       20165,
+       20217,
+       20271,
+       20287,
+       20288,
+       20305,
+       20306,
+       20419,
+       20597,
+       20598,
+       20600,
+       20925,
+       21082,
+       21084,
+       25780,
+       26573,
+       1224697,
+       1259718,
+       1293657,
+       1293712,
+       1311015,
+       1311649,
+       1311656
+      ],
+      "level": 35,
+      "name": "protection-paladin",
+      "profession1": "Engineering",
+      "profession2": "Herbalism",
+      "protectionPaladin": {
+       "options": {
+        "classOptions": {}
+       }
+      },
+      "race": "RaceHuman",
+      "reactionTimeMs": 100,
+      "rotation": {
+       "prepullActions": [
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 20423
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-3s"
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "rank": 3,
+            "spellId": 1239570
+           }
+          }
+         },
+         "doAtValue": {
+          "const": {
+           "val": "-1.5s"
+          }
+         }
+        }
+       ],
+       "priorityList": [
+        {
+         "action": {
+          "autocastOtherCooldowns": {}
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 20271
+           }
+          },
+          "condition": {
+           "auraIsActive": {
+            "auraId": {
+             "spellId": 20423
+            }
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "spellId": 20423
+           }
+          },
+          "condition": {
+           "cmp": {
+            "lhs": {
+             "auraRemainingTime": {
+              "auraId": {
+               "spellId": 20423
+              }
+             }
+            },
+            "op": "OpLe",
+            "rhs": {
+             "const": {
+              "val": "1.5s"
+             }
+            }
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "rank": 8,
+            "spellId": 10333
+           }
+          }
+         }
+        },
+        {
+         "action": {
+          "castSpell": {
+           "spellId": {
+            "rank": 3,
+            "spellId": 1239570
+           }
+          }
+         }
+        }
+       ],
+       "type": "TypeAPL"
+      },
+      "talentsString": "-053021022032015-"
+     }
+    ]
+   }
+  ],
+  "tanks": [
+   {
+    "index": 0,
+    "type": "Player"
+   }
+  ]
+ },
+ "simOptions": {
+  "iterations": 200,
+  "randomSeed": "42"
+ }
+}

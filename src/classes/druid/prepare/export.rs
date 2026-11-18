@@ -51,7 +51,6 @@ const RAKE_RANKS: [i32; 4] = [1822, 1823, 1824, 9904];
 const BITE_RANKS: [i32; 5] = [22568, 22827, 22828, 22829, 31018];
 const BEAR_ENRAGE_RANK: [i32; 1] = [5229];
 const MAUL_RANKS: [i32; 7] = [6807, 6808, 6809, 8972, 9745, 9880, 9881];
-const LACERATE_RANKS: [i32; 3] = [414644, 1235826, 1235827];
 const SWIPE_RANKS: [i32; 5] = [779, 780, 769, 9754, 9908];
 
 /// Go `HitOutcome.String` of one flag, which `outcomeNames` lists.
@@ -712,12 +711,13 @@ impl Druid {
             }
             if let Some(lacerate) = self.lacerate {
                 // lacerate.go: a flat tick a stack and a weapon share a stack.
-                let ladder = Ladder::ranked(&LACERATE_RANKS);
-                let rank = ladder.highest();
+                // The rank's own second effect, as `effect_at(2)` reads it on the frozen
+                // ladder: push 113531's low ranks are not on that ladder.
+                let rank = super::bear::lacerate_rank(sim.rules);
                 let mut effect = json!({
                     "kind": "lacerate", "spell": spell_position(sim, unit, lacerate),
                     "tick_base": rank.periodic_effect().average(character_level()),
-                    "weapon_share_per_stack": ladder.effect_at(2).fraction_at(rank.rank_number()),
+                    "weapon_share_per_stack": rank.effects[1].percent(),
                     "max_stacks": super::bear::LACERATE_MAX_STACKS,
                     "tick_can_crit": rank.periodic_can_crit(),
                     "tick_magic": rank.defense_type_core() == DefenseType::Magic,

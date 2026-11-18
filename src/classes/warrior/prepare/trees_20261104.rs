@@ -26,8 +26,9 @@ const IMPROVED_WHIRLWIND_ROW: &str = r#"{"ID":1310315,"Name":"Improved Whirlwind
 
 /// Reckless Swings (1329555): costs 25% of base health, a 15 sec cooldown, a 1 sec global
 /// cooldown, an 8 sec aura of 4 charges whose proc (effect 1, a trigger of 1329554) is each
-/// melee auto attack.
-const RECKLESS_SWINGS_ROW: &str = r#"{"ID":1329555,"Name":"Reckless Swings","School":1,"Attr":[201588752,98304,0,0,0,0,0,0,0,0,0,0,0,0,64,8192,0],"DurationMs":8000,"CooldownMs":15000,"GCDMs":1000,"StartRecoveryCategory":133,"ProcChance":100,"ProcCharges":4,"ProcFlags":[4,0],"ClassFlags":{"Family":4,"Mask":[0,131072,0,0]},"Effects":[{"ID":1369167,"SpellID":1329555,"Type":6,"Aura":42,"PvpMult":1,"TriggerID":1329554,"ChainAmp":1,"Target":[1,0]}],"Powers":[{"Type":-2,"CostPct":25}]}"#;
+/// melee auto attack and, since push 114115 (16 November 2026), each melee ability (ProcFlags
+/// 0x14).
+const RECKLESS_SWINGS_ROW: &str = r#"{"ID":1329555,"Name":"Reckless Swings","School":1,"Attr":[201588752,98304,0,0,0,0,0,0,0,0,0,0,0,0,64,8192,0],"DurationMs":8000,"CooldownMs":15000,"GCDMs":1000,"StartRecoveryCategory":133,"ProcChance":100,"ProcCharges":4,"ProcFlags":[20,0],"ClassFlags":{"Family":4,"Mask":[0,131072,0,0]},"Effects":[{"ID":1369167,"SpellID":1329555,"Type":6,"Aura":42,"PvpMult":1,"TriggerID":1329554,"ChainAmp":1,"Target":[1,0]}],"Powers":[{"Type":-2,"CostPct":25}]}"#;
 
 /// Reckless Swings' proc (1329554): 5 Rage (50 tenths, an energize on the Rage power).
 const RECKLESS_SWINGS_PROC_ROW: &str = r#"{"ID":1329554,"Name":"Reckless Swings","School":1,"Attr":[327680,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8192,0],"ClassFlags":{"Family":4,"Mask":[0,0,0,0]},"Effects":[{"ID":1369166,"SpellID":1329554,"Type":30,"BasePoints":50,"PvpMult":1,"Misc":1,"ChainAmp":1,"Target":[1,0]},{"ID":1369168,"SpellID":1329554,"Index":1,"Type":3,"BasePoints":1,"PvpMult":1,"ChainAmp":1,"Target":[1,0]}],"Powers":[{"Type":-2}]}"#;

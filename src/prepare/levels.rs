@@ -90,6 +90,9 @@ pub(crate) struct Character {
     /// The spells a first preparation registered for the player and did not flag unlearned,
     /// with their class spell name: what a rotation can be pointed at ([`known_rank_of_name`]).
     pub registered: std::collections::BTreeMap<i32, String>,
+    /// The level a rank is learned at where the class states one in place of its row's
+    /// ([`known_rank_at`]): a live hotfix that moved the rank, or a rank the store lacks.
+    pub stated_levels: std::collections::BTreeMap<i32, i32>,
 }
 
 /// The attributes in the sheet's order.
@@ -189,6 +192,7 @@ impl Character {
             unlearned: BTreeSet::new(),
             known_as: std::collections::BTreeMap::new(),
             registered: std::collections::BTreeMap::new(),
+            stated_levels: std::collections::BTreeMap::new(),
         }
     }
 }
@@ -224,9 +228,10 @@ pub(crate) fn character_level() -> i32 {
 /// Which of a ladder's ranks the character knows, highest first wins.
 ///
 /// With a spellbook the character knows the ranks it lists. A ladder none of whose ranks the
-/// spellbook lists is not a trained spell (a talent, an item's spell or a triggered effect), and
-/// is known up to the character's level like every rank without a spellbook: a rank whose spell
-/// level is at or below the character's level. A spell level of 0 is a row without a level.
+/// spellbook lists is known up to the character's level like every rank without a spellbook (a
+/// rank whose spell level is at or below the character's level; a spell level of 0 is a row
+/// without a level), unless the rank is one the trainer teaches ([`book_withholds`]): that is a
+/// talent, an item's spell or a triggered effect, which the spellbook does not list.
 pub(crate) fn known_rank<'a>(ranks: &[&'a Spell]) -> Option<&'a Spell> {
     let known = CURRENT.with(|current| {
         let character = current.borrow();
@@ -238,7 +243,10 @@ pub(crate) fn known_rank<'a>(ranks: &[&'a Spell]) -> Option<&'a Spell> {
         ranks
             .iter()
             .rev()
-            .find(|rank| i32::from(rank.spell_level) <= character.level)
+            .find(|rank| {
+                !book_withholds(&character, rank.id)
+                    && learned_at(&character, rank) <= character.level
+            })
             .copied()
     })?;
     if ranks.len() > 1 {
@@ -256,6 +264,33 @@ pub(crate) fn known_rank<'a>(ranks: &[&'a Spell]) -> Option<&'a Spell> {
     Some(known)
 }
 
+/// Which of a ladder's ranks the character knows, as [`known_rank`] reads them, with the level
+/// each rank is learned at stated by the class rather than read off its row: a live hotfix moved
+/// the ranks to other levels than the frozen rows state, or a rank is not in the store at all.
+/// The stated levels hold for the rest of the preparation, so [`is_unlearned`] and the rotation
+/// rewrite read them too. When the character knows none, the first rank stands in, noted as
+/// unlearned ([`unlearned_rank`]).
+pub(crate) fn known_rank_at<'a>(ranks: &[(&'a Spell, i32)]) -> Option<&'a Spell> {
+    CURRENT.with(|current| {
+        let mut character = current.borrow_mut();
+        for (rank, level) in ranks {
+            character.stated_levels.insert(rank.id, *level);
+        }
+    });
+    let rows: Vec<&'a Spell> = ranks.iter().map(|(rank, _)| *rank).collect();
+    known_rank(&rows).or_else(|| unlearned_rank(&rows))
+}
+
+/// The level the character learns a rank at: the class's stated level where it gave one
+/// ([`known_rank_at`]), the row's spell level otherwise.
+fn learned_at(character: &Character, rank: &Spell) -> i32 {
+    character
+        .stated_levels
+        .get(&rank.id)
+        .copied()
+        .unwrap_or_else(|| i32::from(rank.spell_level))
+}
+
 /// A levelling character's rotations, naming the rank it knows wherever a rotation names
 /// another rank of the same spell: the presets name the top rank, which a level 30 character
 /// has not trained, in casts, aura and dot checks alike. Go's `RankAliases` does this only for
@@ -271,7 +306,9 @@ pub(crate) fn rewrite_rotations(request: &mut serde_json::Value, character: &Cha
         if let Some(known) = character.known_as.get(&id) {
             return Some(*known);
         }
-        known_rank_of_name(id, character).filter(|known| *known != id)
+        known_rank_of_name(id, character)
+            .or_else(|| known_family_rank(id, character))
+            .filter(|known| *known != id)
     };
     fn walk(value: &mut Value, known: &dyn Fn(i32) -> Option<i32>) {
         match value {
@@ -335,12 +372,16 @@ fn known_rank_of_name(id: i32, character: &Character) -> Option<i32> {
 /// The group buffs a class casts on its raid and what a levelling caster casts instead when it
 /// has not learned the group version: Arcane Brilliance is learned at 56 from a book, and a level
 /// 21 mage buffs with its Arcane Intellect.
-const SINGLE_TARGET_OF: [(&str, &str); 5] = [
+const SINGLE_TARGET_OF: [(&str, &str); 8] = [
     ("Arcane Brilliance", "Arcane Intellect"),
     ("Prayer of Fortitude", "Power Word: Fortitude"),
     ("Prayer of Spirit", "Divine Spirit"),
     ("Prayer of Shadow Protection", "Shadow Protection"),
     ("Gift of the Wild", "Mark of the Wild"),
+    // A paladin below 52 has no Greater Blessing and blesses itself with the 5 min one.
+    ("Greater Blessing of Might", "Blessing of Might"),
+    ("Greater Blessing of Wisdom", "Blessing of Wisdom"),
+    ("Greater Blessing of Kings", "Blessing of Kings"),
 ];
 
 /// The rank of a buff a levelling character casts in place of `spell`, the level 60 row core's
@@ -636,9 +677,137 @@ pub(crate) fn is_unlearned(spell_id: i32) -> bool {
         if character.level == MAX_LEVEL {
             return false;
         }
+        if book_withholds(&character, spell_id) {
+            return true;
+        }
         let row = crate::prepare::spelldata::find(spell_id);
         row.id != 0 && row.rank.starts_with("Rank ") && !knows_rank(&character, row)
     })
+}
+
+/// [`is_unlearned`] for a registered spell that a rotation can also name by other ranks
+/// (`rank_aliases`): a spell the spellbook withholds is known all the same when the book lists
+/// one of those. A level 30 rogue has trained Shank rank 1 (1329283), which the engine registers
+/// as rank 2 (1329549) with rank 1 as an alias. A spell unlearned by its level or its ladder stays
+/// unlearned: an alias is a lower rank, not the registered one.
+pub(crate) fn is_unlearned_with_aliases(spell_id: i32, aliases: &[i32]) -> bool {
+    if !is_unlearned(spell_id) {
+        return false;
+    }
+    CURRENT.with(|current| {
+        let character = current.borrow();
+        let row = crate::prepare::spelldata::find(spell_id);
+        let ranked = row.id != 0 && row.rank.starts_with("Rank ");
+        if character.unlearned.contains(&spell_id) || ranked {
+            return true;
+        }
+        !character
+            .known_spells
+            .as_ref()
+            .is_some_and(|book| aliases.iter().any(|alias| book.contains(alias)))
+    })
+}
+
+/// Notes that a rotation naming `from` casts `to`, a rank the character knows
+/// ([`rewrite_rotations`]), where class code pairs ranks no ladder resolves (Holy Shock's heal
+/// follows the rank cast).
+pub(crate) fn note_known_as(from: i32, to: i32) {
+    CURRENT.with(|current| {
+        let mut character = current.borrow_mut();
+        if character.level != MAX_LEVEL && from != to {
+            character.known_as.insert(from, to);
+        }
+    });
+}
+
+/// Notes `spell_id` as unlearned: a row that follows another spell's rank (Holy Shock's heal
+/// follows the rank cast) and that no spellbook lists.
+pub(crate) fn mark_unlearned(spell_id: i32) {
+    CURRENT.with(|current| {
+        let mut character = current.borrow_mut();
+        if character.level != MAX_LEVEL {
+            character.unlearned.insert(spell_id);
+        }
+    });
+}
+
+/// Whether the character's spellbook leaves out a spell the class trainer teaches
+/// (`data/forever-trainer-spells.jsonl`, `tools/forever_trainer_spells.py`): a levelling
+/// character with a spellbook that does not list the rank has not trained it, whatever the rank's
+/// level row says. Shadowfiend's row (401977) reads level 1 and Shank's rank 2 (1329549) has none
+/// in the store, and levelling characters that had trained neither cast both (18 Nov 2026). A
+/// talent is never withheld: a class registers it only with points in it. Without a spellbook,
+/// and at level 60, nothing is.
+fn book_withholds(character: &Character, spell_id: i32) -> bool {
+    if character.level == MAX_LEVEL {
+        return false;
+    }
+    let Some(book) = &character.known_spells else {
+        return false;
+    };
+    !book.contains(&spell_id)
+        && trainer_rank(spell_id).is_some()
+        && !crate::prepare::spelldata::ladder::is_talent_row(spell_id)
+}
+
+/// A trainer-taught rank: its family (the spell's first rank) and its level.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct TrainerRank {
+    family: i32,
+    level: i32,
+}
+
+fn trainer_ranks() -> &'static std::collections::HashMap<i32, TrainerRank> {
+    use std::collections::HashMap;
+    use std::sync::OnceLock;
+    static RANKS: OnceLock<HashMap<i32, TrainerRank>> = OnceLock::new();
+    RANKS.get_or_init(|| {
+        let table = &crate::data::TRAINER_SPELLS;
+        table
+            .keys()
+            .filter_map(|id| {
+                let row: serde_json::Value =
+                    serde_json::from_str(table.row(id)?).unwrap_or_else(|err| {
+                        panic!("data/forever-trainer-spells.jsonl row {id}: {err}")
+                    });
+                let field = |name: &str| i32::try_from(row[name].as_i64()?).ok();
+                Some((
+                    i32::try_from(id).ok()?,
+                    TrainerRank {
+                        family: field("family")?,
+                        level: field("level")?,
+                    },
+                ))
+            })
+            .collect()
+    })
+}
+
+fn trainer_rank(spell_id: i32) -> Option<TrainerRank> {
+    trainer_ranks().get(&spell_id).copied()
+}
+
+/// For a trainer rank the spellbook withholds, the highest rank of the same family it lists that
+/// the first preparation registered as the same class spell: a rotation that names Holy Shock
+/// rank 4 (20930) casts the rank 3 (20929) a level 50 paladin has trained. Holy Shock registers
+/// each rank as its own spell from a hand-written table, so no ladder or store row maps them.
+fn known_family_rank(id: i32, character: &Character) -> Option<i32> {
+    if !book_withholds(character, id) {
+        return None;
+    }
+    let family = trainer_rank(id)?.family;
+    let book = character.known_spells.as_ref()?;
+    let kind = character.registered.get(&id);
+    trainer_ranks()
+        .iter()
+        .filter(|(rank, trainer)| trainer.family == family && book.contains(rank))
+        .filter(|(rank, _)| match (kind, character.registered.get(rank)) {
+            (_, None) => false,
+            (Some(kind), Some(other)) => kind == other,
+            (None, Some(_)) => true,
+        })
+        .max_by_key(|(rank, trainer)| (trainer.level, **rank))
+        .map(|(rank, _)| *rank)
 }
 
 /// Whether the character has trained an unranked spell such as a conjure: in its spellbook, or
@@ -679,7 +848,7 @@ fn knows_rank(character: &Character, rank: &Spell) -> bool {
             return false;
         }
     }
-    i32::from(rank.spell_level) <= character.level
+    !book_withholds(character, rank.id) && learned_at(character, rank) <= character.level
 }
 
 /// Every ranked row with this rank's name.
@@ -755,12 +924,80 @@ mod tests {
 
     #[test]
     fn a_ladder_the_spellbook_does_not_list_follows_the_level() {
+        // Judgement of Righteousness ranks 2 to 4 (levels 10, 18 and 26) are triggered by the
+        // Seal, which the trainer teaches; no spellbook lists them.
+        let judgement = Ladder::ranked(&[20280, 20281, 20282]);
         let character = Character {
             level: 20,
             known_spells: Some([133].into_iter().collect()),
             ..Character::default()
         };
-        assert_eq!(with_character(character, || frostbolt().highest().id), 837);
+        assert_eq!(with_character(character, || judgement.highest().id), 20281);
+    }
+
+    /// The trainer teaches Frostbolt, so a spellbook without any rank of it is the word: the
+    /// character has not trained it, whatever its level allows (18 Nov 2026).
+    #[test]
+    fn a_trainer_spell_the_spellbook_leaves_out_is_unlearned() {
+        let character = Character {
+            level: 20,
+            known_spells: Some([133].into_iter().collect()),
+            ..Character::default()
+        };
+        assert_eq!(
+            with_character(character, || {
+                let rank = frostbolt().highest().id;
+                (
+                    rank,
+                    is_unlearned(116),
+                    is_unlearned(837),
+                    is_unlearned(133),
+                )
+            }),
+            (116, true, true, false)
+        );
+        // Shadowfiend's row reads level 1; a level 38 priest whose book lacks it has not trained
+        // it, and one whose book lists it has.
+        let shadowfiend = Ladder::ranked(&[401977]);
+        let without = Character {
+            level: 38,
+            known_spells: Some([585].into_iter().collect()),
+            ..Character::default()
+        };
+        assert!(with_character(without, || {
+            shadowfiend.highest();
+            is_unlearned(401977)
+        }));
+        let with = Character {
+            level: 38,
+            known_spells: Some([585, 401977].into_iter().collect()),
+            ..Character::default()
+        };
+        assert!(!with_character(with, || is_unlearned(401977)));
+        // Without a spellbook the level decides, as before.
+        let no_book = Character {
+            level: 38,
+            ..Character::default()
+        };
+        assert!(!with_character(no_book, || is_unlearned(401977)));
+    }
+
+    /// Shank's rank 2 (1329549, not in the store) is what the engine registers; a book that lists
+    /// rank 1 (1329283) knows it through the alias, one that lists neither does not.
+    #[test]
+    fn a_trainer_rank_known_through_its_alias() {
+        let at = |book: &[i32]| {
+            let character = Character {
+                level: 30,
+                known_spells: Some(book.iter().copied().collect()),
+                ..Character::default()
+            };
+            with_character(character, || {
+                is_unlearned_with_aliases(1_329_549, &[1_329_283])
+            })
+        };
+        assert!(!at(&[1752, 1_329_283]));
+        assert!(at(&[1752]));
     }
 
     /// A share of maximum mana (Arcane Mind) scales the base too: with the engine's mana 1.1

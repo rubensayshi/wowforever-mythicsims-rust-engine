@@ -3,6 +3,14 @@
 //! handler runs one spell batch window later.
 //! A crit grants every charge of melee speed; otherwise a white hit spends one, at most once
 //! per charge cooldown.
+//!
+//! Under Forever's rules a Windfury Totem strike, the party's or the shaman's own, spends no
+//! charge and leaves the charge cooldown alone, since the hotfixes of 17 November 2026: "Fixed
+//! an issue where Flurry incorrectly lost stacks when Windfury totem attacks landed." Its crit
+//! still starts Flurry, as any melee crit does: the post speaks of lost stacks only, and a
+//! level 60 Fury warrior's combat log of 16 November 2026 shows the same strike's crit
+//! starting the Warrior's Flurry 22 of 22 times. No Shaman log is counted yet. Without the
+//! rule the strike, a copy of the main hand auto, spends a charge as a white swing does.
 
 use crate::core::fight::{Agent, AuraRef, Fight, SpellId, SpellResult};
 
@@ -13,6 +21,9 @@ pub(crate) struct Flurry {
     speed: f64,
     charge_icd: i64,
     can_proc_from_procs: bool,
+    /// Forever's rules since the hotfixes of 17 November 2026: a Windfury Totem strike spends
+    /// no charge.
+    totem_strike_spends_none: bool,
 }
 
 pub(crate) fn bind<A: Agent>(
@@ -22,6 +33,7 @@ pub(crate) fn bind<A: Agent>(
     speed: f64,
     charge_icd: i64,
     can_proc_from_procs: bool,
+    totem_strike_spends_none: bool,
 ) -> Result<Flurry, String> {
     Ok(Flurry {
         trigger: fight.player_aura(trigger)?,
@@ -29,6 +41,7 @@ pub(crate) fn bind<A: Agent>(
         speed,
         charge_icd,
         can_proc_from_procs,
+        totem_strike_spends_none,
     })
 }
 
@@ -60,6 +73,7 @@ impl Flurry {
     pub(crate) fn handle<A: Agent>(
         &self,
         fight: &mut Fight<A>,
+        spell: SpellId,
         result: &SpellResult,
         white: bool,
         icd: &mut i64,
@@ -68,6 +82,11 @@ impl Flurry {
             fight.activate_aura(self.aura);
             let max = fight.aura(self.aura).max_stacks;
             fight.set_stacks(self.aura, max);
+            return;
+        }
+        // A Windfury Totem strike carries the main hand auto's mask, so it is told apart from
+        // the white swing by its spell.
+        if self.totem_strike_spends_none && fight.windfury_strike_attack_power(spell).is_some() {
             return;
         }
         if fight.aura(self.aura).active && white && *icd <= fight.now {
