@@ -17,8 +17,8 @@ use super::export::{action, mask_names, poison_bonus};
 use super::poisons::{poison_proc_mask, IMBUES};
 use super::rework;
 use super::spell_data::spell_data;
+use super::spells::shank_energy_gain;
 use super::spells::BUILDER;
-use super::spells::SHANK_ENERGY_GAIN;
 use super::util::{has_dagger, mutilate_weapon_share, proc_mask_for_types, spell_action, Hand};
 use super::{masks, Rogue, SLICE_AND_DICE_DURATIONS};
 
@@ -377,7 +377,7 @@ impl Rogue {
             let mut shank = json!({
                 "kind": "shank", "spell_id": sim.spell(spell).action_id.spell_id,
                 "energy_gain":
-                    SHANK_ENERGY_GAIN + rework::flash_of_steel_energy(self.extra_points("flash_of_steel")),
+                    shank_energy_gain() + rework::flash_of_steel_energy(self.extra_points("flash_of_steel")),
             });
             let boot_knife = rework::boot_knife_chance(self.extra_points("boot_knife"));
             if boot_knife > 0.0 {

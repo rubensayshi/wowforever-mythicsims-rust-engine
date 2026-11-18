@@ -156,6 +156,32 @@ fn shank_waits_for_the_trainer() {
     assert!(casts.get(&SHANK_RANK_2).copied().unwrap_or(0.0) > 0.0);
 }
 
+/// Shank rank 1 (level 24) generates 15 Energy, rank 2 (level 44) 25; the engine registers rank 2
+/// and presses it through rank 1's alias, so the effect carries the known rank's Energy.
+#[test]
+fn shank_rank_1_generates_rank_1_energy() {
+    let shank_gain = |request: &Value| {
+        let prepared = prepare(request);
+        prepared["effects"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|effect| effect["kind"] == "shank")
+            .and_then(|effect| effect["energy_gain"].as_f64())
+    };
+    // This rogue's Flash of Steel adds the same Energy to either rank.
+    let mut request = request("combat-rogue-L38-shank-rank-1");
+    let rank_1 = shank_gain(&request).unwrap();
+    let player = &mut request["raid"]["parties"][0]["players"][0];
+    player["level"] = Value::from(44);
+    player["knownSpells"]
+        .as_array_mut()
+        .unwrap()
+        .push(Value::from(SHANK_RANK_2));
+    let rank_2 = shank_gain(&request).unwrap();
+    assert_eq!((rank_1, rank_2 - rank_1), (21.0, 10.0));
+}
+
 #[test]
 fn shadowfiend_waits_for_the_spellbook() {
     let (_, prepared, casts) = run("healer-priest-L38-no-shadowfiend");
