@@ -1599,6 +1599,15 @@ the Go goldens and exporter uses. The departures:
   one resource tracking aura (SpellEffect 688737, aura 45; wago.tools `product=wowf`, client
   1.60.1.70888, 11 November 2026). The row has no armor, no stats and no effect, so wearing it is
   wearing nothing on the head, roll for roll. The reference's rules still refuse it as unknown.
+- Torch of Retribution (10515) is refused under Forever's rules
+  (`tests/forever_torch_of_retribution_20261118.rs`, 18 November 2026). The reference row is a
+  weapon of speed 0.5 that hits for 0 to 1; the live client's Item row is of the armor class
+  (class 4, subclass 0, two-hand slot, build 1.60.1.70959) and its tooltip states no damage and
+  no speed, the one reference weapon row that is no weapon in the client. Swung at 0.5 a seal
+  lands four times as often as on a real two-hander: a Retribution Paladin holding it read 1,351
+  DPS against 996 with its reference weapon. The application already refused it in Best Gear and
+  the Droptimizer; preparation now refuses it by name for every sim (`prepare/items.rs`). The
+  reference's rules keep the row.
 - Toofbreaker (286430), a Forever one-hand mace that refused a Combat Rogue's Quick Sims on 10
   November 2026 (`tests/forever_toofbreaker_20261111.rs`): item level 45, 40 to 75, speed 1.90,
   +7 Strength, +5 Stamina, "Chance on hit: Bash the target, causing 42 Physical damage. Deals 2
