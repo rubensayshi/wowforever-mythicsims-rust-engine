@@ -35,6 +35,7 @@ OWN_FILES = {
     "forever-random-enchantments.jsonl",
     "forever-random-enchantment-items.jsonl",
     "forever-live-items.jsonl",
+    "forever-trainer-spells.jsonl",
 }
 
 # SimDatabase list, output file and the key each row is found by.

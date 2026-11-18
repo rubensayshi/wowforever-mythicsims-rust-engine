@@ -251,7 +251,12 @@ pub(crate) fn export_spell_of(
     // A spell the character has not learned is no APL or major cooldown spell: the rotation
     // and the cooldown manager never press it.
     let mut flags = spell.flags.names();
-    if super::levels::is_unlearned(spell.action_id.spell_id) {
+    let aliases: Vec<i32> = spell
+        .rank_aliases
+        .iter()
+        .map(|alias| alias.spell_id)
+        .collect();
+    if super::levels::is_unlearned_with_aliases(spell.action_id.spell_id, &aliases) {
         flags.retain(|flag| flag != "SpellFlagAPL" && flag != "SpellFlagMCD");
         flags.push("SpellFlagUnlearned".to_string());
     }

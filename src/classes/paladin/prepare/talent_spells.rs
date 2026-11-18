@@ -205,8 +205,24 @@ impl Paladin {
     }
 
     /// Go `registerHolyShock`.
+    ///
+    /// A levelling paladin casts the highest rank it has trained: a rank its spellbook leaves out
+    /// is unlearned (`levels::is_unlearned`), and so is that rank's heal, which no spellbook lists;
+    /// a rotation that names either casts the trained rank's.
     fn register_holy_shock(&mut self, sim: &mut Sim, unit: UnitId) {
+        use crate::prepare::levels;
+        let known = HOLY_SHOCK_RANKS
+            .iter()
+            .rev()
+            .find(|rank| !levels::is_unlearned(rank.spell_id));
         for rank in &HOLY_SHOCK_RANKS {
+            if levels::is_unlearned(rank.spell_id) {
+                levels::mark_unlearned(rank.heal_id);
+                if let Some(known) = known {
+                    levels::note_known_as(rank.spell_id, known.spell_id);
+                    levels::note_known_as(rank.heal_id, known.heal_id);
+                }
+            }
             self.register_holy_shock_rank(sim, unit, rank);
         }
     }
