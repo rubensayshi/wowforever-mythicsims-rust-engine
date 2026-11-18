@@ -2737,7 +2737,7 @@ fn set_stat_proc_effects(env: &Environment, unrepresented: &mut Vec<String>) -> 
     // (set aura, trigger name, aura, aura spell, stats, proc mask)
     let crusaders_wrath =
         || Stats::from_pairs(&[(Stat::SpellDamage, 65.0), (Stat::HealingPower, 65.0)]);
-    let procs: [(&str, &str, &str, i32, Stats, ProcMask); 2] = [
+    let procs: [(&str, &str, &str, i32, Stats, ProcMask); 3] = [
         (
             "Lightforge Armor 5P",
             "Item - Crusader's Wrath Proc - Lightforge Armor",
@@ -2753,6 +2753,17 @@ fn set_stat_proc_effects(env: &Environment, unrepresented: &mut Vec<String>) -> 
             27499,
             crusaders_wrath(),
             ProcMask::MELEE_WHITE_HIT,
+        ),
+        // Spider's Kiss (2): 5% on a landed melee hit, -100 armor on the wearer for 10 sec
+        // (forever_item_sets.rs `spiders_kiss_2`). Without this entry the bonus aura listened to
+        // hits with nothing to run them, and the gate refused every character wearing both pieces.
+        (
+            "Spider's Kiss 2P",
+            "Spider's Kiss",
+            "Spider's Kiss",
+            17333,
+            Stats::from_pairs(&[(Stat::Armor, -100.0)]),
+            ProcMask::MELEE,
         ),
     ];
     for (set_aura, name, aura_label, aura_id, stats, mask) in procs {
