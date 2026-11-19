@@ -1336,10 +1336,18 @@ fn swap_change_limit(
                 refuse()
             }
         }
+        // An item use's swapped flag, which the runtime sets as its item comes off and clears as
+        // it goes on (SwapOp::ItemUse): a use of the main set gains the flag, and a use of the swap
+        // set, flagged from the pull, loses it (Headmaster's Charge in a Manual Crowd Pummeler
+        // opener's swap set, seven refused Best Gear runs on 19 November 2026).
         ["player", "spells", index, "flags"] => {
             let index: usize = index.parse().ok()?;
             let mut flags = prepared.player.spells.get(index)?.flags.clone();
-            flags.push("SpellFlagSwapped".into());
+            if let Some(at) = flags.iter().position(|flag| flag == "SpellFlagSwapped") {
+                flags.remove(at);
+            } else {
+                flags.push("SpellFlagSwapped".into());
+            }
             let now: Vec<String> = serde_json::from_value(change.value.clone()).unwrap_or_default();
             let sorted = |mut list: Vec<String>| {
                 list.sort();

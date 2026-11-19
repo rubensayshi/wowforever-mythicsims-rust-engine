@@ -30,9 +30,10 @@ row. So is a use, chance on hit or equip line the engine models by hand (ENGINE_
 Serpentbane Crown's use, the two Rock on Stick weapons' bash, Toofbreaker's bash, Dreadfrost
 Saber's Frost damage, Totem of Rage's shock damage, Totem of Sustaining's Water Shield globe,
 Maw of Min'loth's leech when struck), a use the engine never presses (UNPRESSED_USE: Zarla's Snack Pouch's whelp, whose damage no row
-states, and Behemoth Bones' heal), an equip proc whose chance no row states (UNSTATED_PROC:
-Claymore of Two Moons), and an equip line that acts only when the wearer is struck, which the engine refuses on the
-character it can reach (Zealot Plate's mana, Girdle of Extracted Answers' damage on block). A use
+states, and Behemoth Bones' heal), an equip proc whose chance no row states or that cannot
+fire in a sim (UNSTATED_PROC: Claymore of Two Moons, Axe of Inevitable Ruin, High Elf's Recurve,
+Wit's Edge), and an equip line that acts only when the wearer is struck, which the engine refuses
+on the character it can reach (Zealot Plate's mana, Girdle of Extracted Answers' damage on block). A use
 that is a stat buff (ON_USE_STATS: Heart of the Primeval, Lucky Shovelnose Tuft, Flamebreak
 Talisman) is written into the row as its item effect, as the reference rows hold a stat trinket's.
 A crit line whose percentage is no whole rating is read only for the item listed with it
@@ -464,6 +465,10 @@ NO_FIGHT_EFFECT = [
         # Ward of the Dead 217727, an item level 1 quest trinket: its equip spell (440841) shows a
         # quest grave.
         r"Equip: Reveals the grave which hides an offering\.",
+        # Axe of Inevitable Ruin 274484: its use joins it with Axe of Lingering Dread into another
+        # item, outside a fight.
+        r"Use: Combines Axe of Lingering Dread and Axe of Inevitable Ruin to reconstruct the "
+        r"Pendulum of Doom\.",
     ]
 ]
 # Use, chance on hit and equip lines the engine models by hand
@@ -550,11 +555,22 @@ UNPRESSED_USE = [
 # spell (1309550) is a dummy aura with ProcChance 100 on melee attacks beside a tooltip that says
 # "a chance", and no row states the chance or how often an attack waxes (Waxing Moon 1319378, 189
 # Arcane) rather than wanes (Waning Moon 1319382, 40 Strength). The server decides both.
+# Axe of Inevitable Ruin 274484 and High Elf's Recurve 284050: chance on hit lines whose tooltip
+# states no chance and no procs per minute, and whose ItemSparse rows are encrypted, so no row
+# states a rate (a Holy Paladin and a Hunter refused on 18 and 19 November 2026).
+# Wit's Edge 276632: a Mage only sword whose proc acts on melee attacks, which a Mage in the engine
+# never makes (it shoots its wand), so the 15% proc can never fire in a sim (two Arcane Mages
+# refused on 19 November 2026).
 UNSTATED_PROC = [
     re.compile(re.escape(line))
     for line in [
         "Equip: Your attacks have a chance to Wax, dealing 189 Arcane damage or Wane, granting 40 "
         "Strength for 10 sec.",
+        "Chance on hit: Wounds the target for 140 to 196 damage.",
+        "Chance on hit: Strike your target with a Poisonous Sting, inflicting 27 damage every 3 sec "
+        "for 9 sec.",
+        "Equip: Melee attacks have a 15% chance to grant a Clearcasting state, reducing the mana "
+        "cost of your next damage spell by 100%. (Proc chance: 15%)",
     ]
 ]
 # A use that is a stat buff, by item: the exact use line of the tooltip and the item effect the row
