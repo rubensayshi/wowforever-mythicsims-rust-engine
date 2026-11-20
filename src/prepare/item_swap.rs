@@ -379,6 +379,29 @@ pub(crate) fn weapon_from_off_hand(sim: &Sim, unit: UnitId) -> Weapon {
     }
 }
 
+/// Under Forever's rules (MythicSim Rust-only) a stone's flat damage stays on the hand: the
+/// weapon a swap puts there carries it, as the one worn at the pull does. An empty hand carries
+/// nothing. The reference rebuilds the weapon from its item alone and loses the stone.
+fn add_stone(sim: &Sim, unit: UnitId, weapon: &mut Weapon, hand: usize) {
+    let flat = sim.character(unit).imbue_flat_weapon_damage[hand];
+    if sim.rules == Rules::Forever
+        && flat != 0.0
+        && weapon.swing_speed != 0.0
+        && !weapon_is_unarmed(sim, unit, hand)
+    {
+        weapon.base_damage_min += flat;
+        weapon.base_damage_max += flat;
+    }
+}
+
+fn weapon_is_unarmed(sim: &Sim, unit: UnitId, hand: usize) -> bool {
+    if hand == 0 {
+        sim.mh_weapon(unit).is_none()
+    } else {
+        sim.oh_weapon(unit).is_none()
+    }
+}
+
 /// The set auras and states a swap leaves, for the export.
 pub(crate) fn swap_labels() -> Value {
     json!({"main_aura": MAIN_LABEL, "swapped_aura": SWAPPED_LABEL})
@@ -477,12 +500,14 @@ impl super::env::Environment {
             return;
         }
         if slot == slot::MAIN_HAND && self.sim.unit(unit).auto_attacks.auto_swing_melee && !feral {
-            let weapon = weapon_from_main_hand(&self.sim, unit);
+            let mut weapon = weapon_from_main_hand(&self.sim, unit);
+            add_stone(&self.sim, unit, &mut weapon, 0);
             self.sim.unit_mut(unit).auto_attacks.mh = weapon;
         }
         // The off hand's attack follows the dual wield the swap leaves, and a shield blocks.
         if slot == slot::OFF_HAND && self.sim.unit(unit).auto_attacks.auto_swing_melee {
-            let weapon = weapon_from_off_hand(&self.sim, unit);
+            let mut weapon = weapon_from_off_hand(&self.sim, unit);
+            add_stone(&self.sim, unit, &mut weapon, 1);
             let dual_wielding = weapon.swing_speed != 0.0;
             let shield = self.sim.character(unit).equipment[slot::OFF_HAND].weapon_type
                 == "WeaponTypeShield";

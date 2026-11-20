@@ -104,6 +104,9 @@ pub(crate) struct Character {
     pub hardcast_avoidance_aura: Option<AuraId>,
     /// Go `ItemSwap`, when the request swaps items.
     pub item_swap: Option<super::item_swap::ItemSwap>,
+    /// The flat weapon damage of the stones on the main hand and the off hand, which stays on
+    /// whatever weapon an item swap puts in that hand.
+    pub imbue_flat_weapon_damage: [f64; 2],
 }
 
 /// Go `UnitLevelFloat64`.
@@ -350,6 +353,7 @@ impl Sim {
             spell_registration_handlers: Vec::new(),
             hardcast_avoidance_aura: None,
             item_swap: None,
+            imbue_flat_weapon_damage: [0.0; 2],
         }));
         let id = self.add_unit(unit);
         if let Some(cooldowns) = player.message("cooldowns") {

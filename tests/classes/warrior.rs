@@ -3,6 +3,7 @@
 
 mod bloodrage;
 mod flat_threat;
+mod item_swap;
 mod prepare;
 mod sword_specialization;
 mod windfury_totem;
