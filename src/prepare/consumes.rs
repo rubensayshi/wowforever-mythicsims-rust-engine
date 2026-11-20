@@ -663,6 +663,11 @@ fn register_static_imbue(env: &mut Environment, imbue_id: i32, hand: Hand) {
         };
         weapon.base_damage_min += flat;
         weapon.base_damage_max += flat;
+        let index = match hand {
+            Hand::Main => 0,
+            Hand::Off => 1,
+        };
+        env.sim.character_mut(unit).imbue_flat_weapon_damage[index] += flat;
     }
 }
 
