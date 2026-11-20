@@ -379,11 +379,16 @@ pub(crate) fn weapon_from_off_hand(sim: &Sim, unit: UnitId) -> Weapon {
     }
 }
 
-/// A stone's flat damage stays on the hand: the weapon a swap puts there carries it, as the
-/// one worn at the pull does. An empty hand carries nothing.
+/// Under Forever's rules (MythicSim Rust-only) a stone's flat damage stays on the hand: the
+/// weapon a swap puts there carries it, as the one worn at the pull does. An empty hand carries
+/// nothing. The reference rebuilds the weapon from its item alone and loses the stone.
 fn add_stone(sim: &Sim, unit: UnitId, weapon: &mut Weapon, hand: usize) {
     let flat = sim.character(unit).imbue_flat_weapon_damage[hand];
-    if flat != 0.0 && weapon.swing_speed != 0.0 && !weapon_is_unarmed(sim, unit, hand) {
+    if sim.rules == Rules::Forever
+        && flat != 0.0
+        && weapon.swing_speed != 0.0
+        && !weapon_is_unarmed(sim, unit, hand)
+    {
         weapon.base_damage_min += flat;
         weapon.base_damage_max += flat;
     }
