@@ -156,6 +156,18 @@ pub(super) const HAWK_CRIT_SHARE: f64 = 0.5;
 pub(super) const HAWK_LOGGED_UNLEASHED_FURY_RANK: i32 = 5;
 /// Go `volleyTickDamage`.
 pub(super) const VOLLEY_TICK_DAMAGE: [f64; 4] = [0.0, 70.0, 91.0, 112.0];
+/// Volley's share of ranged attack power on each tick under Forever's rules. The tick spells
+/// (1279715, 1279719, 1279721) deal a flat 112, 91 and 70 with no coefficient, and the channel's
+/// dummy effect carries 0.03. In game the ticks follow ranged attack power at that 0.03: rank 3
+/// ticks measured at 397 to 1,064 ranged attack power (142.5, 146.5, 150, 153, 156.5 and 165.5)
+/// fit 1.15 x (112 + 0.03 x RAP) to within half a point each, with the hunter's 15% Volley
+/// bonus. The Go reference takes none.
+pub(super) fn volley_rap_per_tick(rules: Rules) -> f64 {
+    match rules {
+        Rules::Forever => 0.03,
+        Rules::GoReference => 0.0,
+    }
+}
 /// Go `trapAttackPowerShare` (patch 147).
 pub(super) const TRAP_ATTACK_POWER_SHARE: f64 = 0.13;
 /// Go `explosiveTrapRange`.

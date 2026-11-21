@@ -5358,10 +5358,13 @@ pub enum Effect {
         tick_magic: bool,
     },
     /// Volley: the channel holds the ranged swing for `ranged_delay_ns`, then the area dot on
-    /// the hunter ticks its snapshot of `tick_base` on every target.
+    /// the hunter ticks its snapshot of `tick_base` plus `attack_power_share` of ranged attack
+    /// power on every target.
     Volley {
         spell_id: i32,
         tick_base: f64,
+        #[serde(default)]
+        attack_power_share: f64,
         ranged_delay_ns: i64,
     },
     /// Resourcefulness: crits proc casting mana regeneration a spell batch window later.

@@ -19,11 +19,11 @@ use crate::prepare::spelldata::{spell::TickOutcomeKind, Ladder, Spell as Row};
 use super::pet::{creature_auto_attack_dps, pet_crit_offset_now};
 use super::spell_data::spell_data;
 use super::spells::{
-    arcane_shot_rap_coefficient, serpent_sting_rap_per_tick, EXPLOSIVE_TRAP_RANGE, HAWK_CRIT_SHARE,
-    HAWK_DAMAGE_PER_RANGED_ATTACK_POWER, HAWK_LOGGED_UNLEASHED_FURY_RANK,
-    HAWK_MELEE_HOTFIX_20261110, HAWK_SWING_SECONDS, HAWK_SWING_SHARE_OF_CREATURE_DPS,
-    HAWK_SWING_SPREAD, SUMMON_HAWK_RAP_SHARE, SUMMON_HAWK_SWING_SHARE, TRAP_ATTACK_POWER_SHARE,
-    VOLLEY_TICK_DAMAGE,
+    arcane_shot_rap_coefficient, serpent_sting_rap_per_tick, volley_rap_per_tick,
+    EXPLOSIVE_TRAP_RANGE, HAWK_CRIT_SHARE, HAWK_DAMAGE_PER_RANGED_ATTACK_POWER,
+    HAWK_LOGGED_UNLEASHED_FURY_RANK, HAWK_MELEE_HOTFIX_20261110, HAWK_SWING_SECONDS,
+    HAWK_SWING_SHARE_OF_CREATURE_DPS, HAWK_SWING_SPREAD, SUMMON_HAWK_RAP_SHARE,
+    SUMMON_HAWK_SWING_SHARE, TRAP_ATTACK_POWER_SHARE, VOLLEY_TICK_DAMAGE,
 };
 use super::{masks, Hunter};
 
@@ -617,11 +617,17 @@ impl Hunter {
         // dot on the hunter snapshots the Go literal tick of the rank.
         if let Some(spell) = self.volley {
             let rank = data.volley.highest();
-            effects.push(json!({
+            let mut effect = json!({
                 "kind": "volley", "spell_id": spell_id_of(sim, spell),
                 "tick_base": VOLLEY_TICK_DAMAGE[rank.rank_number() as usize],
                 "ranged_delay_ns": rank.duration(),
-            }));
+            });
+            // Written only under Forever's rules, so the Go reference's effect stays as it was.
+            let share = volley_rap_per_tick(sim.rules);
+            if share != 0.0 {
+                effect["attack_power_share"] = json!(share);
+            }
+            effects.push(effect);
         }
         // talents_survival.go: Resourcefulness's crit trigger and its casting regeneration, and
         // Expose Prey's landed hits on a marked target opening the Mongoose Bite window.
