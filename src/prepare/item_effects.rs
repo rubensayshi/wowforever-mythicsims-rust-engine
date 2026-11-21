@@ -44,7 +44,12 @@ pub(crate) fn apply_item_effects(env: &mut Environment) -> Result<(), Refusal> {
             }
         }
         let enchant = item.enchant.effect_id;
-        if tables.enchant_effect_ids.contains(&enchant) && !seen_enchants.contains(&enchant) {
+        // Under Forever's rules also an enchant of the live client the reference gives no
+        // effect (`forever_tank_procs`' shield spikes).
+        let has_enchant_effect = tables.enchant_effect_ids.contains(&enchant)
+            || (env.sim.rules == super::sim::Rules::Forever
+                && super::forever_tank_procs::has_enchant_effect(enchant));
+        if has_enchant_effect && !seen_enchants.contains(&enchant) {
             seen_enchants.push(enchant);
             if !super::items_registry::apply_enchant_effect(env, enchant)? {
                 return Err(Refusal::new(

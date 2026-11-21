@@ -248,6 +248,11 @@ pub(crate) fn apply_enchant_effect(env: &mut Environment, enchant: i32) -> Resul
     if apply_hand_written_enchant(env, enchant) {
         return Ok(true);
     }
+    if env.sim.rules == super::sim::Rules::Forever
+        && super::forever_tank_procs::apply_enchant(env, enchant)
+    {
+        return Ok(true);
+    }
     for registration in ENCHANTS {
         if let Registration::Proc(kind, cfg, variants) = registration {
             for expanded in expand_variants(*cfg, variants) {
