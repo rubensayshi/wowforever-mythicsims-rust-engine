@@ -2086,6 +2086,15 @@ the Go goldens and exporter uses. The departures:
   tooltip line and spell (`tests/forever_tier1_sets_20261113.rs`,
   `src/prepare/client_set_effects/tests.rs`). Under the reference's rules the pieces count for
   nothing, as they do in Go.
+  - The crafted pieces themselves (273884 to 273951, four of each set: legs, hands, shoulders,
+    feet) are armor alone at item level 61 in the reference rows. The hotfixes of 20 November 2026
+    gave them their stats, and their live rows (`data/forever-live-items.jsonl`, written by
+    `tools/rust_live_items.py` from Wowhead Forever's tooltips of 22 November 2026) hold them at
+    item level 60: Manaflare Pants (273904), for one, 81 Armor, 16 Stamina, 19 Intellect, 9
+    Spirit, 9 Nature Resistance, 20 spell damage and healing and 5 spell penetration. Each piece
+    is "Unique-Equipped: Artisan's Tier (1)" (limit category 708), one crafted piece a character
+    in game; preparation does not check limit categories, so a request can still wear four
+    (`tests/forever_crafted_tier1_20261122.rs`).
   - The (2) bonus is 1% melee and spell hit, 1% attack and casting speed (a Hunter's ranged
     speed included: the attack speed multiplier is the melee and the ranged one) or Defense +7.
     The (4) bonus is 12 Expertise rating, or melee attack power (aura 102) or spell damage (aura
