@@ -419,6 +419,71 @@ EGANS_BLASTER = {
     ),
 }
 
+# Spearfisher's Waders, mail legs whose dodge line is no whole rating (Wowhead, 22 November 2026).
+SPEARFISHERS_WADERS = {
+    "name": "Spearfisher's Waders",
+    "quality": 3,
+    "tooltip": (
+        "<table><tr><td><!--nstart--><b class=\"q3\">Spearfisher's Waders</b><!--nend--><!--ndstart"
+        "--><!--ndend--><span class=\"q\"><br>Item Level <!--ilvl-->58</span><!--bo--><br>Binds whe"
+        "n equipped<!--ue--><!--ue--><table width=\"100%\"><tr><td>Legs</td><th><!--scstart4:3--><s"
+        "pan class=\"q1\">Mail</span><!--scend--></th></tr></table><!--rf--><span><!--amr-->301 Arm"
+        "or</span><br><span><!--stat3-->+17 Agility</span><br><span><!--stat5-->+19 Intellect</sp"
+        "an><!--ebstats--><!--egstats--><!--eistats--><!--nameDescStats--><!--rs--><!--e--><!--ps"
+        "--><br>Durability 90 / 90</td></tr></table><table><tr><td>Requires Level <!--rlvl-->53<b"
+        "r><!--rr--><span class=\"q2\">Equip: Increases your chance to Dodge an attack by 0.8%.</sp"
+        "an><br><span class=\"q2\">Equip: Increased Fishing +<!--rtg117-->8.</span><!--itemEffects:"
+        "1--><br><!--pvpEquip--><!--pvpEquip--><div class=\"whtt-sellprice\">Sell Price: <span clas"
+        "s=\"moneygold\">2</span> <span class=\"moneysilver\">58</span> <span class=\"moneycopper\">93<"
+        "/span></div></td></tr></table><!--i?287031:1:60:53-->"
+    ),
+}
+# Soulforge Boots, a reissued Soulforge Armor piece whose tooltip closes with the Season of
+# Discovery note (Wowhead, 22 November 2026).
+SOULFORGE_BOOTS = {
+    "name": "Soulforge Boots",
+    "quality": 4,
+    "tooltip": (
+        "<table><tr><td><!--nstart--><b class=\"q4\">Soulforge Boots</b><!--nend--><!--ndstart--><!"
+        "--ndend--><span class=\"q\"><br>Item Level <!--ilvl-->60</span><!--bo--><br>Binds when pic"
+        "ked up<!--ue--><!--ue--><table width=\"100%\"><tr><td>Feet</td><th><!--scstart4:4--><span "
+        "class=\"q1\">Plate</span><!--scend--></th></tr></table><!--rf--><span><!--amr-->470 Armor<"
+        "/span><br><span><!--stat4-->+12 Strength</span><br><span><!--stat7-->+13 Stamina</span><"
+        "br><span><!--stat5-->+12 Intellect</span><br><span><!--stat6-->+10 Spirit</span><!--ebst"
+        "ats--><br><span class=\"q2\">Restores +<!--rtg43-->4 mana per 5 sec.</span><!--egstats--><"
+        "!--eistats--><!--nameDescStats--><!--rs--><!--e--><!--ps--><div class=\"wowhead-tooltip-i"
+        "tem-classes\">Classes: <a href=\"/forever/class=2/paladin\" class=\"c2\">Paladin</a></div></t"
+        "d></tr></table><table><tr><td><!--rr--><span class=\"q2\">Equip: Increases damage and heal"
+        "ing done by magical spells and effects by up to <span><!--rtg41-->12</span>.</span><!--i"
+        "temEffects:1--><br /><br /><span class=\"q\"><a href=\"/forever/item-set=1673/soulforge-arm"
+        "or\" class=\"q\">Soulforge Armor</a> (0/8)</span><div class=\"q0 indent\"><span><!--si226999:"
+        "226974:226983:226991--><a href=\"/forever/item=226999/soulforge-boots\">Soulforge Boots</a"
+        "></span><br /><span><!--si227000:226973:226984:226992--><a href=\"/forever/item=227000/so"
+        "ulforge-chest\">Soulforge Chest</a></span><br /><span><!--si226998:226975:226982:226990--"
+        "><a href=\"/forever/item=226998/soulforge-gloves\">Soulforge Gloves</a></span><br /><span>"
+        "<!--si226997:226976:226981:226989--><a href=\"/forever/item=226997/soulforge-helm\">Soulfo"
+        "rge Helm</a></span><br /><span><!--si226996:226972:226980:226988--><a href=\"/forever/ite"
+        "m=226996/soulforge-legs\">Soulforge Legs</a></span><br /><span><!--si226995:226969:226979"
+        ":226987--><a href=\"/forever/item=226995/soulforge-shoulders\">Soulforge Shoulders</a></sp"
+        "an><br /><span><!--si226994:226971:226978:226986--><a href=\"/forever/item=226994/soulfor"
+        "ge-waist\">Soulforge Waist</a></span><br /><span><!--si226993:226970:226977:226985--><a h"
+        "ref=\"/forever/item=226993/soulforge-wrists\">Soulforge Wrists</a></span></div><br /><span"
+        " class=\"q0\"><span>(2) Set : <a href=\"/forever/spell=18679/increased-all-resist-08\">+8 Al"
+        "l Resistances.</a></span><br /><span>(3) Set : <a href=\"/forever/spell=18378/increased-m"
+        "ana-regen\">Restores 8 mana per 5 sec.</a></span><br /><span>(4) Set : <a href=\"/forever/"
+        "spell=450625/item-crusaders-wrath-proc-lightforge-armor\">Chance on melee autoattack and "
+        "spellcast to increase your damage and healing done by magical spells and effects by up t"
+        "o 65 for 10 sec.</a></span><br /><span>(5) Set : <a href=\"/forever/spell=1302716/rebuke\""
+        ">When struck by a harmful spell, has a 7% chance of Silencing the caster for 3 sec. Can "
+        "only occur once every 60 sec. (Proc chance: 7%, 1m cooldown)</a></span><br /><span>(6) S"
+        "et : <a href=\"/forever/spell=14047/increase-spell-dam-23\">Increases damage and healing d"
+        "one by magical spells and effects by up to 23.</a></span></span><br><!--pvpEquip--><!--p"
+        "vpEquip--><div class=\"whtt-sellprice\">Sell Price: <span class=\"moneygold\">10</span></div"
+        "><div class=\"whtt-seasonal\"><span class=\"q\">Added in Season of Discovery. May not be in "
+        "WoW: Forever.</span></div></td></tr></table><!--i?226999:1:60:60-->"
+    ),
+}
+
 
 def item(class_id, subclass):
     return {"ClassID": str(class_id), "SubclassID": str(subclass)}
@@ -746,6 +811,33 @@ class ParseTests(unittest.TestCase):
         with self.assertRaisesRegex(tool.Unreadable, "has an effect"):
             tool.row_for(280071, None, trinket, changed)
 
+    def test_spearfishers_waders_dodge_line_is_read_for_their_item_alone(self):
+        legs = {**item(4, 3), "InventoryType": "7"}
+        row = tool.row_for(287031, None, legs, SPEARFISHERS_WADERS)
+        self.assertEqual(
+            tool.dump_row(row),
+            '{"id":287031,"name":"Spearfisher\'s Waders","type":"ItemTypeLegs",'
+            '"armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"1":17,"3":19,"28":10,'
+            '"30":301},"ilvl":58}}}',
+        )
+        with self.assertRaisesRegex(tool.Unreadable, "listed for another item"):
+            tool.row_for(287032, None, legs, SPEARFISHERS_WADERS)
+
+    def test_a_listed_season_of_discovery_item_joins_its_reference_set(self):
+        feet = {**item(4, 4), "InventoryType": "8"}
+        boots = {**sparse(8, 60), "Display_lang": "Soulforge Boots"}
+        row = tool.row_for(226999, boots, feet, SOULFORGE_BOOTS)
+        self.assertEqual(
+            tool.dump_row(row),
+            '{"id":226999,"name":"Soulforge Boots","type":"ItemTypeFeet",'
+            '"armor_type":"ArmorTypePlate","set_name":"Soulforge Armor","set_id":1673,'
+            '"scaling_options":{"0":{"stats":{"0":12,"2":13,"3":12,"4":12,"5":12,"16":10,"30":470,'
+            '"34":4},"ilvl":60}},"class_allowlist":["ClassPaladin"]}',
+        )
+        # Any other item with the note stays left out.
+        with self.assertRaisesRegex(tool.Unreadable, "Season of Discovery"):
+            tool.row_for(226998, boots, feet, SOULFORGE_BOOTS)
+
     def test_a_listed_fractional_crit_line_is_read_for_its_item_alone(self):
         dagger = {**item(2, 15), "InventoryType": "13"}
         # 0.4% is 5.6 crit rating, 14 a percent.
@@ -887,7 +979,7 @@ class CommittedFileTests(unittest.TestCase):
         # Savage Gladiator Shoulders join the reference set The Gladiator.
         self.assertEqual(rows[277117]["set_name"], "The Gladiator")
         self.assertEqual(rows[277117]["set_id"], tool.REFERENCE_SETS["The Gladiator"])
-        self.assertEqual(sum("set_name" in row for row in rows.values()), 11)
+        self.assertEqual(sum("set_name" in row for row in rows.values()), 12)
 
     def test_a_real_item_with_a_development_name_is_taken(self):
         self.assertTrue(tool.JUNK_NAME.search("Old Leather Jacket"))

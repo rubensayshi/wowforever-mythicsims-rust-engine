@@ -395,6 +395,7 @@
 {"id":23200,"name":"Totem of Sustaining","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeTotem","scaling_options":{"0":{"ilvl":65}}}
 {"id":217727,"name":"Ward of the Dead","type":"ItemTypeTrinket","scaling_options":{"0":{"ilvl":1}},"unique":true}
 {"id":219343,"name":"Filcher's Cowl","type":"ItemTypeBack","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"1":11,"16":7,"30":36},"ilvl":50}}}
+{"id":226999,"name":"Soulforge Boots","type":"ItemTypeFeet","armor_type":"ArmorTypePlate","set_name":"Soulforge Armor","set_id":1673,"scaling_options":{"0":{"stats":{"0":12,"2":13,"3":12,"4":12,"5":12,"16":10,"30":470,"34":4},"ilvl":60}},"class_allowlist":["ClassPaladin"]}
 {"id":227935,"name":"Hammer of the Fallen Thane","type":"ItemTypeWeapon","weapon_type":"WeaponTypeMace","hand_type":"HandTypeMainHand","weapon_speed":2.2,"scaling_options":{"0":{"weapon_damage_min":39,"weapon_damage_max":74,"stats":{"2":5,"3":10,"4":68,"5":68,"34":2},"ilvl":59}}}
 {"id":250101,"name":"Summit Guardian Polearm","type":"ItemTypeWeapon","weapon_type":"WeaponTypePolearm","hand_type":"HandTypeTwoHand","weapon_speed":0.5,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":1,"ilvl":1}}}
 {"id":250217,"name":"Purveyor of Light","type":"ItemTypeWeapon","weapon_type":"WeaponTypeAxe","hand_type":"HandTypeOneHand","weapon_speed":2,"scaling_options":{"0":{"weapon_damage_min":1,"weapon_damage_max":2,"ilvl":1}}}
@@ -780,6 +781,7 @@
 {"id":287028,"name":"Tormented Cuffs","type":"ItemTypeWrist","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"2":13,"4":9,"5":9,"30":36},"ilvl":58}}}
 {"id":287029,"name":"Nature Guardian's Legguards","type":"ItemTypeLegs","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"3":22,"10":24,"30":142,"34":7},"ilvl":57}}}
 {"id":287030,"name":"Blackmaw Bindings","type":"ItemTypeWrist","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"1":14,"4":10,"5":10,"16":6,"30":153},"ilvl":59}}}
+{"id":287031,"name":"Spearfisher's Waders","type":"ItemTypeLegs","armor_type":"ArmorTypeMail","scaling_options":{"0":{"stats":{"1":17,"3":19,"28":10,"30":301},"ilvl":58}}}
 {"id":287032,"name":"Den Champion's Binding","type":"ItemTypeWaist","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":16,"4":14,"5":14,"16":8,"30":336},"ilvl":57}}}
 {"id":287033,"name":"Furbolg Berserker's Boots","type":"ItemTypeFeet","armor_type":"ArmorTypePlate","scaling_options":{"0":{"stats":{"0":18,"16":9,"24":10,"30":417},"ilvl":58}}}
 {"id":287034,"name":"Grove Subjugator's Blade","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeOneHand","weapon_speed":1.8,"scaling_options":{"0":{"weapon_damage_min":33,"weapon_damage_max":62,"stats":{"2":6,"4":68,"5":68,"16":-10,"21":14},"ilvl":60}}}
