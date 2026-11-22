@@ -36,8 +36,8 @@ Wit's Edge), and an equip line that acts only when the wearer is struck, which t
 on the character it can reach (Zealot Plate's mana, Girdle of Extracted Answers' damage on block). A use
 that is a stat buff (ON_USE_STATS: Heart of the Primeval, Lucky Shovelnose Tuft, Flamebreak
 Talisman) is written into the row as its item effect, as the reference rows hold a stat trinket's.
-A crit line whose percentage is no whole rating is read only for the item listed with it
-(FRACTIONAL_RATING_LINES: Tunnelweb Pincer). A relic (a libram, idol or
+A crit or dodge line whose percentage is no whole rating is read only for the item listed with it
+(FRACTIONAL_RATING_LINES: Tunnelweb Pincer, Spearfisher's Waders). A relic (a libram, idol or
 totem) is written in the ranged slot, as the reference rows hold one (RELIC_TYPE). An
 item whose tooltip is missing, or has any other use, chance on hit, set or equip line, or any line
 this tool does not read, is left out and listed.
@@ -46,7 +46,9 @@ A piece of a set in CLIENT_SETS is taken with its set_name and set_id, as a refe
 them; its tooltip's set block (the piece names and bonus lines) is not part of the row.
 Preparation applies the bonuses that are plain stats and refuses an equipment that reaches one of
 the others (src/prepare/forever_client_sets.rs). A new piece of a set the reference rows hold
-(REFERENCE_SETS: The Gladiator) carries the two fields as those rows do. An id in REAL_ITEMS is taken
+(REFERENCE_SETS: The Gladiator, Soulforge Armor) carries the two fields as those rows do. A
+tooltip closing with Wowhead's Season of Discovery note is left out unless the item is listed in
+WORN_SEASON_OF_DISCOVERY_ITEMS (Soulforge Boots). An id in REAL_ITEMS is taken
 although its name reads as development data.
 
 Most of the items the Forever client adds (ids from about 270000) have an Item row but no
@@ -138,7 +140,20 @@ CLIENT_SETS = {"Krol'dok Battlegear": 2135, "Defias Enforcer's Garb": 2136}
 # six pieces count as one set. Preparation registers no bonus for these sets, for the reference
 # pieces or the new one. The Gladiator (ItemSet 1): Savage Gladiator Shoulders 277117 beside the
 # five Classic pieces 11726 to 11731.
-REFERENCE_SETS = {"The Gladiator": 1}
+REFERENCE_SETS = {"The Gladiator": 1, "Soulforge Armor": 1673}
+# Soulforge Armor (ItemSet 1673) is the reissued Tier 0.5 Paladin set: its reference rows are
+# 226969 to 226992, and the client adds Soulforge Boots 226999 of the same set. The pieces count
+# together by set_id; preparation gives them Soulforge Armor's bonuses by name
+# (src/prepare/forever_client_sets.rs).
+
+# Items whose Wowhead Forever tooltip closes with the note "Added in Season of Discovery. May not
+# be in WoW: Forever." although the live client holds them: a readable ItemSparse row of the
+# live client that agrees with the tooltip, and a Forever character wearing it. The note is left
+# out for these alone; any other item with it stays left out. Soulforge Boots 226999: ItemSparse
+# 1.60.1.71037 (ItemSet 1673, item level 60, Paladin), worn with five Soulforge Armor pieces in two
+# refused Retribution Paladin sims on 21 November 2026 (addon exports of client 71037).
+SEASON_OF_DISCOVERY_NOTE = "Added in Season of Discovery. May not be in WoW: Forever."
+WORN_SEASON_OF_DISCOVERY_ITEMS = {226999}
 
 ITEM_TYPE = {
     1: "ItemTypeHead",
@@ -632,13 +647,17 @@ ON_USE_STATS = {
     ),
 }
 ON_USE_STAT_LINES = {line: item_id for item_id, (line, _) in ON_USE_STATS.items()}
-# A crit line whose percentage is no whole rating (14 a percent), by item: the exact line and the
+# A crit or dodge line whose percentage is no whole rating (14 and 12 a percent), by item: the exact line and the
 # stats the row carries for it. Tunnelweb Pincer's 0.4% is 5.6 crit rating, which reads back as the
 # 0.4% the tooltip states; the client's own rating is a whole number the tooltip rounds (5 shows as
 # 0.4%, and so does 6) and its ItemSparse row is encrypted, so the stated figure is the one taken.
 # Any other item with such a line stays left out ("fractional rating").
 FRACTIONAL_RATING_LINES = {
     280085: ("Equip: Improves your chance to get a critical strike by 0.4%.", {21: 5.6}),
+    # Spearfisher's Waders' 0.8% dodge: its ItemSparse row is encrypted too (Item row only in
+    # 1.60.1.71037), and Wowhead Forever's gear planner states the unrounded figure, dodgepct
+    # 0.8333 (21 November 2026), which is 10 dodge rating at 12 a percent.
+    287031: ("Equip: Increases your chance to Dodge an attack by 0.8%.", {28: 10}),
 }
 FRACTIONAL_RATING_ITEMS = {line: item_id for item_id, (line, _) in FRACTIONAL_RATING_LINES.items()}
 # A clause that doubles an equip line in a city or stronghold, where no fight is (Black Horn
@@ -742,6 +761,10 @@ def parse_tooltip(response):
     name = response["name"]
     out = {"name": name, "quality": response.get("quality"), "stats": {}}
     lines, effects = tooltip_lines(response["tooltip"])
+    if lines and lines[-1] == SEASON_OF_DISCOVERY_NOTE:
+        # The note closes the tooltip, after any set block; row_for takes it for a listed item.
+        lines = lines[:-1]
+        out["season_of_discovery_note"] = True
     lines, set_name = without_client_set(lines)
     if set_name:
         out["set"] = set_name
@@ -935,6 +958,8 @@ def row_for(item_id, sparse, item, response):
         option["stats"] = {str(key): stats[key] for key in sorted(stats)}
     option["ilvl"] = parsed["ilvl"]
     row["scaling_options"] = {"0": option}
+    if parsed.get("season_of_discovery_note") and item_id not in WORN_SEASON_OF_DISCOVERY_ITEMS:
+        raise Unreadable("a Season of Discovery item")
     if parsed.get("fractional_rating", [item_id]) != [item_id]:
         raise Unreadable("a fractional rating line listed for another item")
     if parsed.get("on_use_stats"):
