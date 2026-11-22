@@ -17,6 +17,19 @@
 //!   piece of the client's quest class (Item.ClassID 12) with no armor and no stats, whose only
 //!   line shows elven gems on the minimap. The row is an armor row with no armor type, as
 //!   Gahz'ridian Detector's.
+//! - "no item with id 219326", five sims of a level 58 Feral Druid: Seed of Renewal, a trinket of
+//!   item level 50 with no stats (Item row of client 1.60.1.71037: class 4, InventoryType 12; no
+//!   ItemSparse row). Its one line embeds a seed in an enemy and grows a Healing Blossom from the
+//!   corpse if the enemy is slain within 30 seconds, which no fight in a sim reaches. The row has
+//!   no stats and no effect.
+//! - "player aura \"Wildheart Raiment 5P\" listens to combat events without an effect", two
+//!   Droptimizers of a Restoration Shaman wearing five pieces of Wildheart Raiment (ItemSet 185),
+//!   which no class restriction keeps to Druids on Forever. The bonus (450608, ItemSetSpell 7918)
+//!   reads "Chance on spellcast to restore 200 Mana, on melee attack to regenerate 20 Energy over
+//!   5 sec, and when struck by a melee attack to generate 10 Rage" with no chance on the tooltip
+//!   or in the client rows (SpellAuraOptions 236884: ProcChance 100 on a dummy aura), so, as on a
+//!   Druid, its listener hears only the melee hits the wearer takes and is inert while nothing
+//!   strikes the wearer. Only a Druid's export claimed it.
 
 use forever_engine::{
     check_prepared, contracts::prepared_v2::PreparedV2, prepare_json_with, simulate_prepared, Rules,
@@ -31,6 +44,11 @@ const GOGGLES_OF_GEM_HUNTING: i64 = 4491;
 const SHAMAN: &str = "fixtures/forever-gaps/enhancement-shaman-spearfisher-waders.request.json";
 const PALADIN: &str = "fixtures/forever-gaps/retribution-paladin-soulforge-boots.request.json";
 const ROGUE: &str = "fixtures/forever-gaps/combat-rogue-goggles-of-gem-hunting.request.json";
+const SEED_OF_RENEWAL: i64 = 219326;
+const DRUID: &str = "fixtures/forever-gaps/feral-druid-seed-of-renewal.request.json";
+const WILDHEART_SHAMAN: &str =
+    "fixtures/forever-gaps/restoration-shaman-wildheart-raiment.request.json";
+const WILDHEART_BELT: i64 = 16716;
 
 fn request(fixture: &str) -> Value {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(fixture);
@@ -64,7 +82,9 @@ fn simulate(value: &Value) {
     check_prepared(&prepared).unwrap_or_else(|err| panic!("{err:?}"));
     let result = simulate_prepared(&prepared).unwrap().result;
     let player = &result["raidMetrics"]["parties"][0]["players"][0];
-    assert!(player["dps"]["avg"].as_f64().unwrap() > 0.0);
+    // A healer's sim heals and may deal no damage.
+    let done = |metric: &str| player[metric]["avg"].as_f64().unwrap_or(0.0);
+    assert!(done("dps") > 0.0 || done("hps") > 0.0);
 }
 
 fn stat(prepared: &Value, name: &str) -> f64 {
@@ -125,4 +145,46 @@ fn goggles_of_gem_hunting_sim_and_change_no_stat() {
     let bare = prepared(&without(ROGUE, GOGGLES_OF_GEM_HUNTING));
     simulate(&with);
     assert_eq!(with["player"]["stats"], bare["player"]["stats"]);
+}
+
+#[test]
+fn seed_of_renewal_sims_and_changes_no_stat() {
+    let with = prepared(&request(DRUID));
+    let bare = prepared(&without(DRUID, SEED_OF_RENEWAL));
+    simulate(&with);
+    assert_eq!(with["player"]["stats"], bare["player"]["stats"]);
+}
+
+#[test]
+fn a_shaman_in_five_pieces_of_wildheart_raiment_sims_with_the_bonus_inert() {
+    let with = prepared(&request(WILDHEART_SHAMAN));
+    let claims = |prepared: &Value| {
+        prepared["effects"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|effect| {
+                effect["kind"] == "inert_listener" && effect["aura"] == "Wildheart Raiment 5P"
+            })
+            .count()
+    };
+    assert_eq!(claims(&with), 1);
+    simulate(&with);
+    // Four pieces register no five piece aura, so nothing claims one.
+    let four = prepared(&without(WILDHEART_SHAMAN, WILDHEART_BELT));
+    assert_eq!(claims(&four), 0);
+    simulate(&four);
+}
+
+#[test]
+fn the_reference_still_refuses_a_shaman_in_five_pieces_of_wildheart_raiment() {
+    let request = request(WILDHEART_SHAMAN);
+    let prepared = prepare_json_with(request.to_string().as_bytes(), "rust", Rules::GoReference)
+        .unwrap_or_else(|err| panic!("{err}"));
+    let prepared: PreparedV2 = serde_json::from_value(prepared).unwrap();
+    let refusals = check_prepared(&prepared).unwrap_err();
+    assert!(
+        format!("{refusals:?}").contains("Wildheart Raiment 5P"),
+        "{refusals:?}"
+    );
 }

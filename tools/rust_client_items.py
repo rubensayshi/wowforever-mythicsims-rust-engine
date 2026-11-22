@@ -32,7 +32,7 @@ Saber's Frost damage, Totem of Rage's shock damage, Totem of Sustaining's Water 
 Maw of Min'loth's leech when struck), a use the engine never presses (UNPRESSED_USE: Zarla's Snack Pouch's whelp, whose damage no row
 states, and Behemoth Bones' heal), an equip proc whose chance no row states or that cannot
 fire in a sim (UNSTATED_PROC: Claymore of Two Moons, Axe of Inevitable Ruin, High Elf's Recurve,
-Wit's Edge), and an equip line that acts only when the wearer is struck, which the engine refuses
+Wit's Edge, Seed of Renewal), and an equip line that acts only when the wearer is struck, which the engine refuses
 on the character it can reach (Zealot Plate's mana, Girdle of Extracted Answers' damage on block). A use
 that is a stat buff (ON_USE_STATS: Heart of the Primeval, Lucky Shovelnose Tuft, Flamebreak
 Talisman) is written into the row as its item effect, as the reference rows hold a stat trinket's.
@@ -585,6 +585,10 @@ UNPRESSED_USE = [
 # Wit's Edge 276632: a Mage only sword whose proc acts on melee attacks, which a Mage in the engine
 # never makes (it shoots its wand), so the 15% proc can never fire in a sim (two Arcane Mages
 # refused on 19 November 2026).
+# Seed of Renewal 219326: a trinket with no stats whose seed does nothing until the creature
+# carrying it is slain, when a Healing Blossom grows from the corpse. A sim's fight ends with its
+# target, so the seed never blooms (five refused sims of a level 58 Feral Druid on 22 November
+# 2026).
 UNSTATED_PROC = [
     re.compile(re.escape(line))
     for line in [
@@ -595,6 +599,10 @@ UNSTATED_PROC = [
         "for 9 sec.",
         "Equip: Melee attacks have a 15% chance to grant a Clearcasting state, reducing the mana "
         "cost of your next damage spell by 100%. (Proc chance: 15%)",
+        # Seed of Renewal 219326.
+        "Equip: Chance to embed a seed into enemy humanoids, beasts, or dragonkin hit by your "
+        "abilities or spells. If the creature is slain within 30 seconds of the seed being "
+        "embedded, a Healing Blossom will grow from its corpse. (Proc chance: 40%, 2m cooldown)",
     ]
 ]
 # A use that is a stat buff, by item: the exact use line of the tooltip and the item effect the row

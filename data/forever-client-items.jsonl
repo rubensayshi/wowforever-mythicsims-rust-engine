@@ -395,6 +395,7 @@
 {"id":22395,"name":"Totem of Rage","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeTotem","scaling_options":{"0":{"ilvl":57}}}
 {"id":23200,"name":"Totem of Sustaining","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeTotem","scaling_options":{"0":{"ilvl":65}}}
 {"id":217727,"name":"Ward of the Dead","type":"ItemTypeTrinket","scaling_options":{"0":{"ilvl":1}},"unique":true}
+{"id":219326,"name":"Seed of Renewal","type":"ItemTypeTrinket","scaling_options":{"0":{"ilvl":50}}}
 {"id":219343,"name":"Filcher's Cowl","type":"ItemTypeBack","armor_type":"ArmorTypeCloth","scaling_options":{"0":{"stats":{"1":11,"16":7,"30":36},"ilvl":50}}}
 {"id":226999,"name":"Soulforge Boots","type":"ItemTypeFeet","armor_type":"ArmorTypePlate","set_name":"Soulforge Armor","set_id":1673,"scaling_options":{"0":{"stats":{"0":12,"2":13,"3":12,"4":12,"5":12,"16":10,"30":470,"34":4},"ilvl":60}},"class_allowlist":["ClassPaladin"]}
 {"id":227935,"name":"Hammer of the Fallen Thane","type":"ItemTypeWeapon","weapon_type":"WeaponTypeMace","hand_type":"HandTypeMainHand","weapon_speed":2.2,"scaling_options":{"0":{"weapon_damage_min":39,"weapon_damage_max":74,"stats":{"2":5,"3":10,"4":68,"5":68,"34":2},"ilvl":59}}}

@@ -147,6 +147,25 @@ GOGGLES = {
         "<!--useText:1--><!--itemEffects:1--><br><!--pvpEquip--><!--pvpEquip--></td></tr></table>"
     ),
 }
+# Seed of Renewal, a trinket with no stats whose seed blooms only from a slain enemy's corpse
+# (Wowhead, 23 November 2026).
+SEED = {
+    "name": "Seed of Renewal",
+    "quality": 3,
+    "tooltip": (
+        "<table><tr><td><!--nstart--><b class=\"q3\">Seed of Renewal</b><!--nend--><!--ndstart--><!--"
+        "ndend--><span class=\"q\"><br>Item Level <!--ilvl-->50</span><!--bo--><br>Binds when picked "
+        "up<!--ue--><!--ue--><table width=\"100%\"><tr><td>Trinket</td><th><!--scstart4:-4--><span cl"
+        "ass=\"q1\"></span><!--scend--></th></tr></table><!--rf--><!--ebstats--><!--egstats--><!--eis"
+        "tats--><!--nameDescStats--><!--rs--><!--e--><!--ps--></td></tr></table><table><tr><td><!--"
+        "rr--><!--useText:0:2--><span id=\"useText2\" class=\"q2\">Equip: <!--useEffect:0:2--><a href=\""
+        "/forever/spell=443278/seed-of-renewal\" class=\"q2\">Chance to embed a seed into enemy humano"
+        "ids, beasts, or dragonkin hit by your abilities or spells. If the creature is slain within"
+        " 30 seconds of the seed being embedded, a Healing Blossom will grow from its corpse. (Proc"
+        " chance: 40%, 2m cooldown)</a><!--useEffect:2--></span><!--useText:2--><!--itemEffects:1--"
+        "><br><!--pvpEquip--><!--pvpEquip--></td></tr></table>"
+    ),
+}
 # Toofbreaker, a Forever mace whose chance on hit the engine models by hand (Wowhead, 11 November
 # 2026).
 TOOFBREAKER = {
@@ -1031,6 +1050,19 @@ class CommittedFileTests(unittest.TestCase):
         with open(tool.OUT) as rows:
             ids = {json.loads(line)["id"] for line in rows}
         self.assertLessEqual(set(bonuses), ids)
+
+    def test_a_proc_that_needs_a_slain_enemy_is_left_out_of_the_row(self):
+        # Item row 219326: class 4 (armor), subclass 0, InventoryType 12; no ItemSparse row.
+        seed = tool.row_for(219326, None, {**item(4, 0), "InventoryType": "12"}, SEED)
+        self.assertEqual(
+            tool.dump_row(seed),
+            '{"id":219326,"name":"Seed of Renewal","type":"ItemTypeTrinket",'
+            '"scaling_options":{"0":{"ilvl":50}}}',
+        )
+        # Another chance or cooldown is another line, which leaves the item out.
+        other = {**SEED, "tooltip": SEED["tooltip"].replace("Proc chance: 40%", "Proc chance: 50%")}
+        with self.assertRaisesRegex(tool.Unreadable, "has an effect"):
+            tool.row_for(219326, None, {**item(4, 0), "InventoryType": "12"}, other)
 
     def test_the_modelled_effect_items_are_committed(self):
         with open(tool.OUT) as rows:
