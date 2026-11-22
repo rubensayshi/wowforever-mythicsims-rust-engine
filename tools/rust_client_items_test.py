@@ -131,6 +131,22 @@ DETECTOR = {
         "<!--useText:1--><!--itemEffects:1--><br><!--pvpEquip--><!--pvpEquip--></td></tr></table>"
     ),
 }
+# Goggles of Gem Hunting, a head piece of the client's quest class with no armor and no stats
+# (Wowhead, 22 November 2026).
+GOGGLES = {
+    "name": "Goggles of Gem Hunting",
+    "quality": 1,
+    "tooltip": (
+        '<table><tr><td><!--nstart--><b class="q1">Goggles of Gem Hunting</b><!--nend--><!--ndstart-->'
+        '<!--ndend--><span class="q"><br>Item Level <!--ilvl-->1</span><!--bo--><br>Quest Item<br>'
+        'Unique<!--ue--><!--ue--><table width="100%"><tr><td>Head</td></tr></table><!--rf-->'
+        "<!--ebstats--><!--egstats--><!--eistats--><!--nameDescStats--><!--rs--><!--e--><!--ps-->"
+        '</td></tr></table><table><tr><td><!--rr--><!--useText:0:1--><span id="useText1" '
+        'class="q2">Equip: <!--useEffect:0:1--><a href="/forever/spell=4152/detect-elven-gems" '
+        'class="q2">Nearby elven gems appear on the minimap.</a><!--useEffect:1--></span>'
+        "<!--useText:1--><!--itemEffects:1--><br><!--pvpEquip--><!--pvpEquip--></td></tr></table>"
+    ),
+}
 # Toofbreaker, a Forever mace whose chance on hit the engine models by hand (Wowhead, 11 November
 # 2026).
 TOOFBREAKER = {
@@ -678,6 +694,13 @@ class ParseTests(unittest.TestCase):
         # A quest item that is not listed as worn is no row.
         with self.assertRaisesRegex(tool.Unreadable, "not listed as worn"):
             tool.row_for(9979, sparse, quest, DETECTOR)
+        # Item row 4491: class 12 (quest), subclass 0, InventoryType 1.
+        goggles = {"Display_lang": "Goggles of Gem Hunting", "ItemLevel": "1", "InventoryType": "1"}
+        self.assertEqual(
+            tool.dump_row(tool.row_for(4491, goggles, quest, GOGGLES)),
+            '{"id":4491,"name":"Goggles of Gem Hunting","type":"ItemTypeHead",'
+            '"scaling_options":{"0":{"ilvl":1}},"unique":true}',
+        )
 
     def test_a_use_or_chance_on_hit_the_engine_models_is_left_out_of_the_row(self):
         crown = tool.row_for(274609, None, {**item(4, 3), "InventoryType": "1"}, SERPENTBANE)

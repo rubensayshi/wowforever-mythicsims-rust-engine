@@ -10,6 +10,13 @@
 //!   Stamina, +12 Intellect, +10 Spirit, 4 mana per 5 sec and damage and healing up to 12. The
 //!   ItemSparse row of client 1.60.1.71037 and the tooltip agree. The Paladin wore it with five
 //!   reference pieces of the set, so it is the sixth piece.
+//!
+//! And on 22 November 2026:
+//!
+//! - "no item with id 4491", a level 42 Combat Rogue's Best Gear: Goggles of Gem Hunting, a head
+//!   piece of the client's quest class (Item.ClassID 12) with no armor and no stats, whose only
+//!   line shows elven gems on the minimap. The row is an armor row with no armor type, as
+//!   Gahz'ridian Detector's.
 
 use forever_engine::{
     check_prepared, contracts::prepared_v2::PreparedV2, prepare_json_with, simulate_prepared, Rules,
@@ -19,9 +26,11 @@ use std::{fs, path::Path};
 
 const SPEARFISHERS_WADERS: i64 = 287031;
 const SOULFORGE_BOOTS: i64 = 226999;
+const GOGGLES_OF_GEM_HUNTING: i64 = 4491;
 
 const SHAMAN: &str = "fixtures/forever-gaps/enhancement-shaman-spearfisher-waders.request.json";
 const PALADIN: &str = "fixtures/forever-gaps/retribution-paladin-soulforge-boots.request.json";
+const ROGUE: &str = "fixtures/forever-gaps/combat-rogue-goggles-of-gem-hunting.request.json";
 
 fn request(fixture: &str) -> Value {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(fixture);
@@ -108,4 +117,12 @@ fn soulforge_boots_are_the_paladins_sixth_soulforge_armor_piece() {
     for (name, item) in [("SpellDamage", 12.0), ("HealingPower", 12.0), ("MP5", 4.0)] {
         assert!(stat(&with, name) - stat(&bare, name) >= item, "{name}");
     }
+}
+
+#[test]
+fn goggles_of_gem_hunting_sim_and_change_no_stat() {
+    let with = prepared(&request(ROGUE));
+    let bare = prepared(&without(ROGUE, GOGGLES_OF_GEM_HUNTING));
+    simulate(&with);
+    assert_eq!(with["player"]["stats"], bare["player"]["stats"]);
 }

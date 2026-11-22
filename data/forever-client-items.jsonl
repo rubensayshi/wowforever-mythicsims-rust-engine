@@ -332,6 +332,7 @@
 {"id":4024,"name":"Heavy War Staff","type":"ItemTypeWeapon","weapon_type":"WeaponTypeStaff","hand_type":"HandTypeTwoHand","weapon_speed":3.4,"scaling_options":{"0":{"weapon_damage_min":59,"weapon_damage_max":90,"ilvl":47}}}
 {"id":4025,"name":"Balanced Long Bow","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeBow","weapon_speed":1.8,"scaling_options":{"0":{"weapon_damage_min":15,"weapon_damage_max":29,"ilvl":45}}}
 {"id":4026,"name":"Sentinel Musket","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeGun","weapon_speed":2.8,"scaling_options":{"0":{"weapon_damage_min":22,"weapon_damage_max":43,"ilvl":43}}}
+{"id":4491,"name":"Goggles of Gem Hunting","type":"ItemTypeHead","scaling_options":{"0":{"ilvl":1}},"unique":true}
 {"id":4982,"name":"Ripped Prospector Belt","type":"ItemTypeWaist","armor_type":"ArmorTypeLeather","scaling_options":{"0":{"stats":{"30":54},"ilvl":38}}}
 {"id":5379,"name":"Boot Knife","type":"ItemTypeRanged","ranged_weapon_type":"RangedWeaponTypeThrown","weapon_speed":1.7,"scaling_options":{"0":{"weapon_damage_min":2,"weapon_damage_max":5,"ilvl":8}}}
 {"id":5516,"name":"Threshadon Fang","type":"ItemTypeWeapon","weapon_type":"WeaponTypeDagger","hand_type":"HandTypeOneHand","weapon_speed":1.5,"scaling_options":{"0":{"weapon_damage_min":5,"weapon_damage_max":10,"ilvl":16}}}

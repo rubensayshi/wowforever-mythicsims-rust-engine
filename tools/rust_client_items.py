@@ -19,7 +19,7 @@ product=wowf address answered with build 1.60.1.70755, while the same address wi
 
 An item is taken when it is a weapon or armor row, not in items.jsonl, with an equipment slot,
 a real name (no deprecated, test, old or placeholder rows) and a tooltip whose every line this
-tool reads. A quest item a character wears (WORN_QUEST_ITEMS: Gahz'ridian Detector, a head piece
+tool reads. A quest item a character wears (WORN_QUEST_ITEMS: Gahz'ridian Detector and Goggles of Gem Hunting, head pieces
 of the client's quest class) is taken as an armor row with no armor type, and one of the ranged
 slot (Egan's Blaster) as a ranged row with no ranged weapon type, damage or speed. The equip lines that are a plain stat (Increased Defense, Attack Power, spell damage
 and healing, hit, crit, mana per 5 sec, dodge, parry, block, expertise, weapon damage;
@@ -123,9 +123,11 @@ REAL_ITEMS = {280505}
 # sims of a Retribution Paladin on 13 November 2026); its row is a ranged row with no ranged
 # weapon type, which nothing shoots with. Amulet of Draconic Subversion 16787 is a neck with no
 # stats whose use is a disguise (five refused Quick Sims of an Enhancement Shaman on 19 November
-# 2026); its row is an armor row with no armor type.
+# 2026); its row is an armor row with no armor type. Goggles of Gem Hunting 4491 is a head piece
+# with no armor and no stats whose equip line shows elven gems on the minimap (one refused Quick Sim
+# of a Combat Rogue on 22 November 2026); its row is an armor row with no armor type.
 QUEST_CLASS = 12
-WORN_QUEST_ITEMS = {9978, 13289, 16787}
+WORN_QUEST_ITEMS = {4491, 9978, 13289, 16787}
 # The InventoryType of a worn quest item of the ranged slot.
 QUEST_RANGED_SLOT = 26
 
@@ -445,6 +447,8 @@ NO_FIGHT_EFFECT = [
         r"Equip: Underwater Breath lasts \d+% longer than normal\.",
         # Gahz'ridian Detector 9978.
         r"Equip: Nearby Gahz'ridian appears on the minimap\.",
+        # Goggles of Gem Hunting 4491.
+        r"Equip: Nearby elven gems appear on the minimap\.",
         # Grimm's Packing Gloves 276395, Enchantresses' Spire 287025.
         r"Equip: Increased (?:Herbalism|Mining|Skinning|Fishing) \+\d+\.",
         r"Equip: Reduces the cast time of Disenchant by \d+%\.",
