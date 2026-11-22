@@ -29,6 +29,14 @@
 //!   a proc recovery (SpellAuraOptions 247236 has none), and the tooltip reads it as "5 sec
 //!   cooldown"; it gates the proc as a recovery would. The damage never misses and cannot crit,
 //!   as the damage of a proc trigger damage aura does not roll an attack table.
+//! - The shield spike enchants, Iron (43, "Iron Spike (8-12)"), Mithril (463, "Mithril Spike
+//!   (16-20)") and Thorium (1704, "Thorium Spike (20-30)"): each SpellItemEnchantment row's only
+//!   effect is an equip spell (Effect 3) whose row has the Girdle's shape: a proc trigger damage
+//!   aura (43) with a ProcChance of 100 on melee hits taken (ProcTypeMask 40), a 5 sec spell
+//!   cooldown (SpellCooldowns 54286, 54285, 55115) and the same attributes. Iron Shield Spike
+//!   (9784) deals a roll of 10 with a variance of 0.4, Mithril Shield Spike (9782) 18 with a
+//!   variance of 0.22 and Thorium Shield Spike (16624) 25 with a variance of 0.4, every time the
+//!   wearer blocks, as the Girdle's does.
 //!
 //! A character no target attacks is never struck and never blocks: it wears each as a plain item,
 //! and the listeners are inert. A tank with no mana bar gains nothing from Zealot Plate, which
@@ -67,6 +75,13 @@ const ZEALOTRY: i32 = 1_294_666;
 /// Shield Spike.
 const SHIELD_SPIKE: i32 = 1_308_777;
 
+/// The shield spike enchants: the enchant, its label and the equip spell its row casts.
+const SHIELD_SPIKE_ENCHANTS: [(i32, &str, i32); 3] = [
+    (43, "Iron Shield Spike", 9_784),
+    (463, "Mithril Shield Spike", 9_782),
+    (1704, "Thorium Shield Spike", 16_624),
+];
+
 /// The labels the listeners go by. A set bonus's is the permanent aura its piece count registers
 /// (`item_sets`), an item's the item's name.
 const KROLDOK_4_LABEL: &str = "Krol'dok Battlegear 4P";
@@ -85,9 +100,36 @@ pub(crate) fn has_item_effect(item: i32) -> bool {
 pub(crate) fn apply_item(env: &mut Environment, item: i32) -> bool {
     match item {
         ZEALOT_PLATE => zealot_plate(env),
-        GIRDLE_OF_EXTRACTED_ANSWERS => shield_spike(env),
+        GIRDLE_OF_EXTRACTED_ANSWERS => shield_spike(
+            env,
+            SHIELD_SPIKE,
+            GIRDLE_LABEL,
+            EffectSource {
+                id: GIRDLE_OF_EXTRACTED_ANSWERS,
+                is_enchant: false,
+            },
+        ),
         _ => return false,
     }
+    true
+}
+
+/// The enchants of this module, applied under Forever's rules.
+pub(crate) fn has_enchant_effect(enchant: i32) -> bool {
+    SHIELD_SPIKE_ENCHANTS.iter().any(|(id, ..)| *id == enchant)
+}
+
+/// Applies the effect of one of [`has_enchant_effect`]'s enchants, answering whether it is one.
+pub(crate) fn apply_enchant(env: &mut Environment, enchant: i32) -> bool {
+    let Some(&(id, label, spell)) = SHIELD_SPIKE_ENCHANTS.iter().find(|(id, ..)| *id == enchant)
+    else {
+        return false;
+    };
+    let source = EffectSource {
+        id,
+        is_enchant: true,
+    };
+    shield_spike(env, spell, label, source);
     true
 }
 
@@ -154,19 +196,15 @@ fn zealot_plate(env: &mut Environment) {
     source.register_trigger(env, &listener);
 }
 
-/// Girdle of Extracted Answers: the spell that deals Shield Spike's damage, and the listener on
-/// the item that casts it on the attacker on a block.
-fn shield_spike(env: &mut Environment) {
+/// Girdle of Extracted Answers and the shield spike enchants: the spell that deals the row's
+/// damage, and the listener on the item or enchant that casts it on the attacker on a block.
+fn shield_spike(env: &mut Environment, spell: i32, label: &str, source: EffectSource) {
     let unit = env.player;
-    let row = must_find(SHIELD_SPIKE);
-    let source = EffectSource {
-        id: GIRDLE_OF_EXTRACTED_ANSWERS,
-        is_enchant: false,
-    };
+    let row = must_find(spell);
     let config = spell_data_proc_damage_spell(env, row, true);
     env.sim.register_spell(unit, config);
     let mut listener = proc_trigger(&env.sim, Some(unit), row, &[]);
-    listener.name = GIRDLE_LABEL.to_string();
+    listener.name = label.to_string();
     listener.action_id = source.action_id();
     listener.outcome = HitOutcome::BLOCK;
     listener.require_damage_dealt = false;
@@ -198,12 +236,15 @@ fn inert(label: &str) -> Value {
 pub(crate) fn export_effects(env: &Environment) -> Vec<Value> {
     let tanking = env.tanking();
     let mut effects = Vec::new();
-    for label in [
+    let labels = [
         KROLDOK_4_LABEL,
         KROLDOK_5_LABEL,
         ZEALOT_PLATE_LABEL,
         GIRDLE_LABEL,
-    ] {
+    ]
+    .into_iter()
+    .chain(SHIELD_SPIKE_ENCHANTS.iter().map(|(_, label, _)| *label));
+    for label in labels {
         let Some(aura) = aura_named(env, label) else {
             continue;
         };
@@ -212,8 +253,11 @@ pub(crate) fn export_effects(env: &Environment) -> Vec<Value> {
                 KROLDOK_4_LABEL => kroldok_heal_effect(env, aura),
                 KROLDOK_5_LABEL => Some(ogre_dominance_effect(env, aura)),
                 ZEALOT_PLATE_LABEL => Some(zealot_plate_effect(env, aura)),
-                GIRDLE_LABEL => shield_spike_effect(env, aura),
-                _ => None,
+                GIRDLE_LABEL => shield_spike_effect(env, aura, SHIELD_SPIKE),
+                _ => SHIELD_SPIKE_ENCHANTS
+                    .iter()
+                    .find(|(_, enchant_label, _)| *enchant_label == label)
+                    .and_then(|(_, _, spell)| shield_spike_effect(env, aura, *spell)),
             }
         } else {
             None
@@ -274,10 +318,10 @@ fn zealot_plate_effect(env: &Environment, aura: AuraId) -> Value {
     })
 }
 
-/// `spell_data_damage_proc` for Shield Spike: a block deals the row's roll to the attacker.
-fn shield_spike_effect(env: &Environment, aura: AuraId) -> Option<Value> {
-    let position = position_of(env, SHIELD_SPIKE)?;
-    let damage = must_find(SHIELD_SPIKE)
+/// `spell_data_damage_proc` for a shield spike: a block deals the row's roll to the attacker.
+fn shield_spike_effect(env: &Environment, aura: AuraId, spell: i32) -> Option<Value> {
+    let position = position_of(env, spell)?;
+    let damage = must_find(spell)
         .effects
         .iter()
         .find(|effect| effect.aura == super::dbcenums::A_PROC_TRIGGER_DAMAGE)?;
