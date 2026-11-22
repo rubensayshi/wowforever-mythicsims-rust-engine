@@ -71,37 +71,206 @@
   "priorityList": [
     {
       "action": {
-        "castSpell": {
-          "spellId": {
-            "spellId": 11597
+        "cancelAura": {
+          "auraId": {
+            "spellId": 11567,
+            "tag": 1
           }
         },
         "condition": {
-          "cmp": {
-            "lhs": {
-              "auraNumStacks": {
-                "auraId": {
-                  "rank": 5,
-                  "spellId": 11597
-                },
-                "sourceUnit": {
-                  "type": "CurrentTarget"
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "auraIsActive": {
+                  "auraId": {
+                    "spellId": 11567,
+                    "tag": 1
+                  }
+                }
+              },
+              {
+                "isExecutePhase": {
+                  "threshold": "E20"
                 }
               }
-            },
-            "op": "OpLt",
-            "rhs": {
-              "const": {
-                "val": "1"
-              }
-            }
+            ]
           }
         }
       }
     },
     {
       "action": {
-        "autocastOtherCooldowns": {}
+        "resetSequence": {
+          "sequenceName": "Slam once per cooldown 8"
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 11605
+                      }
+                    }
+                  },
+                  "op": "OpGt",
+                  "rhs": {
+                    "const": {
+                      "val": "2s"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "waitUntil": {
+          "condition": {
+            "cmp": {
+              "lhs": {
+                "spellTimeToReady": {
+                  "spellId": {
+                    "spellId": 11605
+                  }
+                }
+              },
+              "op": "OpGt",
+              "rhs": {
+                "const": {
+                  "val": "0s"
+                }
+              }
+            }
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "sequenceIsComplete": {
+                  "sequenceName": "Slam once per cooldown 8"
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 11605
+                      }
+                    }
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "0s"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "cancelAura": {
+          "auraId": {
+            "spellId": 11567,
+            "tag": 1
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "sequenceIsReady": {
+                  "sequenceName": "Slam once per cooldown 8"
+                }
+              },
+              {
+                "auraIsActive": {
+                  "auraId": {
+                    "spellId": 11567,
+                    "tag": 1
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "30"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
       }
     },
     {
@@ -229,6 +398,743 @@
     },
     {
       "action": {
+        "cancelAura": {
+          "auraId": {
+            "spellId": 11567,
+            "tag": 1
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "auraIsActive": {
+                  "auraId": {
+                    "spellId": 11567,
+                    "tag": 1
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "35"
+                    }
+                  }
+                }
+              },
+              {
+                "or": {
+                  "vals": [
+                    {
+                      "cmp": {
+                        "lhs": {
+                          "spellTimeToReady": {
+                            "spellId": {
+                              "spellId": 21553
+                            }
+                          }
+                        },
+                        "op": "OpLe",
+                        "rhs": {
+                          "const": {
+                            "val": "1.5s"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "cmp": {
+                        "lhs": {
+                          "spellTimeToReady": {
+                            "spellId": {
+                              "spellId": 11605
+                            }
+                          }
+                        },
+                        "op": "OpLe",
+                        "rhs": {
+                          "const": {
+                            "val": "1.0s"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 25289
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "autocastOtherCooldowns": {},
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "or": {
+                  "vals": [
+                    {
+                      "cmp": {
+                        "lhs": {
+                          "remainingTime": {}
+                        },
+                        "op": "OpLe",
+                        "rhs": {
+                          "const": {
+                            "val": "20s"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "cmp": {
+                        "lhs": {
+                          "remainingTime": {}
+                        },
+                        "op": "OpGe",
+                        "rhs": {
+                          "const": {
+                            "val": "140s"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 20662
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "isExecutePhase": {
+                  "threshold": "E20"
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "90"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 11585
+          }
+        },
+        "condition": {
+          "cmp": {
+            "lhs": {
+              "numberTargets": {}
+            },
+            "op": "OpLe",
+            "rhs": {
+              "const": {
+                "val": "1"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 11574
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "val": {
+                    "dotIsActive": {
+                      "spellId": {
+                        "spellId": 11574
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "remainingTime": {}
+                  },
+                  "op": "OpGt",
+                  "rhs": {
+                    "const": {
+                      "val": "6s"
+                    }
+                  }
+                }
+              },
+              {
+                "const": {
+                  "val": "true"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "sequence": {
+          "actions": [
+            {
+              "castSpell": {
+                "spellId": {
+                  "spellId": 11605
+                }
+              }
+            }
+          ],
+          "name": "Slam once per cooldown 8"
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "gcdTimeToReady": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "0s"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 11605
+                      }
+                    }
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "0s"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 21553
+          }
+        },
+        "condition": {
+          "cmp": {
+            "lhs": {
+              "numberTargets": {}
+            },
+            "op": "OpLe",
+            "rhs": {
+              "const": {
+                "val": "1"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 20662
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "isExecutePhase": {
+                  "threshold": "E20"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 1310222
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "auraIsActive": {
+                  "auraId": {
+                    "spellId": 2457
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 21553
+                      }
+                    }
+                  },
+                  "op": "OpGt",
+                  "rhs": {
+                    "const": {
+                      "val": "0.8s"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 11605
+                      }
+                    }
+                  },
+                  "op": "OpGt",
+                  "rhs": {
+                    "const": {
+                      "val": "0.8s"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "10"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 7373
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 21553
+                      }
+                    }
+                  },
+                  "op": "OpGt",
+                  "rhs": {
+                    "const": {
+                      "val": "0.8s"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellTimeToReady": {
+                      "spellId": {
+                        "spellId": 11605
+                      }
+                    }
+                  },
+                  "op": "OpGt",
+                  "rhs": {
+                    "const": {
+                      "val": "0.8s"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "10"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 25286
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "85"
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "val": {
+                    "isExecutePhase": {
+                      "threshold": "E20"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 1329555
+          }
+        },
+        "condition": {
+          "cmp": {
+            "lhs": {
+              "numberTargets": {}
+            },
+            "op": "OpLe",
+            "rhs": {
+              "const": {
+                "val": "1"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 2687
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpLe",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "30"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "castSpell": {
+          "spellId": {
+            "spellId": 11597
+          }
+        },
+        "condition": {
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "auraNumStacks": {
+                      "auraId": {
+                        "rank": 5,
+                        "spellId": 11597
+                      },
+                      "sourceUnit": {
+                        "type": "CurrentTarget"
+                      }
+                    }
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "1"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "action": {
+        "autocastOtherCooldowns": {},
+        "condition": {
+          "cmp": {
+            "lhs": {
+              "numberTargets": {}
+            },
+            "op": "OpGe",
+            "rhs": {
+              "const": {
+                "val": "2"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "action": {
         "castSpell": {
           "spellId": {
             "spellId": 2458
@@ -324,6 +1230,19 @@
           "and": {
             "vals": [
               {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
                 "auraIsActive": {
                   "auraId": {
                     "spellId": 2458
@@ -370,10 +1289,29 @@
           }
         },
         "condition": {
-          "spellCanCast": {
-            "spellId": {
-              "spellId": 11585
-            }
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "spellCanCast": {
+                  "spellId": {
+                    "spellId": 11585
+                  }
+                }
+              }
+            ]
           }
         }
       }
@@ -388,6 +1326,19 @@
         "condition": {
           "and": {
             "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
               {
                 "not": {
                   "val": {
@@ -425,20 +1376,39 @@
           }
         },
         "condition": {
-          "cmp": {
-            "lhs": {
-              "spellCastTime": {
-                "spellId": {
-                  "spellId": 11605
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "spellCastTime": {
+                      "spellId": {
+                        "spellId": 11605
+                      }
+                    }
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "1.5s"
+                    }
+                  }
                 }
               }
-            },
-            "op": "OpLt",
-            "rhs": {
-              "const": {
-                "val": "1.5s"
-              }
-            }
+            ]
           }
         }
       }
@@ -448,6 +1418,19 @@
         "castSpell": {
           "spellId": {
             "spellId": 21553
+          }
+        },
+        "condition": {
+          "cmp": {
+            "lhs": {
+              "numberTargets": {}
+            },
+            "op": "OpGe",
+            "rhs": {
+              "const": {
+                "val": "2"
+              }
+            }
           }
         }
       }
@@ -460,8 +1443,27 @@
           }
         },
         "condition": {
-          "isExecutePhase": {
-            "threshold": "E20"
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "isExecutePhase": {
+                  "threshold": "E20"
+                }
+              }
+            ]
           }
         }
       }
@@ -476,6 +1478,19 @@
         "condition": {
           "and": {
             "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
               {
                 "cmp": {
                   "lhs": {
@@ -519,48 +1534,6 @@
                   "rhs": {
                     "const": {
                       "val": "20"
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "action": {
-        "castSpell": {
-          "spellId": {
-            "spellId": 25286,
-            "tag": 1
-          }
-        },
-        "condition": {
-          "and": {
-            "vals": [
-              {
-                "cmp": {
-                  "op": "OpEq",
-                  "lhs": {
-                    "numberTargets": {}
-                  },
-                  "rhs": {
-                    "const": {
-                      "val": "1"
-                    }
-                  }
-                }
-              },
-              {
-                "cmp": {
-                  "op": "OpGe",
-                  "lhs": {
-                    "currentRage": {}
-                  },
-                  "rhs": {
-                    "const": {
-                      "val": "101"
                     }
                   }
                 }
@@ -636,6 +1609,19 @@
               {
                 "cmp": {
                   "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
                     "spellTimeToReady": {
                       "spellId": {
                         "spellId": 21553
@@ -678,6 +1664,19 @@
           "spellId": {
             "spellId": 1329555
           }
+        },
+        "condition": {
+          "cmp": {
+            "lhs": {
+              "numberTargets": {}
+            },
+            "op": "OpGe",
+            "rhs": {
+              "const": {
+                "val": "2"
+              }
+            }
+          }
         }
       }
     },
@@ -689,16 +1688,35 @@
           }
         },
         "condition": {
-          "cmp": {
-            "lhs": {
-              "currentRage": {}
-            },
-            "op": "OpLt",
-            "rhs": {
-              "const": {
-                "val": "10"
+          "and": {
+            "vals": [
+              {
+                "cmp": {
+                  "lhs": {
+                    "numberTargets": {}
+                  },
+                  "op": "OpGe",
+                  "rhs": {
+                    "const": {
+                      "val": "2"
+                    }
+                  }
+                }
+              },
+              {
+                "cmp": {
+                  "lhs": {
+                    "currentRage": {}
+                  },
+                  "op": "OpLt",
+                  "rhs": {
+                    "const": {
+                      "val": "10"
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         }
       }
