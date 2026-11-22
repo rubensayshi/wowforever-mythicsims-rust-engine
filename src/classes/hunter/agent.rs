@@ -628,6 +628,7 @@ impl HunterAgent {
                 Effect::Volley {
                     spell_id,
                     tick_base,
+                    attack_power_share,
                     ranged_delay_ns,
                 } => {
                     let spell = find_spell(&fight, *spell_id)
@@ -636,6 +637,7 @@ impl HunterAgent {
                         &mut fight,
                         spell,
                         *tick_base,
+                        *attack_power_share,
                         *ranged_delay_ns,
                     )?);
                 }

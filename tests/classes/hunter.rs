@@ -488,6 +488,35 @@ fn explosive_trap_and_volley_reach_every_target() {
     }
 }
 
+/// Under Forever's rules each Volley tick adds 0.03 of the hunter's ranged attack power to the
+/// rank's flat tick: the same fight with the share left out deals every tick for less.
+#[test]
+fn volley_ticks_take_a_share_of_ranged_attack_power() {
+    let ticks = |share: f64| -> Vec<f64> {
+        let mut value = survival_against(5);
+        for effect in value["effects"].as_array_mut().unwrap() {
+            if effect["kind"] == "volley" {
+                effect["attack_power_share"] = json!(share);
+            }
+        }
+        first_fight_log(value)
+            .lines()
+            .filter(|line| line.contains("{SpellID: 14295}") && line.contains(" tick "))
+            .filter_map(|line| line.split(" for ").nth(1))
+            .map(|damage| damage[..damage.find(' ').unwrap()].parse().unwrap())
+            .collect()
+    };
+    let (flat, scaled) = (ticks(0.0), ticks(0.03));
+    assert!(!flat.is_empty(), "the hunter channels Volley");
+    assert_eq!(flat.len(), scaled.len());
+    for (flat, scaled) in flat.iter().zip(&scaled) {
+        assert!(
+            scaled > flat,
+            "a tick of {scaled} is not above the flat {flat}"
+        );
+    }
+}
+
 /// A Serpent Sting tick outcome the runtime does not implement is a Hunter class limit.
 #[test]
 fn an_unknown_serpent_sting_tick_is_a_class_limit() {
