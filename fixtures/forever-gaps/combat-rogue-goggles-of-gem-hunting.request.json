@@ -1,0 +1,650 @@
+{
+  "encounter": {
+    "duration": 120,
+    "durationVariation": 15,
+    "executeProportion20": 0.2,
+    "executeProportion25": 0.25,
+    "executeProportion35": 0.35,
+    "executeProportion45": 0.45,
+    "executeProportion90": 0.9,
+    "noHitSuppression": true,
+    "targets": [
+      {
+        "canCrush": true,
+        "damageSpread": 0.3333,
+        "id": 213336,
+        "level": 44,
+        "minBaseDamage": 3000,
+        "name": "Level 44",
+        "parryHaste": true,
+        "stats": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          805,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2606,
+          0,
+          127393,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "swingSpeed": 2
+      }
+    ]
+  },
+  "raid": {
+    "buffs": {},
+    "debuffs": {},
+    "parties": [
+      {
+        "buffs": {},
+        "players": [
+          {
+            "buffs": {},
+            "characterSheet": {
+              "armor": [
+                0,
+                896
+              ],
+              "attackPower": [
+                314,
+                42,
+                0
+              ],
+              "attributeBuffs": [
+                25,
+                83,
+                47,
+                0,
+                13
+              ],
+              "attributeDebuffs": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "attributes": [
+                81,
+                169,
+                102,
+                27,
+                56
+              ],
+              "auras": [
+                1786,
+                429959,
+                1328826
+              ],
+              "base": [
+                56,
+                86,
+                55,
+                27,
+                43
+              ],
+              "block": 0,
+              "dodge": 17.4357,
+              "equipment": {
+                "items": [
+                  {
+                    "id": 4491
+                  },
+                  {
+                    "id": 15690
+                  },
+                  {
+                    "id": 2278
+                  },
+                  {
+                    "id": 9877,
+                    "randomSuffix": 12733
+                  },
+                  {
+                    "id": 8175
+                  },
+                  {
+                    "id": 274599
+                  },
+                  {
+                    "id": 4107
+                  },
+                  {
+                    "id": 16659
+                  },
+                  {
+                    "id": 274602
+                  },
+                  {
+                    "id": 4055
+                  },
+                  {
+                    "id": 277210
+                  },
+                  {
+                    "id": 270052
+                  },
+                  {
+                    "id": 276895
+                  },
+                  {
+                    "id": 260802
+                  },
+                  {
+                    "id": 279887
+                  },
+                  {
+                    "id": 6802
+                  },
+                  {
+                    "id": 3463
+                  }
+                ]
+              },
+              "healingPower": 0,
+              "health": 1610,
+              "level": 42,
+              "mana": 0,
+              "manaRegen": [
+                0,
+                0
+              ],
+              "meleeCrit": 8.8094,
+              "meleeHit": 3,
+              "parry": 10.64,
+              "rangedAttackPower": [
+                360,
+                42,
+                0
+              ],
+              "rangedCrit": 7.1694,
+              "spellCrit": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "spellHit": 3,
+              "spellPower": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "weaponSkill": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "class": "ClassRogue",
+            "consumables": {
+              "mhImbueId": 26891,
+              "ohImbueId": 27186
+            },
+            "equipment": {
+              "items": [
+                {
+                  "id": 4491
+                },
+                {
+                  "id": 15690
+                },
+                {
+                  "id": 2278
+                },
+                {
+                  "id": 9877,
+                  "randomSuffix": 12733
+                },
+                {
+                  "id": 8175
+                },
+                {
+                  "id": 274599
+                },
+                {
+                  "id": 4107
+                },
+                {
+                  "id": 16659
+                },
+                {
+                  "id": 274602
+                },
+                {
+                  "id": 4055
+                },
+                {
+                  "id": 277210
+                },
+                {
+                  "id": 270052
+                },
+                {
+                  "id": 276895
+                },
+                {
+                  "id": 260802
+                },
+                {
+                  "id": 279887
+                },
+                {
+                  "id": 6802
+                },
+                {
+                  "id": 3463
+                }
+              ]
+            },
+            "knownSpells": [
+              53,
+              81,
+              408,
+              674,
+              921,
+              1725,
+              1767,
+              1786,
+              1804,
+              1833,
+              1842,
+              1856,
+              1860,
+              1943,
+              1966,
+              2070,
+              2094,
+              2764,
+              2836,
+              3127,
+              5171,
+              5227,
+              5277,
+              6603,
+              7744,
+              7918,
+              8621,
+              8624,
+              8629,
+              8633,
+              8647,
+              8676,
+              8696,
+              13750,
+              13877,
+              14251,
+              20577,
+              33388,
+              1260189,
+              1293657,
+              1293712,
+              1328825,
+              1329265,
+              1329283
+            ],
+            "level": 42,
+            "name": "Player",
+            "profession1": "Leatherworking",
+            "profession2": "Skinning",
+            "race": "RaceUndead",
+            "reactionTimeMs": 100,
+            "rogue": {
+              "options": {
+                "classOptions": {}
+              }
+            },
+            "rotation": {
+              "prepullActions": [
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 1784
+                      }
+                    }
+                  },
+                  "doAtValue": {
+                    "const": {
+                      "val": "-1s"
+                    }
+                  }
+                }
+              ],
+              "priorityList": [
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 11290
+                      }
+                    },
+                    "condition": {
+                      "auraIsActive": {
+                        "auraId": {
+                          "spellId": 1784
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "rank": 2,
+                        "spellId": 6774
+                      }
+                    },
+                    "condition": {
+                      "or": {
+                        "vals": [
+                          {
+                            "and": {
+                              "vals": [
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "currentComboPoints": {}
+                                    },
+                                    "op": "OpGe",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "1"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "not": {
+                                    "val": {
+                                      "auraIsActive": {
+                                        "auraId": {
+                                          "rank": 2,
+                                          "spellId": 6774
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "remainingTime": {}
+                                    },
+                                    "op": "OpGe",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "6"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "and": {
+                              "vals": [
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "currentComboPoints": {}
+                                    },
+                                    "op": "OpGe",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "5"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "auraRemainingTime": {
+                                        "auraId": {
+                                          "rank": 2,
+                                          "spellId": 6774
+                                        }
+                                      }
+                                    },
+                                    "op": "OpLt",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "3"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "remainingTime": {}
+                                    },
+                                    "op": "OpGt",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "9"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 13750
+                      }
+                    },
+                    "condition": {
+                      "and": {
+                        "vals": [
+                          {
+                            "cmp": {
+                              "lhs": {
+                                "currentEnergy": {}
+                              },
+                              "op": "OpLt",
+                              "rhs": {
+                                "const": {
+                                  "val": "59"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "cmp": {
+                              "lhs": {
+                                "timeToNextEnergyTick": {}
+                              },
+                              "op": "OpLt",
+                              "rhs": {
+                                "const": {
+                                  "val": "1"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "autocastOtherCooldowns": {},
+                    "condition": {
+                      "auraIsActive": {
+                        "auraId": {
+                          "rank": 2,
+                          "spellId": 6774
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 31016
+                      }
+                    },
+                    "condition": {
+                      "and": {
+                        "vals": [
+                          {
+                            "cmp": {
+                              "lhs": {
+                                "currentComboPoints": {}
+                              },
+                              "op": "OpGe",
+                              "rhs": {
+                                "const": {
+                                  "val": "2"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "or": {
+                              "vals": [
+                                {
+                                  "auraIsActive": {
+                                    "auraId": {
+                                      "rank": 2,
+                                      "spellId": 6774
+                                    }
+                                  }
+                                },
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "currentEnergy": {}
+                                    },
+                                    "op": "OpGe",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "79"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "cmp": {
+                                    "lhs": {
+                                      "remainingTime": {}
+                                    },
+                                    "op": "OpLt",
+                                    "rhs": {
+                                      "const": {
+                                        "val": "6"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 1329549
+                      }
+                    },
+                    "condition": {
+                      "cmp": {
+                        "lhs": {
+                          "currentEnergy": {}
+                        },
+                        "op": "OpLt",
+                        "rhs": {
+                          "const": {
+                            "val": "80"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "rank": 8,
+                        "spellId": 11294
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": "TypeAPL"
+            },
+            "talentsString": "02-3200330211012321151-"
+          }
+        ]
+      }
+    ]
+  },
+  "simOptions": {
+    "debugFirstIteration": true,
+    "iterations": 3000,
+    "randomSeed": "1122"
+  }
+}
