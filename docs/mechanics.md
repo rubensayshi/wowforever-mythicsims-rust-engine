@@ -99,6 +99,18 @@ the Go goldens and exporter uses. The departures:
   Shadow Bolts a third of the time, all landed whole. The reference's level 63 boss partially
   resists 18% of them, 6% of the damage on average. The prepared target carries
   `no_level_partial_resist`.
+- A target of any level, from Blizzard's statements and 305 public dungeon reports on
+  forever.warcraftlogs.com (23 November 2026, [level-gap.md](level-gap.md)): the reference's
+  attack table has a column for a target at the character's level to 3 above and 2 below, and
+  gives any other level the 3 above column, so the gate refused it. A target outside the columns
+  now reads tables that follow the gap between the two levels (`prepare/level_gap.rs`), and a
+  character fights one from level 10 to 5 above its own. Below it, miss, dodge and parry fall
+  0.5% a level to nothing, no swing glances and a spell misses 1% less a level; from 4 above,
+  miss is 5% and 1% a level, dodge 5% and 0.5%, glancing 10% likelier a level at the weapon skill
+  formula's damage, crit 1% lower and spell miss 11% higher a level. Parry outside the columns,
+  the crushing blow past 3 above and the 1.8% of crit the boss column carries are
+  approximations. A level the columns cover reads the same numbers as before. The prepared
+  target carries `level_gap_tables` when its level is outside the reference's 0 to 3 above.
 - The raid's Expose Armor, from MythicSim's Discord (28 October 2026, Bae and Vrelk): a player
   who picks the raid's Expose Armor instead of its Sunder Armor should not gain from the pick, but
   the reference applies Expose Armor at full from the pull while Sunder Armor ramps a stack every

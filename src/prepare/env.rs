@@ -609,6 +609,15 @@ impl Environment {
                             defender.unit_type,
                             defender.level,
                         );
+                        // Forever's rules for a target the reference has no column for.
+                        if self.sim.rules == Rules::Forever {
+                            super::level_gap::apply(
+                                &mut table,
+                                self.sim.unit(*attacker).level,
+                                defender.unit_type,
+                                defender.level,
+                            );
+                        }
                         if self.encounter.no_hit_suppression {
                             table.hit_suppression = 0.0;
                         }

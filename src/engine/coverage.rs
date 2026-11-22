@@ -117,7 +117,7 @@ pub const REFUSAL_CODES: &[(&str, &str)] = &[
     ("class_unsupported", "the player's class has no Rust gate"),
     (
         "level_unsupported",
-        "the player is not level 60 or the target not level 60 to 63",
+        "the player's level or the target's level is one the engine does not cover",
     ),
     (
         "target_count_invalid",
@@ -2236,7 +2236,14 @@ pub(crate) fn prepared_coverage(
             ),
         ));
     }
-    if !crate::prepare::levels::target_levels(player.level).contains(&prepared.target.level) {
+    // A level the reference's tables cover, or one Forever's rules prepared the tables for
+    // (`prepare::level_gap`): a reference document carries no such mark.
+    let target_level = prepared.target.level;
+    let covered = crate::prepare::levels::reference_target_levels(player.level)
+        .contains(&target_level)
+        || (prepared.target.level_gap_tables
+            && crate::prepare::levels::target_levels(player.level).contains(&target_level));
+    if !covered {
         reasons.push(Refusal::new(
             "level_unsupported",
             format!("target level {} is not supported", prepared.target.level),

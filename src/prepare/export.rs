@@ -518,6 +518,7 @@ pub(crate) fn export_melee_of(
         attacker_level: sim.unit(player).level,
         defender_type: t.unit_type,
         defender_level: t.level,
+        forever: sim.rules == Rules::Forever,
     };
     for (key, hand) in [
         ("main_hand_skill", skill::MAIN_HAND),
@@ -1169,6 +1170,14 @@ pub(crate) fn export_state(
     // the reference keeps them.
     if env.rules == Rules::Forever {
         prepared["target"]["no_level_partial_resist"] = json!(true);
+        // A target the reference has no column for reads Forever's tables (`level_gap`); the
+        // gate lets its level through on this mark alone.
+        let target_level = env.sim.unit(target).level;
+        if !super::levels::reference_target_levels(env.sim.unit(player).level)
+            .contains(&target_level)
+        {
+            prepared["target"]["level_gap_tables"] = json!(true);
+        }
         // The client's mana regeneration interrupt aura acts at once (docs/mechanics.md);
         // the reference's cached tick waits for another refresh.
         prepared["player"]["casting_regen_at_once"] = json!(true);

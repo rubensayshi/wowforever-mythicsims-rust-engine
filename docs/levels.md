@@ -109,7 +109,7 @@ Not settled:
 - a class not in `LEVELLED_CLASSES` (all nine since 8 Nov, see below);
 - a levelling character without a sheet.
 
-The target may be from the player's level to 3 above (`levels::target_levels`); at 60 it stays 60 to 63.
+The target may be from level 10 to 5 above the player's level (`levels::target_levels`, since 23 November 2026). From the player's level to 3 above it reads the reference's attack table columns as before; outside them, under Forever's rules, its tables follow the gap between the two levels ([level-gap.md](level-gap.md)).
 
 ## Checking a class
 
@@ -175,7 +175,7 @@ Where a class sits on that range is the group around it, not its model:
 ## Open
 
 - Spell coefficients below level 20: checked against public logs on 9 Nov (`docs/levels-logs-2026-11-09.md`). The client rows carry the low rank coefficients and the game takes them with no further penalty, which is what the engine does (`tests/levels_logs_20261109.rs`).
-- Dungeon boss armor: the worker scales the level 63 boss's 3731 armor by level. The client does not carry creature armor.
+- Dungeon boss armor: the worker scales the level 63 boss's 3731 armor by level. The client does not carry creature armor. The public logs' damage events carry each hit before and after armor, so a mob's armor can be measured from them; not done yet.
 - Spirit regen and weapon skill caps below 60 follow the existing level formulas. A Hunter's pet and hawk follow the creature dps row of their level since 18 Nov (below); a Warlock's demon follows the level (below).
 - A cat druid below 20, who has not learned Cat Form, sims in it all the same (with autos only until Claw at 20).
 - Other class buffs and debuffs built from core's fixed rows (Shaman totems' triggered buffs resolve by level already; Sunder and Expose Armor, Hunter's Mark and the external raid rows have not been checked below 60). The worker sims a levelling character solo, so the external rows do not reach it, with one exception: since 12 November 2026 a levelling Hunter keeps its own Hunter's Mark on the target at the rank it has trained (a melee Survival Hunter needs it for Expose Prey, which opens Mongoose Bite).

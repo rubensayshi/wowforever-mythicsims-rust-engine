@@ -55,6 +55,7 @@ pub(crate) mod item_test_support;
 pub(crate) mod itemhelpers;
 pub(crate) mod items;
 pub(crate) mod items_registry;
+pub(crate) mod level_gap;
 pub(crate) mod levels;
 pub(crate) mod major_cooldown;
 pub(crate) mod mp5_sources;
