@@ -32,6 +32,24 @@ fn version_identifies_prototype_and_source_revision() {
     assert!(String::from_utf8_lossy(&result.stdout).contains(forever_engine::SOURCE_REVISION));
 }
 
+/// What an application reads before offering a boss level (docs/level-gap.md): level 10 to 5
+/// above the character. An engine from before this command fails it, and the application
+/// keeps the character's own level to 3 above.
+#[test]
+fn target_levels_prints_the_range_a_sim_can_fight() {
+    let result = Command::new(env!("CARGO_BIN_EXE_forever-engine"))
+        .arg("target-levels")
+        .output()
+        .unwrap();
+    assert!(result.status.success());
+    let printed: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(
+        printed,
+        serde_json::json!({"lowest": 10, "levels_above": 5})
+    );
+    assert_eq!(forever_engine::target_level_range(), (10, 5));
+}
+
 #[test]
 fn benchmark_reports_only_requested_samples_after_warmup() {
     let input =

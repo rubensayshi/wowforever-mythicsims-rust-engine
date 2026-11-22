@@ -65,6 +65,14 @@ Not modelled:
   10 below the character every table has reached its floor, so a lower target changes nothing
   more; the logs reach 11 below.
 
+## What an application reads
+
+`forever-engine target-levels` prints `{"lowest":10,"levels_above":5}`: the lowest target level
+and how far above the character the highest is (`forever_engine::target_level_range`). An engine
+from before this change fails the command, which tells an application to keep the character's
+own level to 3 above. MythicSim's worker and its picker read it from the live bundle, so they
+never offer a level the engine in production refuses.
+
 ## Sources
 
 - Blizzard, WoW Classic, 30 May and 4 June 2019 (the "hit tables" bug thread, read from
