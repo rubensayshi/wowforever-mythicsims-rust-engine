@@ -49,6 +49,7 @@ const DRUID: &str = "fixtures/forever-gaps/feral-druid-seed-of-renewal.request.j
 const WILDHEART_SHAMAN: &str =
     "fixtures/forever-gaps/restoration-shaman-wildheart-raiment.request.json";
 const WILDHEART_BELT: i64 = 16716;
+const TOTEM_OF_RAGE: i64 = 22395;
 
 fn request(fixture: &str) -> Value {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(fixture);
@@ -178,7 +179,14 @@ fn a_shaman_in_five_pieces_of_wildheart_raiment_sims_with_the_bonus_inert() {
 
 #[test]
 fn the_reference_still_refuses_a_shaman_in_five_pieces_of_wildheart_raiment() {
-    let request = request(WILDHEART_SHAMAN);
+    // Without what the reference's data lacks: the Totem of Rage and the cloak's random suffix.
+    let mut request = without(WILDHEART_SHAMAN, TOTEM_OF_RAGE);
+    for item in request["raid"]["parties"][0]["players"][0]["equipment"]["items"]
+        .as_array_mut()
+        .unwrap()
+    {
+        item.as_object_mut().unwrap().remove("randomSuffix");
+    }
     let prepared = prepare_json_with(request.to_string().as_bytes(), "rust", Rules::GoReference)
         .unwrap_or_else(|err| panic!("{err}"));
     let prepared: PreparedV2 = serde_json::from_value(prepared).unwrap();
