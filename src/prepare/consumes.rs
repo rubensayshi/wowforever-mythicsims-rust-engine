@@ -20,8 +20,8 @@ use super::env::Environment;
 use super::items::slot;
 use super::major_cooldown::COOLDOWN_PRIORITY_LOW;
 use super::sim::{
-    AuraConfig, AuraId, BuildPhase, Cooldown, Duration, EffectId, Sim, SpellId, TimerId, UnitId,
-    UnitType, NEVER_EXPIRES, SECOND,
+    AuraConfig, AuraId, BuildPhase, Cooldown, Duration, EffectId, Rules, Sim, SpellId, TimerId,
+    UnitId, UnitType, NEVER_EXPIRES, SECOND,
 };
 use super::spell::{school, Cast, CastConfig, DefenseType, ProcMask, SpellConfig, SpellFlag};
 use super::stats::{Stat, Stats};
@@ -153,16 +153,28 @@ impl Sim {
     /// Go `Character.MHImbueFlatWeaponDamage`.
     pub(crate) fn mh_imbue_flat_weapon_damage(&self, unit: UnitId) -> f64 {
         let consumables = &self.character(unit).consumables;
-        imbue_flat_weapon_damage(consumables.i32("mhImbue_id"))
-            + imbue_flat_weapon_damage(consumables.i32("mh_temp_enchant_id"))
+        imbue_flat_weapon_damage(consumables.i32("mhImbue_id"), self.rules)
+            + imbue_flat_weapon_damage(consumables.i32("mh_temp_enchant_id"), self.rules)
     }
 }
 
-/// Go `imbueFlatWeaponDamage`.
-fn imbue_flat_weapon_damage(imbue_id: i32) -> f64 {
+/// Go `imbueFlatWeaponDamage`: the weapon damage of a stone, by its use spell. The reference adds
+/// only the Dense stones'. Under Forever's rules the lower four tiers add theirs too, the
+/// "Sharpened" and "Weighted" enchantments of the client (1.60.1.69893): Rough (enchantments 40
+/// and 19) +2, Coarse (13 and 20) +3, Heavy (14 and 21) +4 and Solid (483 and 484) +6.
+pub(crate) fn imbue_flat_weapon_damage(imbue_id: i32, rules: Rules) -> f64 {
     match imbue_id {
         // Dense Sharpening Stone, Dense Weightstone.
         16138 | 16622 => 8.0,
+        _ if rules != Rules::Forever => 0.0,
+        // Rough Sharpening Stone, Rough Weightstone.
+        2828 | 3112 => 2.0,
+        // Coarse Sharpening Stone, Coarse Weightstone.
+        2829 | 3113 => 3.0,
+        // Heavy Sharpening Stone, Heavy Weightstone.
+        2830 | 3114 => 4.0,
+        // Solid Sharpening Stone, Solid Weightstone.
+        9900 | 9903 => 6.0,
         _ => 0.0,
     }
 }
@@ -555,7 +567,7 @@ fn register_per_weapon_main_hand_imbue(env: &mut Environment, consumables: &Mess
             effect.3 |= swap;
             continue;
         }
-        let flat = imbue_flat_weapon_damage(id);
+        let flat = imbue_flat_weapon_damage(id, env.sim.rules);
         let mut known = flat != 0.0;
         let mut auras = Vec::new();
         let stats = static_imbue_stats(id);
@@ -654,7 +666,7 @@ fn register_static_imbue(env: &mut Environment, imbue_id: i32, hand: Hand) {
         _ => {}
     }
 
-    let flat = imbue_flat_weapon_damage(imbue_id);
+    let flat = imbue_flat_weapon_damage(imbue_id, env.sim.rules);
     if flat != 0.0 {
         let attacks = &mut env.sim.unit_mut(unit).auto_attacks;
         let weapon = match hand {

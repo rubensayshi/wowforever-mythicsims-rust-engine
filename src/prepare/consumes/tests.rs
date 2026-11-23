@@ -28,6 +28,10 @@ fn factory(sim: &mut Sim, unit: UnitId, _player: &Message) -> Result<Box<dyn Pre
 }
 
 fn build(class: &str, profession: &str, consumables: &str) -> Environment {
+    build_under(Rules::Forever, class, profession, consumables)
+}
+
+fn build_under(rules: Rules, class: &str, profession: &str, consumables: &str) -> Environment {
     let request = format!(
         r#"{{"simOptions":{{"iterations":1,"randomSeed":"100"}},
         "raid":{{"parties":[{{"players":[{{"name":"Player","class":"{class}",
@@ -36,7 +40,7 @@ fn build(class: &str, profession: &str, consumables: &str) -> Environment {
         "encounter":{{"duration":180,"targets":[{{"level":63,"mobType":"MobTypeElemental"}}]}}}}"#
     );
     let request = Request::from_json(request.as_bytes()).expect("a valid request");
-    match Environment::new(request.message(), factory) {
+    match Environment::with_rules(request.message(), factory, rules) {
         Ok(env) => env,
         Err(refusal) => panic!("{refusal}"),
     }
@@ -170,6 +174,74 @@ fn static_imbues_add_their_stats_and_the_dense_stones_their_weapon_damage() {
     assert_eq!(a.oh.base_damage_min - b.oh.base_damage_min, 8.0);
     assert_eq!(with.sim.mh_imbue_flat_weapon_damage(with.player), 8.0);
     assert_eq!(without.sim.mh_imbue_flat_weapon_damage(without.player), 0.0);
+}
+
+/// Under Forever's rules the lower stones add the weapon damage of their client enchantments
+/// (1.60.1.69893: Sharpened and Weighted +2, +3, +4 and +6) to the hand they are on, as the Dense
+/// stones add 8. The reference's rules add only the Dense stones'.
+#[test]
+fn the_lower_stones_add_their_weapon_damage_under_forevers_rules() {
+    let stones = [
+        ("Rough Sharpening Stone", 2828, 2.0),
+        ("Coarse Sharpening Stone", 2829, 3.0),
+        ("Heavy Sharpening Stone", 2830, 4.0),
+        ("Solid Sharpening Stone", 9900, 6.0),
+        ("Rough Weightstone", 3112, 2.0),
+        ("Coarse Weightstone", 3113, 3.0),
+        ("Heavy Weightstone", 3114, 4.0),
+        ("Solid Weightstone", 9903, 6.0),
+        ("Dense Sharpening Stone", 16138, 8.0),
+        ("Dense Weightstone", 16622, 8.0),
+    ];
+    let weapons = |env: &Environment| env.sim.unit(env.player).auto_attacks.clone();
+    for rules in [Rules::Forever, Rules::GoReference] {
+        let without = weapons(&build_under(rules, "ClassWarrior", "Alchemy", "{}"));
+        for (name, id, damage) in stones {
+            let expected = if rules == Rules::Forever || id == 16138 || id == 16622 {
+                damage
+            } else {
+                0.0
+            };
+            let main = build_under(
+                rules,
+                "ClassWarrior",
+                "Alchemy",
+                &format!(r#"{{"mhImbueId":{id}}}"#),
+            );
+            let with = weapons(&main);
+            assert_eq!(
+                with.mh.base_damage_min - without.mh.base_damage_min,
+                expected,
+                "{name}"
+            );
+            assert_eq!(
+                with.mh.base_damage_max - without.mh.base_damage_max,
+                expected,
+                "{name}"
+            );
+            assert_eq!(
+                with.oh.base_damage_min, without.oh.base_damage_min,
+                "{name}"
+            );
+            assert_eq!(
+                main.sim.mh_imbue_flat_weapon_damage(main.player),
+                expected,
+                "{name}"
+            );
+            let off = weapons(&build_under(
+                rules,
+                "ClassWarrior",
+                "Alchemy",
+                &format!(r#"{{"ohImbueId":{id}}}"#),
+            ));
+            assert_eq!(
+                off.oh.base_damage_min - without.oh.base_damage_min,
+                expected,
+                "{name}"
+            );
+            assert_eq!(off.mh.base_damage_min, without.mh.base_damage_min, "{name}");
+        }
+    }
 }
 
 #[test]
