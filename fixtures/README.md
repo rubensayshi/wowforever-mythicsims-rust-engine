@@ -19,3 +19,8 @@ New fixture families should use `fixtures/<class>/<spec>/<schema-or-reference>/`
 with a manifest identifying source, schema and expected coverage. Class tests
 should follow the same class/spec names. Introduce a new family when it has real
 cases; do not populate placeholder directories for unimplemented classes.
+
+[healing-model](healing-model/manifest.json) holds requests with a Go healing model and the
+pinned Go engine's results for them, written by
+[tools/healing_model_goldens.py](../tools/healing_model_goldens.py) and read by
+[tests/healing_model.rs](../tests/healing_model.rs).

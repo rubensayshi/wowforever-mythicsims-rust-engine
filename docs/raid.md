@@ -224,7 +224,8 @@ How it runs:
    as the spell computed it, before the missing health cut it.
 4. **The tank's death.** What landed is handed to the tank's fight at that moment as healing
    (`OtherActionHealingModel`), so its health and `chanceOfDeath` count it. Without healers a tank
-   with no way to heal itself dies in every long fight.
+   with no way to heal itself dies in every long fight. A member's own healing model
+   (`healingModel`, the solo sim's fixed healer) is refused in a raid.
 5. **Report.** `mythicsim.tankHealing`, one entry per assignment in the healers' raid order, and
    only when the raid assigns healers:
 

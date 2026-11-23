@@ -199,6 +199,7 @@ const COMMON_EFFECTS: &[&str] = &[
     "berserking",
     "blood_fury",
     "chance_of_death",
+    "healing_model",
     "conjured_energy",
     "conjured_mana",
     "crusader",
@@ -487,6 +488,10 @@ fn common_claims(effect: &Effect) -> Vec<(&'static str, &str)> {
         Effect::RageBar { aura, .. } => vec![("player", aura)],
         Effect::ExtraAttackProc { trigger_aura, .. } => vec![("player", trigger_aura)],
         Effect::ChanceOfDeath { aura } => vec![("player", aura)],
+        Effect::HealingModel {
+            absorb_aura: Some(aura),
+            ..
+        } => vec![("player", aura)],
         Effect::ParryHaste { unit, aura, .. } => match unit.as_str() {
             "player" => vec![("player", aura)],
             "target" => vec![("target", aura)],

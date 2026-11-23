@@ -407,22 +407,7 @@ impl Environment {
             .unwrap_or_else(|| Message::empty("proto.IndividualBuffs"));
         let unit = self.player;
         self.sim.unit_mut(unit).health_bar = true;
-        // health.go trackChanceOfDeath.
-        // Go reads a healing model only for a player a target swings at (`trackChanceOfDeath`),
-        // and runs a presim for one with a cadence but no healing (`GetPresimOptions`). Any other
-        // model changes nothing: the UI's empty default, or a tank preset's in a fight the
-        // player does not tank.
-        let tanking = self.tanking();
-        let healing_model = player.message("healing_model").filter(|model| {
-            let presim = model.f64("hps") == 0.0 && model.f64("cadence_seconds") != 0.0;
-            presim || (tanking && !model.set_fields().is_empty())
-        });
-        if healing_model.is_some() {
-            return Err(Refusal::new(
-                "healing_model",
-                "healing models are unsupported".to_string(),
-            ));
-        }
+        // health.go trackChanceOfDeath: the aura, then the healing model.
         self.sim.register_aura(
             unit,
             AuraConfig {
@@ -437,6 +422,7 @@ impl Environment {
                 ..Default::default()
             },
         );
+        super::healing_model::track(self, player)?;
         self.apply_all_effects(&raid_buffs, &party_buffs, &individual)?;
         self.sim
             .register_battle_squawk(unit, party.i32("battle_squawks"));

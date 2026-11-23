@@ -173,7 +173,9 @@ impl<A: Agent> Fight<A> {
         self.player_hit_non_physical = values.school & 1 == 0;
         // Go ApplyPostOutcomeDamageModifiers: the player's dynamic damage taken modifiers, as
         // an absorb shield, then the floor.
-        // Go registers the item shields before the class's modifiers.
+        // Go registers the healing model's shield first, then the item shields, then the
+        // class's modifiers.
+        self.healing_model_absorb_taken(&mut result);
         self.item_absorbs_taken(values.school, &mut result);
         A::player_damage_taken_modifiers(self, &mut result);
         result.damage = result.damage.max(0.0);

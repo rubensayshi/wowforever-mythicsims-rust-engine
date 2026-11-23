@@ -36,6 +36,7 @@ pub(crate) use on_use_damage::known as on_use_damage_known;
 mod heal_proc;
 pub(crate) mod healer_gear;
 pub(crate) mod healing;
+pub(crate) mod healing_model;
 pub(crate) mod heals;
 pub(crate) mod health_regen;
 mod log;
@@ -1606,6 +1607,8 @@ pub(crate) enum Action {
     ExternalExpose(u8),
     /// Go trackChanceOfDeath's pending action: mark the player dead if health is still gone.
     DeathCheck,
+    /// Go applyHealingModel's pending action: the heal, then the roll of the next one.
+    HealingModel,
     /// A fixed uptime aura's periodic roll, or its first roll.
     FixedUptime {
         index: usize,
@@ -1920,6 +1923,8 @@ pub(crate) struct Fight<A: Agent> {
     pub(crate) gifts: Option<Box<raid::Gifts>>,
     /// Which targets swing at this fight's player, when the raid's targets have different tanks.
     pub(crate) tank_role: Option<Box<raid::TankRole>>,
+    /// The player's healing model and TMI, when the request has one that acts.
+    pub(crate) healing_model: Option<Box<healing_model::HealingModel>>,
     external_expose: Option<ExternalExpose>,
     /// Gnome's Eureka!, when the character has it.
     pub(crate) eureka: Option<racial::Eureka>,
@@ -4306,6 +4311,7 @@ impl<A: Agent> Fight<A> {
             share: None,
             gifts: None,
             tank_role: None,
+            healing_model: None,
             external_expose: None,
             aura_logs,
             stat_combos,
@@ -5193,6 +5199,7 @@ impl<A: Agent> Fight<A> {
             }
         }
         fight.bind_absorb_procs(effects)?;
+        fight.bind_healing_model(effects)?;
         for effect in effects {
             if let Some(proc) = damage_proc_of(effect, fight.spells.len()) {
                 fight.damage_procs.push(proc);
@@ -5803,6 +5810,7 @@ impl<A: Agent> Fight<A> {
         let max_health = self.player_max_health();
         let old = self.player.health;
         let new = (old - amount).max(0.0);
+        self.tmi_health_removed(amount, max_health);
         let resource = &mut self.resources[self.damage_taken_health];
         resource.events += 1;
         resource.gain += -amount;
@@ -6079,7 +6087,9 @@ impl<A: Agent> Fight<A> {
             if let Some(swap) = &self.item_swap {
                 self.config.melee.armor_ignore_factor = swap.armor_ignore_reset;
             }
-            // Go runs reset effects first in the aura tracker's reset.
+            // Go runs reset effects first in the aura tracker's reset. health.go registers the
+            // healing model's before any other, unless a presim's result registers it last.
+            self.healing_model_reset(false);
             self.reset_mods();
             A::reset(self);
             // Go ApplyFixedUptimeAura's reset effect: the periodic roll, then the first one.
@@ -6099,6 +6109,7 @@ impl<A: Agent> Fight<A> {
                     Action::FixedUptime { index, first: true },
                 );
             }
+            self.healing_model_reset(true);
         }
         self.reset_auras(side);
         // Go driveWindfuryTotem's OnReset: the totem refreshes every period from the reset.
@@ -6440,6 +6451,7 @@ impl<A: Agent> Fight<A> {
             Action::SunderTick(target, done) => self.sunder_tick(target, done),
             Action::ExternalExpose(target) => self.external_expose_lands(target),
             Action::DeathCheck => self.death_check(),
+            Action::HealingModel => self.healing_model_tick(),
             Action::FixedUptime { index, first } => self.fixed_uptime_roll(index, first),
             Action::MovementEnd(side) => {
                 if self

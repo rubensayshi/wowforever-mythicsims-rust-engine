@@ -42,6 +42,7 @@ pub(crate) mod forever_random_enchantments;
 pub(crate) mod forever_set_spells_generated;
 pub(crate) mod forever_tank_procs;
 pub(crate) mod healer_gear;
+pub(crate) mod healing_model;
 pub(crate) mod heals;
 pub(crate) mod hotfix_113554;
 pub(crate) mod incapacitate;

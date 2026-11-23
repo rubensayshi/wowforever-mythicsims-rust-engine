@@ -1,0 +1,64 @@
+{
+  "reference_revision": "a667dce8492bd9fb94269a9f864289cb74006775",
+  "client_build": "1.60.1.70425",
+  "iterations": 200,
+  "generator": "python3 tools/healing_model_goldens.py --oracle oracle-cache/forever-go-oracle-v2",
+  "cases": [
+    {
+      "id": "tank-heals",
+      "base": "production-protection-warrior",
+      "healing_model": {
+        "hps": 700,
+        "cadenceSeconds": 2,
+        "cadenceVariation": 1,
+        "absorbFrac": 0.2,
+        "burstWindow": 6
+      },
+      "go_log": "tank-heals.go-log.txt"
+    },
+    {
+      "id": "tank-presim",
+      "base": "production-protection-warrior",
+      "healing_model": {
+        "cadenceSeconds": 2,
+        "burstWindow": 6
+      }
+    },
+    {
+      "id": "tank-wide-cadence-full-shield",
+      "base": "production-protection-warrior",
+      "healing_model": {
+        "hps": 1000,
+        "cadenceSeconds": 1.5,
+        "cadenceVariation": 3,
+        "absorbFrac": 1,
+        "burstWindow": 5
+      }
+    },
+    {
+      "id": "tank-default-cadence",
+      "base": "production-protection-warrior",
+      "healing_model": {
+        "hps": 900,
+        "absorbFrac": 0.5
+      }
+    },
+    {
+      "id": "not-tanking",
+      "base": "production-arms-warrior",
+      "healing_model": {
+        "hps": 700,
+        "cadenceSeconds": 2,
+        "absorbFrac": 0.3,
+        "burstWindow": 6
+      }
+    },
+    {
+      "id": "not-tanking-presim",
+      "base": "production-arms-warrior",
+      "healing_model": {
+        "cadenceSeconds": 2
+      }
+    }
+  ]
+}

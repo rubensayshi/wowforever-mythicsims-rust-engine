@@ -773,6 +773,7 @@ fn tail_effects(
     if takes_damage && env.sim.get_aura(player, "Chance of Death").is_some() {
         effects.push(json!({"kind": "chance_of_death", "aura": "Chance of Death"}));
     }
+    effects.extend(super::healing_model::effect(env)?);
     effects.extend(party_damage_shields(env, tanking));
     effects.extend(super::export_items::melee_item_listeners(env));
     effects.extend(super::export_items::hit_taken_item_listeners(

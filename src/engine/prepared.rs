@@ -373,8 +373,42 @@ pub fn simulate_gated(prepared: &PreparedV2) -> Result<Gated, PreparedError> {
 
 /// Simulate an input that is valid and that the gate supports.
 fn run(prepared: &PreparedV2) -> Result<PreparedReport, PreparedError> {
+    let presimmed = presim(prepared)?;
+    let prepared = presimmed.as_ref().unwrap_or(prepared);
     let report = classes::run_prepared(prepared).map_err(PreparedError::Invalid)?;
     PreparedReport::of_fight(prepared, report)
+}
+
+/// Go presim.go `runPresims` for health.go `GetPresimOptions`: a healing model with a cadence
+/// but no healing runs the input 100 iterations at seed 1 without logs or the model, and heals
+/// 1.5 times the player's damage taken per second in the fight. `None` without a presim.
+fn presim(prepared: &PreparedV2) -> Result<Option<PreparedV2>, PreparedError> {
+    use crate::contracts::prepared_v2::Effect;
+    let Some(position) = prepared
+        .effects
+        .iter()
+        .position(|effect| matches!(effect, Effect::HealingModel { presim: true, .. }))
+    else {
+        return Ok(None);
+    };
+    let mut first = prepared.clone();
+    first.sim.iterations = 100;
+    first.sim.seed = 1;
+    first.sim.debug = false;
+    first.sim.debug_first_iteration = false;
+    first.effects.remove(position);
+    let report = classes::run_prepared(&first).map_err(PreparedError::Invalid)?;
+    let result =
+        serde_json::to_value(&report).map_err(|err| PreparedError::Invalid(err.to_string()))?;
+    let dtps = result
+        .pointer("/raidMetrics/parties/0/players/0/dtps/avg")
+        .and_then(serde_json::Value::as_f64)
+        .unwrap_or(0.0);
+    let mut fight = prepared.clone();
+    if let Effect::HealingModel { hps, .. } = &mut fight.effects[position] {
+        *hps = dtps * 1.50;
+    }
+    Ok(Some(fight))
 }
 
 impl PreparedReport {

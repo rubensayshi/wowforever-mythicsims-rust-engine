@@ -1279,3 +1279,20 @@ fn the_two_tanks_two_healers_fixture_runs_with_swaps_and_assigned_healers() {
         assert!(dtps(&report, name) > 0.0, "{name}");
     }
 }
+
+/// A member's own healing model (Go health.go's fixed healer) would heal beside the raid's
+/// healers, which Go never runs together: the raid refuses it, naming the tank.
+#[test]
+fn a_members_healing_model_is_refused() {
+    let mut input = healed_tank(&["holy-priest"], &[true], 10);
+    input["request"]["raid"]["parties"][0]["players"][0]["healingModel"] =
+        json!({ "hps": 500, "cadenceSeconds": 2 });
+    match simulate_raid(&serde_json::to_vec(&input).unwrap(), Rules::Forever, false) {
+        Err(RaidError::Refused(refusals)) => {
+            assert_eq!(refusals.len(), 1);
+            assert_eq!(refusals[0].member, 0);
+            assert_eq!(refusals[0].code, "healing_model");
+        }
+        other => panic!("expected a refusal, got {:?}", other.map(|_| ())),
+    }
+}

@@ -799,6 +799,18 @@ pub fn prepare(members: Vec<Member>, rules: Rules) -> Result<Vec<PreparedMember>
         })?;
         validate(&prepared)
             .map_err(|err| invalid(format!("member {}: {err}", member.raid_index)))?;
+        // A member's own healing model would heal beside the raid's healers, which Go never
+        // runs together.
+        if prepared.effects.iter().any(|effect| {
+            matches!(effect, crate::contracts::prepared_v2::Effect::HealingModel { hps, presim, .. } if *hps != 0.0 || *presim)
+        }) {
+            refused.push(refuse(
+                "check",
+                "healing_model",
+                "a raid member's healing model is unsupported".to_string(),
+            ));
+            continue;
+        }
         let gate = refusals(&prepared);
         if !gate.is_empty() {
             refused.extend(

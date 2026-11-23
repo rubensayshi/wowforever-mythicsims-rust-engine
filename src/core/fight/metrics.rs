@@ -749,6 +749,7 @@ impl<A: Agent> Fight<A> {
             }
         }
         self.totals.zero.done_iteration(duration, seed, keep);
+        self.tmi_done_iteration(seed, keep);
         self.totals.oom_seconds += seconds(self.player.oom_time);
         self.pets_metrics_done_iteration(seed);
         self.totals.iterations += 1;
@@ -945,7 +946,7 @@ impl<A: Agent> Fight<A> {
             dps: self.totals.dps.report(),
             threat: self.totals.threat.report(),
             dtps: self.totals.player_dtps.report(),
-            tmi: zero.clone(),
+            tmi: self.tmi_report().unwrap_or_else(|| zero.clone()),
             hps: self.totals.player_hps.report(),
             burst_hps: self.burst.as_ref().map(|_| self.totals.burst_hps.report()),
             tto: self.totals.tto.report(),

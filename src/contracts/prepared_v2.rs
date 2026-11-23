@@ -5569,6 +5569,33 @@ pub enum Effect {
     ChanceOfDeath {
         aura: String,
     },
+    /// Go health.go `trackChanceOfDeath` with the player's healing model, for a player a target
+    /// swings at, and `applyHealingModel`. A pending action from the reset heals `hps` times the
+    /// seconds since the last heal times the two healing taken multipliers at the reset, then
+    /// rolls the time to the next heal: a sign roll and a magnitude roll, below the median
+    /// cadence down to `max(0, median - variation)` or above it up to `median + variation`.
+    /// `absorb_aura` takes `absorb_frac` of each heal as a shield on every school, the player's
+    /// first damage taken modifier. A zero `hps` runs no heals. `tmi_bin` is Go `tmiBin`, the
+    /// TMI window in seconds; zero leaves TMI at zero.
+    ///
+    /// With `presim`, Go's `GetPresimOptions`: the request has a cadence but no healing, so a
+    /// first run of 100 iterations at seed 1 without the model measures the player's damage
+    /// taken per second, and the fight heals 1.5 times that at the median cadence, with no
+    /// variation and no shield, registered after every other reset effect. Go applies it to a
+    /// player no target swings at as well.
+    HealingModel {
+        hps: f64,
+        median_cadence: f64,
+        cadence_variation: f64,
+        absorb_frac: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        absorb_aura: Option<String>,
+        healing_taken_multiplier: f64,
+        external_healing_taken_multiplier: f64,
+        tmi_bin: i32,
+        #[serde(default, skip_serializing_if = "is_false")]
+        presim: bool,
+    },
     /// Go attack.go applyParryHaste once the target swings at the player: a parry pulls the
     /// parrying unit's next main hand swing in.
     ParryHaste {
@@ -6034,6 +6061,7 @@ impl Effect {
             Effect::BestialWrath { .. } => "bestial_wrath",
             Effect::Frenzy { .. } => "frenzy",
             Effect::ChanceOfDeath { .. } => "chance_of_death",
+            Effect::HealingModel { .. } => "healing_model",
             Effect::ParryHaste { .. } => "parry_haste",
             Effect::PushbackTrigger { .. } => "pushback_trigger",
             Effect::FixedUptimeAura { .. } => "fixed_uptime_aura",
