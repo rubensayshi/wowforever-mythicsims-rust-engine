@@ -643,20 +643,27 @@ impl Shaman {
         );
     }
 
-    /// Forever's Mental Quickness (30812) turns Intellect into spell damage.
+    /// Forever's Mental Quickness (30812) turns Intellect into spell damage (Aura 174, Misc 126)
+    /// and, under Forever's rules, into healing power (Aura 175, Misc 3, Intellect), each at the
+    /// row's 30 base points. The reference reads only the spell damage half.
     fn apply_mental_quickness(&self, sim: &mut Sim, unit: UnitId) {
         let points = self.talent("mental_quickness");
         if points == 0 {
             return;
         }
-        sim.unit_mut(unit).sdm.add_stat_dependency(
-            Stat::Intellect,
-            Stat::SpellDamage,
-            spell_data()
-                .mental_quickness
-                .effect(dbcenums::A_MOD_SPELL_DAMAGE_OF_STAT_PERCENT, 126)
-                .fraction_at(points),
-        );
+        let data = &spell_data().mental_quickness;
+        let damage = data
+            .effect(dbcenums::A_MOD_SPELL_DAMAGE_OF_STAT_PERCENT, 126)
+            .fraction_at(points);
+        let healing = (sim.rules == Rules::Forever).then(|| {
+            data.effect(dbcenums::A_MOD_SPELL_HEALING_OF_STAT_PERCENT, 3)
+                .fraction_at(points)
+        });
+        let sdm = &mut sim.unit_mut(unit).sdm;
+        sdm.add_stat_dependency(Stat::Intellect, Stat::SpellDamage, damage);
+        if let Some(healing) = healing {
+            sdm.add_stat_dependency(Stat::Intellect, Stat::HealingPower, healing);
+        }
     }
 
     fn apply_shamanistic_focus(&self, sim: &mut Sim, unit: UnitId) {

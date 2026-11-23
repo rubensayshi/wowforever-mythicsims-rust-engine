@@ -1,6 +1,6 @@
 //! The healer talents past each class's heals, which Forever's rules model from the client rows
-//! and tooltips (docs/mechanics.md): Riptide's bonus to Chain Heal, Genesis on Wild
-//! Growth and Swiftmend, and the Holy Paladin's Oath of Light share. Each test puts a reference build's
+//! and tooltips (docs/mechanics.md): Riptide's bonus to Chain Heal, Mental Quickness's healing
+//! power, Genesis on Wild Growth and Swiftmend, and the Holy Paladin's Oath of Light share. Each test puts a reference build's
 //! talents on one of the healer fixtures, checks what the export carries and what the spell did
 //! in the fights, and that the Go reference's rules do not read it.
 
@@ -22,6 +22,9 @@ const RIPTIDE: i64 = 1239243;
 const HOLY_LIGHT: i64 = 10329;
 const WILD_GROWTH: i64 = 1238215;
 const SWIFTMEND: i64 = 18562;
+// Healing Wave IX, the rank a Forever shaman casts: Healing Wave X (25357) is an Ahn'Qiraj book
+// rank, which Forever's rules leave out.
+const HEALING_WAVE: i64 = 10396;
 
 fn fixture(path: &str) -> Value {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(path);
@@ -159,6 +162,40 @@ fn riptide_raises_the_first_chain_heal_player() {
     // the party's damage reaches them): 25% on it is about 15% on the cast.
     let ratio = healing_a_cast(&with_riptide, CHAIN_HEAL) / healing_a_cast(&without, CHAIN_HEAL);
     assert!((1.10..1.20).contains(&ratio), "Chain Heal ratio {ratio}");
+}
+
+/// Mental Quickness (30812, two ranks): its client row turns Intellect into spell damage (Aura
+/// 174, Misc 126) and into healing power (Aura 175, Misc 3), both at 30 base points. Under
+/// Forever's rules a Restoration shaman with the talent gains as much healing power as spell
+/// damage, and Healing Wave heals more for it; the reference reads only the spell damage half.
+#[test]
+fn mental_quickness_turns_intellect_into_healing_power() {
+    // The fixture's talents, with Mental Quickness 2 (the Enhancement tree's 15th talent).
+    const WITHOUT: &str = "-055-5530500015513151";
+    const WITH: &str = "-055000000000002-5530500015513151";
+    let stat = |prepared: &Value, name: &str| prepared["player"]["stats"][name].as_f64().unwrap();
+    let gains = |rules: Rules| {
+        let with = prepared(&request("restoration-shaman", WITH, &[HEALING_WAVE]), rules);
+        let without = prepared(
+            &request("restoration-shaman", WITHOUT, &[HEALING_WAVE]),
+            rules,
+        );
+        let gain = |name: &str| stat(&with, name) - stat(&without, name);
+        (gain("SpellDamage"), gain("HealingPower"), with, without)
+    };
+    let (damage, healing, with, without) = gains(Rules::Forever);
+    assert!(damage > 50.0, "{damage}");
+    assert!(
+        (healing - damage).abs() < 1e-9,
+        "{healing} healing power, {damage} spell damage"
+    );
+    // Healing Wave's coefficient carries the healing power into every cast.
+    let ratio = healing_a_cast(&with, HEALING_WAVE) / healing_a_cast(&without, HEALING_WAVE);
+    assert!(ratio > 1.03, "Healing Wave ratio {ratio}");
+
+    let (damage, healing, _, _) = gains(Rules::GoReference);
+    assert!(damage > 50.0, "{damage}");
+    assert_eq!(healing, 0.0);
 }
 
 /// Genesis (1223081): 2% a rank since push 113531, on the periodic healing of Rejuvenation,
