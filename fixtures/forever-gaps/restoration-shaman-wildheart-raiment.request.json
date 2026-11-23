@@ -1,0 +1,422 @@
+{
+  "encounter": {
+    "duration": 60,
+    "durationVariation": 0,
+    "executeProportion20": 0.2,
+    "executeProportion25": 0.25,
+    "executeProportion35": 0.35,
+    "executeProportion45": 0.45,
+    "executeProportion90": 0.9,
+    "noHitSuppression": true,
+    "targets": [
+      {
+        "canCrush": true,
+        "damageSpread": 0.3333,
+        "id": 213336,
+        "level": 63,
+        "minBaseDamage": 3000,
+        "name": "Level 60",
+        "parryHaste": true,
+        "stats": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          805,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3731,
+          0,
+          127393,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "swingSpeed": 2
+      }
+    ]
+  },
+  "raid": {
+    "buffs": {
+      "arcaneBrilliance": true,
+      "giftOfTheWild": true,
+      "prayerOfFortitude": true,
+      "prayerOfSpirit": true
+    },
+    "debuffs": {},
+    "parties": [
+      {
+        "buffs": {
+          "graceOfAirTotem": true,
+          "leaderOfThePack": true,
+          "manaSpringTotem": "TristateEffectRegular",
+          "moonkinAura": true,
+          "strengthOfEarthTotem": true
+        },
+        "players": [
+          {
+            "bonusStats": {
+              "stats": [
+                0,
+                0,
+                0,
+                20,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "buffs": {
+              "greaterBlessingOfKings": true,
+              "greaterBlessingOfWisdom": true
+            },
+            "class": "ClassShaman",
+            "consumables": {
+              "conjuredId": 12662,
+              "conjuredItems": [
+                12662
+              ],
+              "flaskId": 13511,
+              "guardianElixirId": 250337,
+              "mhImbueId": 25123,
+              "potId": 13444,
+              "potions": [
+                13444
+              ],
+              "spellPowerElixirId": 250333
+            },
+            "distanceFromTarget": 20,
+            "equipment": {
+              "items": [
+                {
+                  "id": 16720
+                },
+                {
+                  "id": 17707
+                },
+                {
+                  "id": 22234
+                },
+                {
+                  "id": 13386,
+                  "randomSuffix": 13048
+                },
+                {
+                  "id": 16706
+                },
+                {
+                  "id": 13969
+                },
+                {
+                  "id": 13244
+                },
+                {
+                  "id": 16716
+                },
+                {
+                  "id": 16719
+                },
+                {
+                  "id": 16715
+                },
+                {
+                  "id": 17045
+                },
+                {
+                  "id": 13345
+                },
+                {
+                  "id": 272439
+                },
+                {
+                  "id": 11819
+                },
+                {
+                  "id": 13360
+                },
+                {
+                  "id": 13205
+                },
+                {
+                  "id": 22395
+                }
+              ]
+            },
+            "name": "Player",
+            "profession1": "Leatherworking",
+            "profession2": "Skinning",
+            "race": "RaceDwarf",
+            "reactionTimeMs": 100,
+            "restorationShaman": {
+              "options": {
+                "classOptions": {}
+              }
+            },
+            "rotation": {
+              "priorityList": [
+                {
+                  "action": {
+                    "autocastOtherCooldowns": {}
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 408510
+                      }
+                    },
+                    "condition": {
+                      "not": {
+                        "val": {
+                          "auraIsActive": {
+                            "auraId": {
+                              "spellId": 408510
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 25357
+                      },
+                      "target": {
+                        "type": "Self"
+                      }
+                    },
+                    "condition": {
+                      "auraIsActive": {
+                        "auraId": {
+                          "spellId": 16188
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 16188
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 1325256
+                      }
+                    },
+                    "condition": {
+                      "cmp": {
+                        "lhs": {
+                          "currentManaPercent": {}
+                        },
+                        "op": "OpLe",
+                        "rhs": {
+                          "const": {
+                            "val": "40%"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 10463
+                      },
+                      "target": {
+                        "type": "Self"
+                      }
+                    },
+                    "condition": {
+                      "and": {
+                        "vals": [
+                          {
+                            "not": {
+                              "val": {
+                                "auraIsActive": {
+                                  "auraId": {
+                                    "spellId": 10463
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "not": {
+                              "val": {
+                                "auraIsActive": {
+                                  "auraId": {
+                                    "spellId": 1325256
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 1239243
+                      },
+                      "target": {
+                        "type": "Self"
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 10623
+                      },
+                      "target": {
+                        "type": "Self"
+                      }
+                    },
+                    "condition": {
+                      "cmp": {
+                        "lhs": {
+                          "currentManaPercent": {}
+                        },
+                        "op": "OpGe",
+                        "rhs": {
+                          "const": {
+                            "val": "50%"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 25357
+                      },
+                      "target": {
+                        "type": "Self"
+                      }
+                    },
+                    "condition": {
+                      "cmp": {
+                        "lhs": {
+                          "currentManaPercent": {}
+                        },
+                        "op": "OpGe",
+                        "rhs": {
+                          "const": {
+                            "val": "30%"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "action": {
+                    "castSpell": {
+                      "spellId": {
+                        "spellId": 10468
+                      },
+                      "target": {
+                        "type": "Self"
+                      }
+                    }
+                  }
+                }
+              ],
+              "type": "TypeAPL"
+            },
+            "talentsString": "-055230300000202-053030331501014"
+          }
+        ]
+      }
+    ]
+  },
+  "simOptions": {
+    "debugFirstIteration": true,
+    "iterations": 3000,
+    "randomSeed": "1123"
+  }
+}

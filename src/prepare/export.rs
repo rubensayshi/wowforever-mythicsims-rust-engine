@@ -698,7 +698,7 @@ fn tail_effects(
     let target = env.encounter.targets[0];
     let player = env.player;
     let takes_damage = player_takes_damage(env);
-    let inert: [(super::sim::UnitId, &str, &str, &str); 4] = [
+    let inert: [(super::sim::UnitId, &str, &str, &str); 5] = [
         (
             player,
             "player",
@@ -723,8 +723,21 @@ fn tail_effects(
             "Freezing Band",
             "acts only on melee hits the player takes",
         ),
+        (
+            player,
+            "player",
+            WILDHEART_RAIMENT_5,
+            "acts only on melee hits the player takes",
+        ),
     ];
     for (unit, side, label, reason) in inert {
+        // A Druid's export claims the bonus itself, under both rules (druid_item_effects). Any
+        // other class can wear the five pieces on Forever, where the reference refuses them.
+        if label == WILDHEART_RAIMENT_5
+            && (env.sim.rules != Rules::Forever || env.sim.character(player).class == "ClassDruid")
+        {
+            continue;
+        }
         if label == "Chance of Death" && takes_damage {
             continue;
         }
@@ -1312,6 +1325,13 @@ pub(crate) fn export_state(
     Ok((prepared, unrepresented))
 }
 
+/// The aura Wildheart Raiment's five pieces register. Its listener (450608) hears the melee hits
+/// the wearer takes and nothing else (`forever_item_sets::wildheart_raiment_5`): the live tooltip
+/// reads "Chance on spellcast to restore 200 Mana, on melee attack to regenerate 20 Energy over 5
+/// sec, and when struck by a melee attack to generate 10 Rage", and neither it nor the client rows
+/// state a chance (SpellAuraOptions 236884: ProcChance 100 on a dummy aura), so the mana and
+/// energy parts stay out.
+const WILDHEART_RAIMENT_5: &str = "Wildheart Raiment 5P";
 /// The reason an inert party damage shield names.
 const DAMAGE_SHIELD_REASON: &str = "a damage shield: hears only physical hits the player takes";
 
