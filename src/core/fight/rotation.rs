@@ -663,7 +663,7 @@ impl<A: Agent> Fight<A> {
         align_cd_end: bool,
     ) -> bool {
         let total = self.duration;
-        let remaining = self.duration - self.now;
+        let remaining = self.remaining_duration();
         let cast_offset = self.get_duration(offset);
         let cd = self.spells[target].cd.map_or(0, |(_, cd)| cd.max(0));
         let duration = self.aura(target_buff).duration;
@@ -1784,10 +1784,8 @@ impl<A: Agent> Fight<A> {
             Compiled::CurrentManaPercent => self.player.mana / self.player.powers.max_mana,
             // Go `Unit.CurrentHealthPercent`.
             Compiled::CurrentHealthPercent => self.player.health / self.player_max_health(),
-            // Go `GetRemainingDurationPercent` for a fight timed by duration.
-            Compiled::RemainingTimePercent => {
-                (self.duration - self.now) as f64 / self.duration as f64
-            }
+            // Go `GetRemainingDurationPercent`.
+            Compiled::RemainingTimePercent => self.remaining_duration_percent(),
             Compiled::CurrentMana => self.player.mana,
             Compiled::PetCurrentMana(slot) => self.unit(Side::Pet(*slot)).mana,
             Compiled::PetCurrentManaPercent(slot) => {
@@ -1892,7 +1890,7 @@ impl<A: Agent> Fight<A> {
             Compiled::Const(constant) => constant.duration_ns,
             // Go `APLValueAuraRemainingTime`: zero when inactive.
             Compiled::AuraRemainingTime(aura) => self.aura_remaining_time(*aura),
-            Compiled::RemainingTime => self.duration - self.now,
+            Compiled::RemainingTime => self.remaining_duration(),
             // Go `Spell.TimeToReady`.
             Compiled::SpellTimeToReady(spell) => self.spell_time_to_ready(*spell),
             // Go `Dot.TimeUntilNextTick`: the next tick time is zero while inactive.

@@ -379,34 +379,48 @@ fn run(prepared: &PreparedV2) -> Result<PreparedReport, PreparedError> {
     PreparedReport::of_fight(prepared, report)
 }
 
-/// Go presim.go `runPresims` for health.go `GetPresimOptions`: a healing model with a cadence
-/// but no healing runs the input 100 iterations at seed 1 without logs or the model, and heals
-/// 1.5 times the player's damage taken per second in the fight. `None` without a presim.
+/// Go presim.go `runPresims`: one presim round of 100 iterations at seed 1 without logs, for
+/// health.go `GetPresimOptions` and for a fight that ends on health. A healing model with a
+/// cadence but no healing runs without the model and heals 1.5 times the player's damage taken
+/// per second in the fight. A health fight's length is the presim's average iteration length in
+/// whole seconds (sim.go `RunSim`), no longer a guess. `None` without a presim.
 fn presim(prepared: &PreparedV2) -> Result<Option<PreparedV2>, PreparedError> {
     use crate::contracts::prepared_v2::Effect;
-    let Some(position) = prepared
+    let model = prepared
         .effects
         .iter()
-        .position(|effect| matches!(effect, Effect::HealingModel { presim: true, .. }))
-    else {
+        .position(|effect| matches!(effect, Effect::HealingModel { presim: true, .. }));
+    let health = prepared.encounter.end_fight_at_health > 0.0;
+    if model.is_none() && !health {
         return Ok(None);
-    };
+    }
     let mut first = prepared.clone();
     first.sim.iterations = 100;
     first.sim.seed = 1;
     first.sim.debug = false;
     first.sim.debug_first_iteration = false;
-    first.effects.remove(position);
+    if let Some(position) = model {
+        first.effects.remove(position);
+    }
     let report = classes::run_prepared(&first).map_err(PreparedError::Invalid)?;
     let result =
         serde_json::to_value(&report).map_err(|err| PreparedError::Invalid(err.to_string()))?;
-    let dtps = result
-        .pointer("/raidMetrics/parties/0/players/0/dtps/avg")
-        .and_then(serde_json::Value::as_f64)
-        .unwrap_or(0.0);
     let mut fight = prepared.clone();
-    if let Effect::HealingModel { hps, .. } = &mut fight.effects[position] {
-        *hps = dtps * 1.50;
+    if let Some(position) = model {
+        let dtps = result
+            .pointer("/raidMetrics/parties/0/players/0/dtps/avg")
+            .and_then(serde_json::Value::as_f64)
+            .unwrap_or(0.0);
+        if let Effect::HealingModel { hps, .. } = &mut fight.effects[position] {
+            *hps = dtps * 1.50;
+        }
+    }
+    if health {
+        let average = result["avgIterationDuration"].as_f64().unwrap_or(0.0);
+        // Go `time.Duration(AvgIterationDuration) * time.Second`.
+        fight.encounter.duration_ns =
+            (average as i64).wrapping_mul(crate::core::time::NS_PER_SECOND);
+        fight.encounter.duration_is_estimate = false;
     }
     Ok(Some(fight))
 }

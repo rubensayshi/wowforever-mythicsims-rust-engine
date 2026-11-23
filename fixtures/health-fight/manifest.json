@@ -1,0 +1,35 @@
+{
+  "reference_revision": "a667dce8492bd9fb94269a9f864289cb74006775",
+  "client_build": "1.60.1.70425",
+  "iterations": 200,
+  "generator": "python3 tools/health_fight_goldens.py --oracle oracle-cache/forever-go-oracle-v2",
+  "cases": [
+    {
+      "id": "protection-warrior-level-60-mob",
+      "base": "production-protection-warrior",
+      "target_health": 4120,
+      "go_log": "protection-warrior-level-60-mob.go-log.txt"
+    },
+    {
+      "id": "protection-warrior-level-60-mob-healer-presim",
+      "base": "production-protection-warrior",
+      "target_health": 4120
+    },
+    {
+      "id": "fury-warrior-execute",
+      "base": "fury-warrior-demoralizing-shout",
+      "target_health": 60000,
+      "go_log": "fury-warrior-execute.go-log.txt"
+    },
+    {
+      "id": "protection-warrior-3-targets",
+      "base": "production-protection-warrior-3-targets",
+      "target_health": 30000
+    },
+    {
+      "id": "beast-mastery-hunter-wolf",
+      "base": "beast-mastery-hunter-wolf",
+      "target_health": 50000
+    }
+  ]
+}

@@ -176,11 +176,19 @@ fn new_encounter(sim: &mut Sim, options: &Message) -> Result<Encounter, Refusal>
         let id = super::target::new_target(sim, target, index as i32)?;
         encounter.targets.push(id);
     }
+    // Go `NewEncounterForLevel`: a health fight ends at the sum of the request's target health,
+    // 1 when they have none, and runs on a guessed ten minutes until the presim measures it.
     if options.bool("use_health") {
-        return Err(Refusal::new(
-            "encounter",
-            "health-based fights are unsupported".to_string(),
-        ));
+        for target in options.messages("targets") {
+            let stats = super::stats::Stats::from_proto_array(&target.f64s("stats"));
+            encounter.end_fight_at_health += stats[Stat::Health];
+        }
+        if encounter.end_fight_at_health == 0.0 {
+            encounter.end_fight_at_health = 1.0;
+        }
+    }
+    if encounter.end_fight_at_health > 0.0 {
+        encounter.duration = 10 * 60 * super::sim::SECOND;
     }
     Ok(encounter)
 }

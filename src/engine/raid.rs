@@ -799,6 +799,15 @@ pub fn prepare(members: Vec<Member>, rules: Rules) -> Result<Vec<PreparedMember>
         })?;
         validate(&prepared)
             .map_err(|err| invalid(format!("member {}: {err}", member.raid_index)))?;
+        // The raid runs every member to the first member's fight length.
+        if prepared.encounter.end_fight_at_health > 0.0 {
+            refused.push(refuse(
+                "check",
+                "encounter",
+                "a raid's health-based fight is unsupported".to_string(),
+            ));
+            continue;
+        }
         // A member's own healing model would heal beside the raid's healers, which Go never
         // runs together.
         if prepared.effects.iter().any(|effect| {

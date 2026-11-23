@@ -1165,6 +1165,10 @@ pub(crate) fn export_state(
         "effects": effects,
         "unrepresented": [],
     });
+    if env.encounter.end_fight_at_health > 0.0 {
+        prepared["encounter"]["end_fight_at_health"] = json!(env.encounter.end_fight_at_health);
+        prepared["encounter"]["duration_is_estimate"] = json!(true);
+    }
     if target_count > 1 {
         prepared["encounter"]["target_count"] = json!(target_count);
     }

@@ -285,7 +285,7 @@ impl<A: Agent> Fight<A> {
     fn lowered_duration(&mut self, value: &Duration) -> i64 {
         match value {
             Duration::Const(value) => *value,
-            Duration::RemainingTime => self.duration - self.now,
+            Duration::RemainingTime => self.remaining_duration(),
             Duration::CurrentTime => self.now,
             Duration::AuraRemainingTime(aura) => self.aura_remaining_time(*aura),
             Duration::SpellTimeToReady(spell) => self.spell_time_to_ready(*spell),
@@ -529,6 +529,10 @@ impl<A: Agent> Fight<A> {
     fn duration_stable(&mut self, value: &Duration) -> (i64, Motion, u8) {
         match value {
             Duration::Const(value) => (*value, Motion::Fixed, 0),
+            // A health fight's guessed length gives a remaining time that jumps with damage.
+            Duration::RemainingTime if self.remaining_duration_estimated() => {
+                (self.remaining_duration(), Motion::Unknown, 0)
+            }
             Duration::RemainingTime => (
                 self.duration - self.now,
                 Motion::Falling { clamped: false },

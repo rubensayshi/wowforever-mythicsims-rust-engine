@@ -102,7 +102,7 @@ impl PetAi {
     /// later evaluations only log; otherwise move into melee range, then cast the first
     /// ability that can be cast in the family's order, otherwise wait while the GCD is free.
     pub(crate) fn rotation<A: Agent>(&self, fight: &mut Fight<A>) {
-        let remaining = (fight.duration - fight.now) as f64 / fight.duration as f64;
+        let remaining = fight.remaining_duration_percent();
         if remaining < 1.0 - self.uptime {
             fight.disable_pet(self.pet);
             return;

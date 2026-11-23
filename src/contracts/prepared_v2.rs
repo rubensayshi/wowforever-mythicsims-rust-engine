@@ -83,6 +83,15 @@ pub struct Encounter {
     /// index follows the first's, and the player's index counts it.
     #[serde(default, skip_serializing_if = "is_zero_u32")]
     pub target_count: u32,
+    /// Go `Encounter.EndFightAtHealth` of a fight that ends on health (`useHealth`): the sum of
+    /// the request's target health. The fight ends once the damage dealt to the targets exceeds
+    /// it, with no time limit; the execute phases follow the share of it dealt.
+    #[serde(default, skip_serializing_if = "is_zero_f64")]
+    pub end_fight_at_health: f64,
+    /// Go `Encounter.DurationIsEstimate`: `duration_ns` is a guess, which the first iteration's
+    /// length replaces. The engine's presim measures a health fight's length and clears it.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub duration_is_estimate: bool,
 }
 
 /// Per-school values in Go's `SchoolIndex` order.

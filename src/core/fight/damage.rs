@@ -1245,7 +1245,8 @@ impl<A: Agent> Fight<A> {
                 }
             }
         }
-        if result.target == Side::Target {
+        // Go counts the damage every target takes, for a health fight.
+        if result.target.is_target() {
             self.encounter_damage_taken += result.damage;
         }
         if self.log.is_some() && !self.spells[spell].flags.no_logs {

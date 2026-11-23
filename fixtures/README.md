@@ -24,3 +24,8 @@ cases; do not populate placeholder directories for unimplemented classes.
 pinned Go engine's results for them, written by
 [tools/healing_model_goldens.py](../tools/healing_model_goldens.py) and read by
 [tests/healing_model.rs](../tests/healing_model.rs).
+
+[health-fight](health-fight/manifest.json) holds requests whose fight ends on the targets'
+health and the pinned Go engine's results for them, written by
+[tools/health_fight_goldens.py](../tools/health_fight_goldens.py) and read by
+[tests/health_fight.rs](../tests/health_fight.rs).

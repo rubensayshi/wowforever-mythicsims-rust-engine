@@ -1,0 +1,209 @@
+[0.00] [Target 1] Aura gained: {SpellID: 11717, Tag: -1}
+[0.00] [Target 1] Aura gained: {SpellID: 9907, Tag: -1}
+[0.00] [Target 1] Aura gained: {SpellID: 11198, Tag: -1}
+[0.00] [Target 1] Aura gained: {SpellID: 11374, Tag: -1}
+[0.00] [Target 1] Aura gained: {SpellID: 24977, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 10293, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 24932, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 25362, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 25580, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 25587, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 21850, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 21564, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 19900, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 10535, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 25898, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 25916, Tag: -1}
+[0.00] [protection-warrior (#1)] Aura gained: {SpellID: 71}
+[-3.00] [protection-warrior (#1)] Casting {SpellID: 2457} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[-3.00] [protection-warrior (#1)] Completed cast {SpellID: 2457}
+[-3.00] [protection-warrior (#1)] Aura faded: {SpellID: 71}
+[-3.00] [protection-warrior (#1)] Aura gained: {SpellID: 2457}
+[-2.00] [protection-warrior (#1)] Casting {SpellID: 20230} (Cost = 0.000, Cast Time = 0s, GCD = 1.5s, Effective Time = 1.5s)
+[-2.00] [protection-warrior (#1)] Completed cast {SpellID: 20230}
+[-2.00] [protection-warrior (#1)] Aura gained: {SpellID: 20230}
+[-2.00] [protection-warrior (#1)] {SpellID: 20230} stacks: 0 --> 30
+[-1.00] [protection-warrior (#1)] Casting {SpellID: 71} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[-1.00] [protection-warrior (#1)] Completed cast {SpellID: 71}
+[-1.00] [protection-warrior (#1)] Aura faded: {SpellID: 2457}
+[-1.00] [protection-warrior (#1)] Aura gained: {SpellID: 71}
+[-0.00] [protection-warrior (#1)] Aura gained: {SpellID: 25289, Tag: -1}
+[0.00] [protection-warrior (#1)] Casting {SpellID: 2687} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[0.00] [protection-warrior (#1)] Completed cast {SpellID: 2687}
+[0.00] [protection-warrior (#1)] Gained 15.000 rage from {SpellID: 2687} (0.000 --> 15.000) of 100 total.
+[0.00] [protection-warrior (#1)] Spent 337.800 health from {OtherID: 9} (6169.000 --> 5831.200) of 6169 total.
+[0.00] [protection-warrior (#1)] Casting {ItemID: 13442} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[0.00] [protection-warrior (#1)] Completed cast {ItemID: 13442}
+[0.00] [protection-warrior (#1)] Aura gained: {ItemID: 13442}
+[0.00] [protection-warrior (#1)] Gained {"Strength": 60.000,} from {ItemID: 13442}.
+[0.00] [protection-warrior (#1)] Gained 60.000 rage from {ItemID: 13442} (15.000 --> 75.000) of 100 total.
+[0.00] [protection-warrior (#1)] Major cooldown used: {ItemID: 13442}
+[0.00] [protection-warrior (#1)] Casting {SpellID: 23925} (Cost = 18.000, Cast Time = 0s, GCD = 1.5s, Effective Time = 1.5s)
+[0.00] [protection-warrior (#1)] Completed cast {SpellID: 23925}
+[0.00] [protection-warrior (#1)] Spent 18.000 rage from {SpellID: 23925} (75.000 --> 57.000) of 100 total.
+[0.00] [protection-warrior (#1)] [Target 1] {SpellID: 23925} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:711.9, AfterAttackerMods:704.7, AfterResistances:593.0, AfterTargetMods:601.0, AfterOutcome:601.0, AfterPostOutcome:601.0
+[0.00] [protection-warrior (#1)] [Target 1] {SpellID: 23925} Hit for 601.042 damage (SpellSchool: 1). (Threat: 1658.018)
+[0.00] [protection-warrior (#1)] Casting {SpellID: 25286, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[0.00] [protection-warrior (#1)] Completed cast {SpellID: 25286, Tag: 1}
+[0.00] [protection-warrior (#1)] Casting {OtherID: 3, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[0.00] [protection-warrior (#1)] Completed cast {OtherID: 3, Tag: 1}
+[0.00] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 1} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:386.2, AfterAttackerMods:382.4, AfterResistances:321.7, AfterTargetMods:329.7, AfterOutcome:329.7, AfterPostOutcome:329.7
+[0.00] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 1} Hit for 329.750 damage (SpellSchool: 1). (Threat: 492.976)
+[0.00] [protection-warrior (#1)] Gained 8.304 rage from {OtherID: 3, Tag: 1} (57.000 --> 65.304) of 100 total.
+[0.00] [protection-warrior (#1)] No available actions!
+[0.00] [protection-warrior (#1)] Pausing rotation for 1.497s due to resources / CDs.
+[0.01] [protection-warrior (#1)] Gained 1.000 rage from {SpellID: 12964} (65.304 --> 66.304) of 100 total.
+[0.10] [protection-warrior (#1)] No available actions!
+[0.10] [protection-warrior (#1)] Pausing rotation for 1.397s due to resources / CDs.
+[0.25] [protection-warrior (#1)] Aura gained: {SpellID: 25286, Tag: 1}
+[0.32] [Target 1] Casting {OtherID: 3, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[0.32] [Target 1] Completed cast {OtherID: 3, Tag: 1}
+[0.32] [Target 1] [protection-warrior (#1)] {OtherID: 3, Tag: 1} [DEBUG] MAP: 805.0, RAP: 0.0, SP: 0.0, BaseDamage:160.6, AfterAttackerMods:160.6, AfterResistances:70.1, AfterTargetMods:63.1, AfterOutcome:63.1, AfterPostOutcome:63.1
+[0.32] [Target 1] [protection-warrior (#1)] {OtherID: 3, Tag: 1} Hit for 63.084 damage (SpellSchool: 1). (Threat: 63.084)
+[0.32] [protection-warrior (#1)] Gained 0.260 rage from {OtherID: 9} (66.304 --> 66.564) of 100 total.
+[0.32] [protection-warrior (#1)] Spent 63.084 health from {OtherID: 9} (5831.200 --> 5768.116) of 6169 total.
+[0.32] [protection-warrior (#1)] Casting {SpellID: 20240} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[0.32] [protection-warrior (#1)] Completed cast {SpellID: 20240}
+[0.32] [protection-warrior (#1)] [Target 1] {SpellID: 20240} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:358.1, AfterAttackerMods:354.5, AfterResistances:298.3, AfterTargetMods:306.3, AfterOutcome:306.3, AfterPostOutcome:306.3
+[0.32] [protection-warrior (#1)] [Target 1] {SpellID: 20240} Hit for 306.350 damage (SpellSchool: 1). (Threat: 457.993)
+[0.32] [protection-warrior (#1)] {SpellID: 20230} stacks: 30 --> 29
+[0.42] [protection-warrior (#1)] No available actions!
+[0.42] [protection-warrior (#1)] Pausing rotation for 1.080179215s due to resources / CDs.
+[1.00] [protection-warrior (#1)] Gained 1.500 rage from {SpellID: 2687} (66.564 --> 68.064) of 100 total.
+[1.10] [protection-warrior (#1)] Queueing up {SpellID: 11581} to cast at 1.500000001s.
+[1.10] [protection-warrior (#1)] Pausing rotation for 400ms due to resources / CDs.
+[1.50] [protection-warrior (#1)] Casting {SpellID: 11581} (Cost = 12.000, Cast Time = 0s, GCD = 1.5s, Effective Time = 1.5s)
+[1.50] [protection-warrior (#1)] Completed cast {SpellID: 11581}
+[1.50] [protection-warrior (#1)] Spent 12.000 rage from {SpellID: 11581} (68.064 --> 56.064) of 100 total.
+[1.50] [protection-warrior (#1)] [Target 1] {SpellID: 11581} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:144.7, AfterAttackerMods:143.3, AfterResistances:143.3, AfterTargetMods:151.3, AfterOutcome:151.3, AfterPostOutcome:151.3
+[1.50] [Target 1] Aura gained: {SpellID: 11581}
+[1.50] [protection-warrior (#1)] [Target 1] {SpellID: 11581} Hit for 151.271 damage (SpellSchool: 1). (Threat: 226.150)
+[2.00] [protection-warrior (#1)] Gained 1.500 rage from {SpellID: 2687} (56.064 --> 57.564) of 100 total.
+[2.10] [protection-warrior (#1)] No available actions!
+[2.10] [protection-warrior (#1)] Pausing rotation for 900ms due to resources / CDs.
+[2.40] [protection-warrior (#1)] Casting {SpellID: 25286} (Cost = 13.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[2.40] [protection-warrior (#1)] Completed cast {SpellID: 25286}
+[2.40] [protection-warrior (#1)] Spent 13.000 rage from {SpellID: 25286} (57.564 --> 44.564) of 100 total.
+[2.40] [protection-warrior (#1)] [Target 1] {SpellID: 25286} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:534.4, AfterAttackerMods:529.1, AfterResistances:445.2, AfterTargetMods:453.2, AfterOutcome:0.0, AfterPostOutcome:0.0
+[2.40] [protection-warrior (#1)] Gained 10.400 rage from {OtherID: 8} (44.564 --> 54.964) of 100 total.
+[2.40] [protection-warrior (#1)] No available actions!
+[2.40] [protection-warrior (#1)] Pausing rotation for 597ms due to resources / CDs.
+[2.40] [protection-warrior (#1)] Aura faded: {SpellID: 25286, Tag: 1}
+[2.40] [protection-warrior (#1)] [Target 1] {SpellID: 25286} Parry (SpellSchool: 1). (Threat: 0.000)
+[2.48] [Target 1] Casting {OtherID: 3, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[2.48] [Target 1] Completed cast {OtherID: 3, Tag: 1}
+[2.48] [Target 1] [protection-warrior (#1)] {OtherID: 3, Tag: 1} [DEBUG] MAP: 805.0, RAP: 0.0, SP: 0.0, BaseDamage:165.7, AfterAttackerMods:165.7, AfterResistances:72.3, AfterTargetMods:65.1, AfterOutcome:65.1, AfterPostOutcome:65.1
+[2.48] [Target 1] [protection-warrior (#1)] {OtherID: 3, Tag: 1} Hit for 65.055 damage (SpellSchool: 1). (Threat: 65.055)
+[2.48] [protection-warrior (#1)] Gained 0.269 rage from {OtherID: 9} (54.964 --> 55.233) of 100 total.
+[2.48] [protection-warrior (#1)] Spent 65.055 health from {OtherID: 9} (5768.116 --> 5703.061) of 6169 total.
+[2.48] [protection-warrior (#1)] Casting {SpellID: 20240} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[2.48] [protection-warrior (#1)] Completed cast {SpellID: 20240}
+[2.48] [protection-warrior (#1)] [Target 1] {SpellID: 20240} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:386.9, AfterAttackerMods:383.0, AfterResistances:322.3, AfterTargetMods:330.3, AfterOutcome:660.6, AfterPostOutcome:660.6
+[2.48] [protection-warrior (#1)] [Target 1] {SpellID: 20240} Crit for 660.575 damage (SpellSchool: 1). (Threat: 987.559)
+[2.48] [protection-warrior (#1)] Aura gained: {SpellID: 10610, Tag: -1}
+[2.48] [protection-warrior (#1)] {SpellID: 10610, Tag: -1} stacks: 0 --> 1
+[2.48] [protection-warrior (#1)] Casting {OtherID: 3, Tag: 25584} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[2.48] [protection-warrior (#1)] Completed cast {OtherID: 3, Tag: 25584}
+[2.48] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 25584} [DEBUG] MAP: 1882.0, RAP: 112.0, SP: 0.0, BaseDamage:404.6, AfterAttackerMods:400.6, AfterResistances:337.1, AfterTargetMods:345.1, AfterOutcome:690.1, AfterPostOutcome:690.1
+[2.48] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 25584} Crit for 690.137 damage (SpellSchool: 1). (Threat: 1031.755)
+[2.48] [protection-warrior (#1)] Gained 16.608 rage from {OtherID: 3, Tag: 25584} (55.233 --> 71.841) of 100 total.
+[2.48] [protection-warrior (#1)] {SpellID: 10610, Tag: -1} stacks: 1 --> 0
+[2.48] [protection-warrior (#1)] Aura faded: {SpellID: 10610, Tag: -1}
+[2.48] [protection-warrior (#1)] {SpellID: 20230} stacks: 29 --> 28
+[2.49] [protection-warrior (#1)] Aura gained: {SpellID: 12880}
+[2.49] [protection-warrior (#1)] Gained 1.000 rage from {SpellID: 12964} (71.841 --> 72.841) of 100 total.
+[2.49] [protection-warrior (#1)] Casting {SpellID: 15851} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[2.49] [protection-warrior (#1)] Completed cast {SpellID: 15851}
+[2.49] [protection-warrior (#1)] [Target 1] {SpellID: 15851} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:70.2, AfterAttackerMods:63.1, AfterResistances:63.1, AfterTargetMods:63.1, AfterOutcome:63.1, AfterPostOutcome:63.1
+[2.49] [protection-warrior (#1)] [Target 1] {SpellID: 15851} Hit for 63.144 damage (SpellSchool: 4). (Threat: 94.400)
+[2.50] [protection-warrior (#1)] Casting {SpellID: 25286, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[2.50] [protection-warrior (#1)] Completed cast {SpellID: 25286, Tag: 1}
+[2.50] [protection-warrior (#1)] Pausing rotation for 497ms due to resources / CDs.
+[2.75] [protection-warrior (#1)] Aura gained: {SpellID: 25286, Tag: 1}
+[3.00] [protection-warrior (#1)] Gained 1.500 rage from {SpellID: 2687} (72.841 --> 74.341) of 100 total.
+[3.00] [protection-warrior (#1)] No available actions!
+[3.00] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.10] [protection-warrior (#1)] No available actions!
+[3.10] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.20] [protection-warrior (#1)] No available actions!
+[3.20] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.30] [protection-warrior (#1)] No available actions!
+[3.30] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.40] [protection-warrior (#1)] No available actions!
+[3.40] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.50] [protection-warrior (#1)] No available actions!
+[3.50] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.60] [protection-warrior (#1)] No available actions!
+[3.60] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.70] [protection-warrior (#1)] No available actions!
+[3.70] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.80] [protection-warrior (#1)] No available actions!
+[3.80] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[3.90] [protection-warrior (#1)] No available actions!
+[3.90] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.00] [protection-warrior (#1)] Gained 1.500 rage from {SpellID: 2687} (74.341 --> 75.841) of 100 total.
+[4.00] [protection-warrior (#1)] No available actions!
+[4.00] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.10] [protection-warrior (#1)] No available actions!
+[4.10] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.20] [protection-warrior (#1)] No available actions!
+[4.20] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.30] [protection-warrior (#1)] No available actions!
+[4.30] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.40] [protection-warrior (#1)] No available actions!
+[4.40] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.50] [protection-warrior (#1)] No available actions!
+[4.50] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.60] [protection-warrior (#1)] No available actions!
+[4.60] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.70] [protection-warrior (#1)] No available actions!
+[4.70] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.80] [protection-warrior (#1)] No available actions!
+[4.80] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.80] [protection-warrior (#1)] Casting {SpellID: 25286} (Cost = 13.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[4.80] [protection-warrior (#1)] Completed cast {SpellID: 25286}
+[4.80] [protection-warrior (#1)] Spent 13.000 rage from {SpellID: 25286} (75.841 --> 62.841) of 100 total.
+[4.80] [protection-warrior (#1)] [Target 1] {SpellID: 25286} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:512.5, AfterAttackerMods:558.1, AfterResistances:469.6, AfterTargetMods:477.6, AfterOutcome:477.6, AfterPostOutcome:477.6
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25286, Tag: 1}
+[4.80] [protection-warrior (#1)] [Target 1] {SpellID: 25286} Hit for 477.638 damage (SpellSchool: 1). (Threat: 941.907)
+[4.80] [protection-warrior (#1)] Casting {SpellID: 25286, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[4.80] [protection-warrior (#1)] Completed cast {SpellID: 25286, Tag: 1}
+[4.80] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.80] [protection-warrior (#1)] Casting {OtherID: 3, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[4.80] [protection-warrior (#1)] Completed cast {OtherID: 3, Tag: 1}
+[4.80] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 1} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:415.6, AfterAttackerMods:452.6, AfterResistances:380.9, AfterTargetMods:388.9, AfterOutcome:777.7, AfterPostOutcome:777.7
+[4.80] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 1} Crit for 777.739 damage (SpellSchool: 1). (Threat: 1162.720)
+[4.80] [protection-warrior (#1)] Gained 16.608 rage from {OtherID: 3, Tag: 1} (62.841 --> 79.449) of 100 total.
+[4.80] [protection-warrior (#1)] No available actions!
+[4.80] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.80] [protection-warrior (#1)] Casting {OtherID: 3, Tag: 1} (Cost = 0.000, Cast Time = 0s, GCD = 0s, Effective Time = 0s)
+[4.80] [protection-warrior (#1)] Completed cast {OtherID: 3, Tag: 1}
+[4.80] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 1} [DEBUG] MAP: 1636.0, RAP: 112.0, SP: 0.0, BaseDamage:363.8, AfterAttackerMods:396.2, AfterResistances:333.4, AfterTargetMods:341.4, AfterOutcome:341.4, AfterPostOutcome:341.4
+[4.80] [protection-warrior (#1)] [Target 1] {OtherID: 3, Tag: 1} Hit for 341.365 damage (SpellSchool: 1). (Threat: 510.340)
+[4.80] [protection-warrior (#1)] Gained 8.304 rage from {OtherID: 3, Tag: 1} (79.449 --> 87.753) of 100 total.
+[4.80] [protection-warrior (#1)] No available actions!
+[4.80] [protection-warrior (#1)] Pausing rotation for 100ms due to resources / CDs.
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 12880}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25289, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 10293, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 24932, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25362, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25580, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25587, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 21850, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 21564, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 19900, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 10535, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25898, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 25916, Tag: -1}
+[4.80] [protection-warrior (#1)] Aura faded: {ItemID: 13442}
+[4.80] [protection-warrior (#1)] Lost {"Strength": 60.000,} from fading {ItemID: 13442}.
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 20230}
+[4.80] [protection-warrior (#1)] {SpellID: 20230} stacks: 28 --> 0
+[4.80] [protection-warrior (#1)] Aura faded: {SpellID: 71}
+[4.80] [Target 1] Aura faded: {SpellID: 11717, Tag: -1}
+[4.80] [Target 1] Aura faded: {SpellID: 9907, Tag: -1}
+[4.80] [Target 1] Aura faded: {SpellID: 11198, Tag: -1}
+[4.80] [Target 1] Aura faded: {SpellID: 11374, Tag: -1}
+[4.80] [Target 1] Aura faded: {SpellID: 24977, Tag: -1}
+[4.80] [Target 1] Aura faded: {SpellID: 11581}

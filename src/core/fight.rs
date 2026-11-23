@@ -38,6 +38,7 @@ pub(crate) mod healer_gear;
 pub(crate) mod healing;
 pub(crate) mod healing_model;
 pub(crate) mod heals;
+pub(crate) mod health_fight;
 pub(crate) mod health_regen;
 mod log;
 pub(crate) mod melee;
@@ -1923,6 +1924,8 @@ pub(crate) struct Fight<A: Agent> {
     pub(crate) gifts: Option<Box<raid::Gifts>>,
     /// Which targets swing at this fight's player, when the raid's targets have different tanks.
     pub(crate) tank_role: Option<Box<raid::TankRole>>,
+    /// A fight that ends on the targets' health, when the encounter is one.
+    pub(crate) health_fight: Option<health_fight::HealthFight>,
     /// The player's healing model and TMI, when the request has one that acts.
     pub(crate) healing_model: Option<Box<healing_model::HealingModel>>,
     external_expose: Option<ExternalExpose>,
@@ -4312,6 +4315,13 @@ impl<A: Agent> Fight<A> {
             gifts: None,
             tank_role: None,
             healing_model: None,
+            health_fight: (prepared.encounter.end_fight_at_health > 0.0).then_some(
+                health_fight::HealthFight {
+                    end_damage: prepared.encounter.end_fight_at_health,
+                    estimate: prepared.encounter.duration_is_estimate,
+                    next_execute_damage: f64::MAX,
+                },
+            ),
             external_expose: None,
             aura_logs,
             stat_combos,
@@ -5956,6 +5966,7 @@ impl<A: Agent> Fight<A> {
 
     /// Go `Simulation.reset` and `Environment.reset`.
     fn reset(&mut self) {
+        self.health_fight_reset();
         self.in_prepull = true;
         self.duration = self.config.base_duration;
         if self.config.duration_variation != 0 {
@@ -5979,7 +5990,12 @@ impl<A: Agent> Fight<A> {
         }
         self.execute_phase = 0;
         self.next_execute_phase();
-        self.end_of_combat = self.duration;
+        // Go ends a health fight on damage, with no time limit.
+        self.end_of_combat = if self.health_fight.is_some() {
+            NEVER_EXPIRES
+        } else {
+            self.duration
+        };
         self.now = 0;
         self.min_tracker_time = NEVER_EXPIRES;
         self.min_task_time = NEVER_EXPIRES;
@@ -6171,16 +6187,20 @@ impl<A: Agent> Fight<A> {
         self.reschedule_tracker(tracker_min);
     }
 
-    /// Go `nextExecutePhase` for a fight that ends by duration.
+    /// Go `nextExecutePhase`: by the share of the fight's time, or of the targets' health in a
+    /// health fight.
     fn next_execute_phase(&mut self) {
         self.next_execute = NEVER_EXPIRES;
+        if let Some(health) = self.health_fight.as_mut() {
+            health.next_execute_damage = f64::MAX;
+        }
         let [p90, p45, p35, p25, p20] = self.config.execute_proportions;
-        let (phase, proportion) = match self.execute_phase {
-            0 => (100, p90),
-            100 => (90, p45),
-            90 => (45, p35),
-            45 => (35, p25),
-            35 => (25, p20),
+        let (phase, damage, proportion) = match self.execute_phase {
+            0 => (100, 0.90, p90),
+            100 => (90, 0.45, p45),
+            90 => (45, 0.35, p35),
+            45 => (35, 0.25, p25),
+            35 => (25, 0.20, p20),
             25 => {
                 self.execute_phase = 20;
                 return;
@@ -6188,7 +6208,9 @@ impl<A: Agent> Fight<A> {
             phase => panic!("executePhase = {phase} invalid"),
         };
         self.execute_phase = phase;
-        self.next_execute = ((1.0 - proportion) * self.duration as f64) as i64;
+        if !self.health_execute_phase(damage) {
+            self.next_execute = ((1.0 - proportion) * self.duration as f64) as i64;
+        }
     }
 
     /// Go `IsExecutePhase20`.
@@ -6206,7 +6228,7 @@ impl<A: Agent> Fight<A> {
         // Go runs due weapon swings before the next pending action, ties included.
         let next = self.queue.peek_time().unwrap_or(NEVER_EXPIRES);
         if self.due_weapon_attack(next) && self.autos.min_time <= self.min_task_time {
-            if self.autos.min_time > self.end_of_combat {
+            if self.autos.min_time > self.end_of_combat || self.health_fight_over() {
                 return false;
             }
             self.advance_weapon_attacks();
@@ -6214,7 +6236,7 @@ impl<A: Agent> Fight<A> {
         }
         // Then due tasks, the energy ticks.
         if self.due_task(next) {
-            if self.min_task_time > self.end_of_combat {
+            if self.min_task_time > self.end_of_combat || self.health_fight_over() {
                 return false;
             }
             self.advance_tasks();
@@ -6223,7 +6245,7 @@ impl<A: Agent> Fight<A> {
         let Some((time, handle, action)) = self.queue.pop() else {
             return false;
         };
-        if time > self.end_of_combat {
+        if time > self.end_of_combat || self.health_fight_over() {
             return false;
         }
         // Go marks an action consumed when it is popped, before the advance: an aura the
@@ -6247,7 +6269,7 @@ impl<A: Agent> Fight<A> {
         self.now = time;
         // Go loops so equal proportions pass several phases in one advance, calling the execute
         // phase callbacks after each.
-        while self.now >= self.next_execute {
+        while self.now >= self.next_execute || self.health_execute_due() {
             self.next_execute_phase();
             let phase = self.execute_phase;
             A::on_execute_phase(self, phase);
@@ -6695,7 +6717,12 @@ impl<A: Agent> Fight<A> {
 
     /// Go `Simulation.Cleanup` and `doneIteration`.
     fn cleanup(&mut self) {
-        self.now = self.duration;
+        // Go keeps a health fight's end time as its length.
+        if self.health_fight.is_some() {
+            self.duration = self.now;
+        } else {
+            self.now = self.duration;
+        }
         self.queue.clear();
         self.player.hardcast = Hardcast::idle(0);
         // Go Character.doneIteration swaps back to the Main set before anything else.
