@@ -48,7 +48,6 @@ const SHRED_RANKS: [i32; 5] = [5221, 6800, 8992, 9829, 9830];
 const CLAW_RANKS: [i32; 5] = [1082, 3029, 5201, 9849, 9850];
 const RIP_RANKS: [i32; 6] = [1079, 9492, 9493, 9752, 9894, 9896];
 const RAKE_RANKS: [i32; 4] = [1822, 1823, 1824, 9904];
-const BITE_RANKS: [i32; 5] = [22568, 22827, 22828, 22829, 31018];
 const BEAR_ENRAGE_RANK: [i32; 1] = [5229];
 const MAUL_RANKS: [i32; 7] = [6807, 6808, 6809, 8972, 9745, 9880, 9881];
 const SWIPE_RANKS: [i32; 5] = [779, 780, 769, 9754, 9908];
@@ -175,7 +174,7 @@ impl Druid {
         let highest = |ids: &[i32]| Ladder::ranked(ids).highest().id;
         let wanted = STARFIRE_RANKS.contains(&id)
             || WRATH_RANKS.contains(&id)
-            || id == highest(&BITE_RANKS)
+            || id == super::feral::bite_rank(sim.rules).id
             || id == highest(&MAUL_RANKS)
             || id == super::bear::primal_bite_rank(sim.rules).id
             || id == highest(&MOONFIRE_RANKS);
@@ -500,7 +499,7 @@ impl Druid {
         if let Some(bite) = self.ferocious_bite {
             // ferocious_bite.go: client values (the live row under Forever's rules), and 3% attack
             // power a point, a Go literal that keeps the notes' 25% under Forever's rules.
-            let rank = super::feral::cat_rank(sim.rules, &BITE_RANKS);
+            let rank = super::feral::bite_rank(sim.rules);
             let mut effect = json!({
                 "kind": "ferocious_bite", "spell": spell_position(sim, unit, bite),
                 "damage_per_energy": rank.effect_n(2).percent(),

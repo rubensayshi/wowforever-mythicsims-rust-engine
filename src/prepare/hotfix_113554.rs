@@ -163,6 +163,35 @@ pub(crate) const FEROCIOUS_BITE_LIVE_20261104: FerociousBiteRow = FerociousBiteR
     energy_dummy: 330.0,
 };
 
+/// Ferocious Bite rank 1 (1328618), the rank the hotfix of 30 October 2026 adds below the frozen
+/// ladder, a row the store lacks. foreverchanges.pro's druid spellbook (23 November 2026, which
+/// states rank 6 as [`FEROCIOUS_BITE_LIVE_20261104`] does) trains it at 24 for 35 Energy: "40-54
+/// damage" at one combo point, 30 more a point up to "160-174" at five, and "0.7 additional
+/// damage" for each extra Energy. That is a roll of 17 spread over 14, 30 more a combo point and
+/// 70 for the dummy. Its cost, attributes and the rest of its row are rank 2's (22568), as in Go's
+/// fork; the client's own row is not at hand.
+pub(crate) const FEROCIOUS_BITE_RANK_1_20261123: FerociousBiteRow = FerociousBiteRow {
+    base_points: 17.0,
+    spread: 14.0,
+    points_per_combo_point: 30.0,
+    energy_dummy: 70.0,
+};
+
+/// Ferocious Bite's ranks under Forever's rules, with the level each is trained at (the trainer
+/// data, `data/forever-trainer-spells.jsonl`): rank 1 (1328618) at 24, then the frozen ladder's
+/// five at their rows' levels.
+pub(crate) const FEROCIOUS_BITE_RANKS_FOREVER: [(i32, i32); 6] = [
+    (1_328_618, 24),
+    (22_568, 32),
+    (22_827, 40),
+    (22_828, 48),
+    (22_829, 56),
+    (31_018, 60),
+];
+
+/// The frozen store's first Ferocious Bite rank (level 32), which rank 1 copies.
+const FEROCIOUS_BITE_FIRST_FROZEN_RANK: i32 = 22_568;
+
 /// See [`FEROCIOUS_BITE_LIVE_20261104`].
 pub(crate) struct FerociousBiteRow {
     pub(crate) base_points: f64,
@@ -632,6 +661,26 @@ fn build() -> HashMap<i32, &'static Spell> {
         row.effects[0].base_points = tick;
         rows.insert(id, row);
     }
+
+    // Ferocious Bite rank 1, which the frozen store lacks: rank 2's row (22568) with the site's
+    // numbers at level 24. Its effects keep rank 2's SpellEffect IDs.
+    let (id, level) = FEROCIOUS_BITE_RANKS_FOREVER[0];
+    let mut row = must_find(FEROCIOUS_BITE_FIRST_FROZEN_RANK).clone();
+    row.id = id;
+    row.rank = "Rank 1".to_string();
+    let level = level as i16;
+    row.spell_level = level;
+    row.base_level = level;
+    for effect in &mut row.effects {
+        effect.spell_id = id;
+        effect.spell_level = level;
+    }
+    let bite = FEROCIOUS_BITE_RANK_1_20261123;
+    row.effects[0].base_points = bite.base_points;
+    row.effects[0].variance = bite.spread / bite.base_points;
+    row.effects[0].points_per_resource = bite.points_per_combo_point;
+    row.effects[1].base_points = bite.energy_dummy;
+    rows.insert(id, row);
 
     rows.into_iter()
         .map(|(id, row)| (id, &*Box::leak(Box::new(row))))

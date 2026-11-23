@@ -102,6 +102,20 @@ pub(super) fn cat_rank(rules: Rules, ranks: &[i32]) -> &'static Spell {
     hotfix_113554::row(rules, Ladder::ranked(ranks).highest().id)
 }
 
+/// Ferocious Bite's rank: under Forever's rules the ladder starts at rank 1 (1328618, level 24),
+/// a row the store lacks (`hotfix_113554`), so a cat of 24 to 31 bites; it could not before, the
+/// frozen ladder starting at 22568 (level 32). The reference keeps the frozen ladder.
+pub(super) fn bite_rank(rules: Rules) -> &'static Spell {
+    match rules {
+        Rules::Forever => {
+            let ranks = hotfix_113554::FEROCIOUS_BITE_RANKS_FOREVER
+                .map(|(id, level)| (hotfix_113554::row(rules, id), level));
+            crate::prepare::levels::known_rank_at(&ranks).unwrap_or(ranks[5].0)
+        }
+        Rules::GoReference => cat_rank(rules, &BITE_RANKS),
+    }
+}
+
 /// Rend and Tear's damage multiplier at a rank: 2% a rank in the client rows, 3% a rank under
 /// the development notes of 2 November 2026 (Forever's rules). Wowhead's Forever tooltip of the
 /// talent spell reads "by 20%" on 4 November, which is the row's own base points (20 in the frozen
@@ -235,7 +249,7 @@ impl Druid {
     }
 
     fn register_ferocious_bite_spell(&mut self, sim: &mut Sim) {
-        let rank = cat_rank(sim.rules, &BITE_RANKS);
+        let rank = bite_rank(sim.rules);
         let mut config = melee_special(rank, masks::FEROCIOUS_BITE, SpellFlag::NONE);
         config.damage_multiplier = 1.0;
         self.ferocious_bite = Some(self.register_spell(sim, CAT, config));
