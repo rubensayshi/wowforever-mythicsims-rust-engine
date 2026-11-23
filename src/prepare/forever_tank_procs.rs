@@ -37,6 +37,13 @@
 //!   (9784) deals a roll of 10 with a variance of 0.4, Mithril Shield Spike (9782) 18 with a
 //!   variance of 0.22 and Thorium Shield Spike (16624) 25 with a variance of 0.4, every time the
 //!   wearer blocks, as the Girdle's does.
+//! - Force of Will (11810): its equip spell 15594 triggers 15595 when the wearer is struck by a
+//!   melee hit that lands: ProcChance 100 (ProcChanceSource 3, no stated rate, which the decision
+//!   reads as the rate) and a 30 sec ProcCategoryRecovery in the client's SpellAuraOptions
+//!   (1.60.1). 15595 is -51 damage taken from every school (Mod Damage Taken, Misc 127) for
+//!   10 sec. The generated registration reads 15595 as an equip aura, which makes the -51
+//!   permanent; under Forever's rules this effect replaces it (`forever_items`), while the
+//!   reference's rules keep the generated one.
 //!
 //! A character no target attacks is never struck and never blocks: it wears each as a plain item,
 //! and the listeners are inert. A tank with no mana bar gains nothing from Zealot Plate, which
@@ -46,13 +53,15 @@ use serde_json::{json, Value};
 
 use crate::contracts::prepared_v2::ActionId;
 
-use super::aura_helpers::{HitOutcome, StackingStatAura};
+use super::aura_helpers::{CallbackMask, HitOutcome, StackingStatAura};
 use super::env::Environment;
 use super::export_items::{aura_named, outcome_names, spell_position};
+use super::parse_effects::{parse_effects, ParseOptions};
 use super::resolve_aura::{aura_config, label};
 use super::resolve_proc::{chance, proc_trigger};
 use super::shared_items::{spell_data_proc_damage_spell, spell_data_proc_heal_spell, EffectSource};
-use super::sim::AuraId;
+use super::sim::{AuraId, SECOND};
+use super::spell::ProcMask;
 use super::spelldata::must_find;
 use super::stats::{Stat, Stats};
 
@@ -74,6 +83,11 @@ const ZEALOT_TRIGGER: i32 = 1_294_668;
 const ZEALOTRY: i32 = 1_294_666;
 /// Shield Spike.
 const SHIELD_SPIKE: i32 = 1_308_777;
+/// Force of Will.
+pub(crate) const FORCE_OF_WILL: i32 = 11_810;
+/// Force of Will's equip spell and the damage taken buff it triggers.
+const FORCE_OF_WILL_TRIGGER: i32 = 15_594;
+const FORCE_OF_WILL_BUFF: i32 = 15_595;
 
 /// The shield spike enchants: the enchant, its label and the equip spell its row casts.
 const SHIELD_SPIKE_ENCHANTS: [(i32, &str, i32); 3] = [
@@ -88,12 +102,18 @@ const KROLDOK_4_LABEL: &str = "Krol'dok Battlegear 4P";
 const KROLDOK_5_LABEL: &str = "Krol'dok Battlegear 5P";
 const ZEALOT_PLATE_LABEL: &str = "Zealot Plate";
 const GIRDLE_LABEL: &str = "Girdle of Extracted Answers";
+const FORCE_OF_WILL_LABEL: &str = "Force of Will Trigger";
 /// The stacking buff Ogre Dominance applies.
 const OGRE_DOMINANCE_AURA: &str = "Ogre Dominance";
+/// The buff Force of Will applies.
+const FORCE_OF_WILL_AURA: &str = "Force of Will";
 
 /// The item effects of this module, applied under Forever's rules.
 pub(crate) fn has_item_effect(item: i32) -> bool {
-    matches!(item, ZEALOT_PLATE | GIRDLE_OF_EXTRACTED_ANSWERS)
+    matches!(
+        item,
+        ZEALOT_PLATE | GIRDLE_OF_EXTRACTED_ANSWERS | FORCE_OF_WILL
+    )
 }
 
 /// Applies the equip effect of one of [`has_item_effect`]'s items, answering whether it is one.
@@ -109,6 +129,7 @@ pub(crate) fn apply_item(env: &mut Environment, item: i32) -> bool {
                 is_enchant: false,
             },
         ),
+        FORCE_OF_WILL => force_of_will(env),
         _ => return false,
     }
     true
@@ -214,14 +235,60 @@ fn shield_spike(env: &mut Environment, spell: i32, label: &str, source: EffectSo
     source.register_trigger(env, &listener);
 }
 
-/// The stat auras of the effects above, for the combinations `statAurasEffect` reads: Ogre
-/// Dominance's stacks, when the wearer is struck at all.
+/// Force of Will: the 10 sec buff of -51 damage taken from every school, its effects parsed from
+/// 15595, and the listener on the item that activates it when a melee hit taken lands, at most
+/// once in 30 sec.
+fn force_of_will(env: &mut Environment) {
+    let unit = env.player;
+    let buff = must_find(FORCE_OF_WILL_BUFF);
+    let aura = env
+        .sim
+        .register_aura(unit, aura_config(buff, &[label(FORCE_OF_WILL_AURA)]));
+    parse_effects(
+        &mut env.sim,
+        Some(unit),
+        aura,
+        buff,
+        ParseOptions::default(),
+    );
+    let source = EffectSource {
+        id: FORCE_OF_WILL,
+        is_enchant: false,
+    };
+    // The store files the row's 100 as no stated rate; it is the rate.
+    let rate = [chance(1.0)];
+    let mut listener = proc_trigger(
+        &env.sim,
+        Some(unit),
+        must_find(FORCE_OF_WILL_TRIGGER),
+        &rate,
+    );
+    listener.name = FORCE_OF_WILL_LABEL.to_string();
+    listener.action_id = source.action_id();
+    listener.callback = CallbackMask::ON_SPELL_HIT_TAKEN;
+    listener.proc_mask = ProcMask::MELEE;
+    listener.outcome = HitOutcome::LANDED;
+    listener.require_damage_dealt = false;
+    // SpellAuraOptions: ProcCategoryRecovery 30000.
+    listener.icd = 30 * SECOND;
+    source.register_trigger(env, &listener);
+}
+
+/// The stat auras of the effects above, for the combinations `statAurasEffect` reads, when the
+/// wearer is struck at all: Ogre Dominance's stacks and Force of Will's damage taken, which the
+/// target's swing reads from the combination's rolls.
 pub(crate) fn stat_auras(env: &Environment) -> Vec<String> {
-    if aura_named(env, KROLDOK_5_LABEL).is_some() && env.tanking() {
-        vec![OGRE_DOMINANCE_AURA.to_string()]
-    } else {
-        Vec::new()
+    if !env.tanking() {
+        return Vec::new();
     }
+    [
+        (KROLDOK_5_LABEL, OGRE_DOMINANCE_AURA),
+        (FORCE_OF_WILL_LABEL, FORCE_OF_WILL_AURA),
+    ]
+    .into_iter()
+    .filter(|(listener, _)| aura_named(env, listener).is_some())
+    .map(|(_, buff)| buff.to_string())
+    .collect()
 }
 
 /// A listener nothing in the fight reaches: the wearer is struck by no target.
@@ -241,6 +308,7 @@ pub(crate) fn export_effects(env: &Environment) -> Vec<Value> {
         KROLDOK_5_LABEL,
         ZEALOT_PLATE_LABEL,
         GIRDLE_LABEL,
+        FORCE_OF_WILL_LABEL,
     ]
     .into_iter()
     .chain(SHIELD_SPIKE_ENCHANTS.iter().map(|(_, label, _)| *label));
@@ -254,6 +322,7 @@ pub(crate) fn export_effects(env: &Environment) -> Vec<Value> {
                 KROLDOK_5_LABEL => Some(ogre_dominance_effect(env, aura)),
                 ZEALOT_PLATE_LABEL => Some(zealot_plate_effect(env, aura)),
                 GIRDLE_LABEL => shield_spike_effect(env, aura, SHIELD_SPIKE),
+                FORCE_OF_WILL_LABEL => Some(force_of_will_effect(env, aura)),
                 _ => SHIELD_SPIKE_ENCHANTS
                     .iter()
                     .find(|(_, enchant_label, _)| *enchant_label == label)
@@ -302,6 +371,18 @@ fn ogre_dominance_effect(env: &Environment, aura: AuraId) -> Value {
         "aura": OGRE_DOMINANCE_AURA, "trigger_spells": Vec::<usize>::new(),
         "callbacks": ["on_spell_hit_taken"], "struck": true, "landed_only": true,
         "require_damage": true, "proc_chance": 1.0, "add_stack": true,
+    })
+}
+
+/// `spell_data_stat_proc` for Force of Will: a landed melee hit taken activates the buff, a
+/// spell batch window later. The buff changes no stat; the target's swing reads its -51 from the
+/// stat aura combination's rolls.
+fn force_of_will_effect(env: &Environment, aura: AuraId) -> Value {
+    json!({
+        "kind": "spell_data_stat_proc", "trigger_aura": env.sim.aura(aura).label,
+        "aura": FORCE_OF_WILL_AURA, "trigger_spells": Vec::<usize>::new(),
+        "callbacks": ["on_spell_hit_taken"], "struck": true, "landed_only": true,
+        "require_damage": false, "proc_chance": 1.0,
     })
 }
 
