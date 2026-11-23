@@ -51,21 +51,48 @@
 //!   refreshed it. No fight is in a swamp, so the doubling (the buff's Dummy of 4) never applies.
 //!   The rows are in the pinned store.
 //!
-//! Soulforge Armor (ItemSet 516: the Classic Tier 0.5 Paladin pieces 22086 to 22093, which the
-//! reference does not register; its Soulforge Armor is the later reissue's set), read the same
-//! way on 13 November 2026 beside the Wowhead Forever tooltip of Soulforge Breastplate (22089):
+//! Soulforge Armor (ItemSet 1673, the live client's Tier 0.5 Paladin set: three role variants,
+//! 226969 to 226992, and Soulforge Boots 226999, which count together), read on 23 November 2026
+//! from the ItemSetSpell rows of build 1.60.1.71037 beside the Wowhead Forever tooltips. Its
+//! pieces carry the name and the id of the reissued set; the Classic pieces 22086 to 22093 (set
+//! 516, whose rows were read here before: +40 Attack Power at 6 pieces, +200 Armor at 8) are
+//! worn by nobody in Forever's logs and count by the same name.
 //!
-//! - (2) "+8 All Resistances." ItemSetSpell 2317, Increased All Resist 08 (18679): a resistance
-//!   aura (22) of 8 on every school (mask 126).
-//! - (4) "Chance on melee attack to increase your damage and healing done by magical spells and
-//!   effects by up to 65 for 10 sec." ItemSetSpell 2318, Crusader's Wrath (27498), a proc on
-//!   melee autoattacks (ProcTypeMask 4) that casts 27499, 65 spell damage (13) and healing (135).
-//!   SpellAuraOptions 135342 has ProcChance 100 and no rate, as Lightforge Armor's (5) proc of the
-//!   same buff (450625) has; it runs at Lightforge's 3 per minute
-//!   (`forever_item_sets::crusaders_wrath`).
-//! - (6) "+40 Attack Power." ItemSetSpell 2316, Attack Power 40 (14049): melee (99) and ranged
-//!   (124) attack power of 40.
-//! - (8) "+200 Armor." ItemSetSpell 2319, Increased Armor 200 (14803): an armor aura (674) of 200.
+//! - (2) "+8 All Resistances." 18679: a resistance aura (22) of 8 on every school (mask 126).
+//! - (3) "Restores 8 mana per 5 sec." 18378.
+//! - (4) "Chance on melee autoattack and spellcast to increase your damage and healing done by
+//!   magical spells and effects by up to 65 for 10 sec." 450625, Lightforge Armor's (5)
+//!   Crusader's Wrath, casting 27499 (65 spell damage and healing). Its row has ProcChance 100
+//!   and no rate; it runs at Lightforge's 3 per minute on melee autoattacks
+//!   (`forever_item_sets::crusaders_wrath`), the spellcast half unread, as Lightforge's is.
+//! - (5) "When struck by a harmful spell, has a 7% chance of Silencing the caster for 3 sec."
+//!   1302716: crowd control, applied as nothing.
+//! - (6) "Increases damage and healing done by magical spells and effects by up to 23." 14047.
+//!
+//! The Tier 0.5 caster sets of the live client: Sorcerer's Regalia (ItemSet 1671, the Mage's
+//! pieces 226929 to 226936), Deathmist Raiment (1681, the Warlock's 226905 to 226912) and
+//! Vestments of the Virtuous (1675, the Priest's two role variants 226945 to 226960, which count
+//! together). Forever's pieces are encrypted rows of the client: their ItemSparse rows name the
+//! set, while the ItemSet rows still list Season of Discovery's ids (226937 to 226944 and the
+//! like), so the pieces count by the set name they carry. The ItemSetSpell rows of build
+//! 1.60.1.71037 (wago.tools `product=wowf`, 23 November 2026) and the Wowhead Forever tooltips
+//! of Sorcerer's Bindings (226929) and Deathmist Belt (226905) agree, and the three sets share
+//! their rows but the 4 and 5 piece spells:
+//!
+//! - (2) "+8 All Resistances." 18679, as Soulforge Armor's (2).
+//! - (3) "Restores 8 mana per 5 sec." 18378: 8 MP5, as the Tier 0 sets' (6).
+//! - (4) Sorcerer's Regalia: "Your spellcasts have a 5% chance to energize you for 200 mana."
+//!   450527, Magister's Regalia's (5) Sudden Insight. Vestments of the Virtuous: the same proc
+//!   by Vestments of the Devout's (5) row 450576. Deathmist Raiment: "Your spellcasts have a 5%
+//!   chance to heal you for 270 to 330." 450585, Dreadmist Raiment's (5) Dark Reward.
+//! - (5) "When struck in combat" freezes (27867), fears (27780) or "When struck" casts Divine
+//!   Protection (27778): a crowd control or defensive proc on a hit taken, which no damage or
+//!   heal of a fight here reads, applied as nothing, as the Tier 0 sets' (4) are.
+//! - (6) "Increases damage and healing done by magical spells and effects by up to 23." 14047:
+//!   23 spell damage and healing.
+//!
+//! Before this the engine registered none of the three, so their pieces counted for their own
+//! stats alone in a damage sim (a healer sim read the stat rows of Vestments of the Virtuous).
 
 use std::rc::Rc;
 
@@ -207,24 +234,48 @@ fn soulforge_armor_2(env: &mut Environment, aura: AuraId) {
 
 /// Soulforge Armor (4): Crusader's Wrath, as Lightforge Armor's (5).
 fn soulforge_armor_4(env: &mut Environment, aura: AuraId) {
-    super::forever_item_sets::crusaders_wrath(env, aura, SOULFORGE_CRUSADERS_WRATH, 27498);
+    super::forever_item_sets::crusaders_wrath(env, aura, SOULFORGE_CRUSADERS_WRATH, 450625);
 }
 
 /// The name of Soulforge Armor's Crusader's Wrath proc.
 pub(crate) const SOULFORGE_CRUSADERS_WRATH: &str = "Crusader's Wrath Proc - Soulforge Armor";
 
-/// Soulforge Armor (6): +40 Attack Power.
-fn soulforge_armor_6(env: &mut Environment, aura: AuraId) {
-    env.sim.attach_stats_buff(
-        aura,
-        Stats::from_pairs(&[(Stat::AttackPower, 40.0), (Stat::RangedAttackPower, 40.0)]),
-    );
+/// Tier 0.5 caster sets (2): +8 All Resistances, as Soulforge Armor's.
+fn tier05_caster_2(env: &mut Environment, aura: AuraId) {
+    soulforge_armor_2(env, aura);
 }
 
-/// Soulforge Armor (8): +200 Armor.
-fn soulforge_armor_8(env: &mut Environment, aura: AuraId) {
+/// Tier 0.5 sets (3): restores 8 mana per 5 sec, Soulforge Armor's too.
+fn tier05_caster_3(env: &mut Environment, aura: AuraId) {
     env.sim
-        .attach_stats_buff(aura, Stats::from_pairs(&[(Stat::Armor, 200.0)]));
+        .attach_stats_buff(aura, Stats::from_pairs(&[(Stat::MP5, 8.0)]));
+}
+
+/// Sorcerer's Regalia (4): Sudden Insight, a spell cast's 5% chance to restore 200 mana.
+fn sorcerers_regalia_4(env: &mut Environment, aura: AuraId) {
+    super::forever_item_sets::sudden_insight(env, aura, 450527);
+}
+
+/// Vestments of the Virtuous (4): Sudden Insight, by Vestments of the Devout's row.
+fn vestments_of_the_virtuous_4(env: &mut Environment, aura: AuraId) {
+    super::forever_item_sets::sudden_insight(env, aura, 450576);
+}
+
+/// Deathmist Raiment (4): Dark Reward, a spell cast's 5% chance to heal the wearer.
+fn deathmist_raiment_4(env: &mut Environment, aura: AuraId) {
+    super::forever_item_sets::dark_reward(env, aura);
+}
+
+/// Tier 0.5 sets (5): a proc on a hit taken that only controls the attacker or protects
+/// the wearer, which nothing in a fight here reads.
+fn tier05_caster_5(_env: &mut Environment, _aura: AuraId) {}
+
+/// Tier 0.5 sets (6): 23 spell damage and healing, Soulforge Armor's too.
+fn tier05_caster_6(env: &mut Environment, aura: AuraId) {
+    env.sim.attach_stats_buff(
+        aura,
+        Stats::from_pairs(&[(Stat::SpellDamage, 23.0), (Stat::HealingPower, 23.0)]),
+    );
 }
 
 /// The client's sets, with the bonuses applied and the piece counts that are not prepared yet.
@@ -261,14 +312,63 @@ pub(crate) static CLIENT_ITEM_SETS: &[ClientItemSet] = &[
     },
     ClientItemSet {
         set: ItemSet {
-            id: 516,
+            id: 1673,
             name: "Soulforge Armor",
             alternative_name: "",
             bonuses: &[
                 (2, soulforge_armor_2),
+                (3, tier05_caster_3),
                 (4, soulforge_armor_4),
-                (6, soulforge_armor_6),
-                (8, soulforge_armor_8),
+                (5, tier05_caster_5),
+                (6, tier05_caster_6),
+            ],
+            required_profession: "",
+        },
+        not_prepared: &[],
+    },
+    ClientItemSet {
+        set: ItemSet {
+            id: 1671,
+            name: "Sorcerer's Regalia",
+            alternative_name: "",
+            bonuses: &[
+                (2, tier05_caster_2),
+                (3, tier05_caster_3),
+                (4, sorcerers_regalia_4),
+                (5, tier05_caster_5),
+                (6, tier05_caster_6),
+            ],
+            required_profession: "",
+        },
+        not_prepared: &[],
+    },
+    ClientItemSet {
+        set: ItemSet {
+            id: 1681,
+            name: "Deathmist Raiment",
+            alternative_name: "",
+            bonuses: &[
+                (2, tier05_caster_2),
+                (3, tier05_caster_3),
+                (4, deathmist_raiment_4),
+                (5, tier05_caster_5),
+                (6, tier05_caster_6),
+            ],
+            required_profession: "",
+        },
+        not_prepared: &[],
+    },
+    ClientItemSet {
+        set: ItemSet {
+            id: 1675,
+            name: "Vestments of the Virtuous",
+            alternative_name: "",
+            bonuses: &[
+                (2, tier05_caster_2),
+                (3, tier05_caster_3),
+                (4, vestments_of_the_virtuous_4),
+                (5, tier05_caster_5),
+                (6, tier05_caster_6),
             ],
             required_profession: "",
         },
@@ -307,7 +407,7 @@ mod tests {
             let mut counts: Vec<i32> = client.set.bonuses.iter().map(|(n, _)| *n).collect();
             counts.extend(client.not_prepared);
             counts.sort_unstable();
-            // The generated rows where they hold the set (Soulforge Armor: 2, 4, 6 and 8).
+            // The generated rows where they hold the set (the Tier 0.5 sets: 2 to 6).
             let mut rows: Vec<i32> = super::super::forever_set_spells_generated::SET_BONUSES
                 .iter()
                 .filter(|(id, _, _)| *id == client.set.id)

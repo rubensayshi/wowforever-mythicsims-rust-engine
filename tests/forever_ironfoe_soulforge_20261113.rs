@@ -5,9 +5,11 @@
 //!   against Orcs are 2 times as likely to activate this effect. (Proc chance: 6%, 100ms
 //!   cooldown)". The row's 6 is the chance against Orcs, so Fury of Forgewright rolls 3% on the
 //!   targets the sims fight. The reference keeps its 6%.
-//! - Soulforge Armor (ItemSet 516, the Tier 0.5 Paladin set): (2) +8 All Resistances, (4)
-//!   Crusader's Wrath, 65 spell damage and healing for 10 sec on a melee autoattack, (6) +40
-//!   Attack Power, (8) +200 Armor. Before, its pieces were plain items.
+//! - Soulforge Armor (the Tier 0.5 Paladin set): (2) +8 All Resistances, (4) Crusader's Wrath, 65
+//!   spell damage and healing for 10 sec on a melee autoattack. Before, its pieces were plain
+//!   items. Since 23 November 2026 the bonuses are the reissued set's (ItemSet 1673): (3) 8 mana
+//!   per 5 sec and (6) 23 spell damage and healing beside those, and nothing at 8 pieces
+//!   (`forever_t05_caster_sets_20261123`).
 
 use forever_engine::{
     check_prepared, contracts::prepared_v2::PreparedV2, prepare_json_with, simulate_prepared, Rules,
@@ -28,16 +30,16 @@ const LEGS: usize = 8;
 const FEET: usize = 9;
 const MAIN_HAND: usize = 14;
 
-/// The Soulforge pieces in the order the tests add them.
+/// The reissued Soulforge pieces (the first role variant) in the order the tests add them.
 const SOULFORGE: [(usize, i64); 8] = [
-    (HEAD, 22091),
-    (SHOULDER, 22093),
-    (CHEST, 22089),
-    (HANDS, 22090),
-    (LEGS, 22092),
-    (WAIST, 22086),
-    (WRIST, 22088),
-    (FEET, 22087),
+    (HEAD, 226976),
+    (SHOULDER, 226969),
+    (CHEST, 226973),
+    (HANDS, 226975),
+    (LEGS, 226972),
+    (WAIST, 226971),
+    (WRIST, 226970),
+    (FEET, 226974),
 ];
 
 /// The armor slots the Soulforge tests fill, emptied first so a difference is the items' alone.
@@ -114,9 +116,10 @@ fn ironfoe_rolls_three_percent_under_forevers_rules() {
 }
 
 #[test]
-fn soulforge_armor_bonuses_apply_at_two_four_six_and_eight_pieces() {
+fn soulforge_armor_bonuses_apply_from_two_to_six_pieces() {
     let three = prepare(&paladin(&SOULFORGE[..3]), Rules::Forever);
     assert!(has_aura(&three, "Soulforge Armor 2P"));
+    assert!(has_aura(&three, "Soulforge Armor 3P"));
     assert!(!has_aura(&three, "Soulforge Armor 4P"));
     assert!(effect(&three, "stat_proc", "Soulforge Armor 4P").is_none());
 
@@ -127,13 +130,23 @@ fn soulforge_armor_bonuses_apply_at_two_four_six_and_eight_pieces() {
     assert!(!wrath["chances"].as_array().unwrap().is_empty());
 
     let eight = prepare(&paladin(&SOULFORGE), Rules::Forever);
-    for pieces in [2, 4, 6, 8] {
+    for pieces in 2..=6 {
         assert!(has_aura(&eight, &format!("Soulforge Armor {pieces}P")));
     }
+    assert!(!has_aura(&eight, "Soulforge Armor 8P"));
 
     assert_eq!(bonus(2, "FireResistance"), 8.0);
-    assert_eq!(bonus(6, "AttackPower"), 40.0);
-    assert!(bonus(8, "Armor") >= 200.0, "{}", bonus(8, "Armor"));
+    assert!((bonus(3, "MP5") - 8.0).abs() < 0.5, "{}", bonus(3, "MP5"));
+    assert!(
+        (bonus(6, "SpellDamage") - 23.0).abs() < 0.5,
+        "{}",
+        bonus(6, "SpellDamage")
+    );
+    assert!(
+        bonus(6, "AttackPower").abs() < 0.5,
+        "{}",
+        bonus(6, "AttackPower")
+    );
 }
 
 /// In fights the four piece bonus gains Crusader's Wrath, about three times a minute.

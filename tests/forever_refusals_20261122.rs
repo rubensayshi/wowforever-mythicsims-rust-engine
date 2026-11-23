@@ -100,17 +100,25 @@ fn soulforge_boots_are_the_paladins_sixth_soulforge_armor_piece() {
     let with = prepared(&request(PALADIN));
     let bare = prepared(&without(PALADIN, SOULFORGE_BOOTS));
     simulate(&with);
+    // The reissued set's bonuses are at 2 to 6 pieces (`forever_client_sets`).
     assert_eq!(
         set_bonuses(&with),
         [
             "Soulforge Armor 2P",
+            "Soulforge Armor 3P",
             "Soulforge Armor 4P",
+            "Soulforge Armor 5P",
             "Soulforge Armor 6P"
         ]
     );
     assert_eq!(
         set_bonuses(&bare),
-        ["Soulforge Armor 2P", "Soulforge Armor 4P"]
+        [
+            "Soulforge Armor 2P",
+            "Soulforge Armor 3P",
+            "Soulforge Armor 4P",
+            "Soulforge Armor 5P"
+        ]
     );
     // Damage and healing up to 12 and 4 mana per 5 sec, beside what the Paladin draws from the
     // boots' Strength, Intellect and Spirit.
