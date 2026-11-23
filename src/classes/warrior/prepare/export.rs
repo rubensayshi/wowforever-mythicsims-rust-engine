@@ -447,6 +447,20 @@ impl Warrior {
                     * f64::from(row.power(dbcenums::POWER_HEALTH).cost_pct) / 100.0,
                 "delay_ns": SPELL_BATCH_WINDOW}));
         }
+        // Gore Drinker (Forever's rules; talents/gore_drinker.rs): the buff's charges and the
+        // share of maximum health each restores, from the talent's rank curves, and the
+        // healing taken multiplier a heal reads.
+        let gore_drinker = talent("gore_drinker");
+        if gore_drinker > 0 && sim.rules == Rules::Forever {
+            let ladder = &data.gore_drinker;
+            effects.push(json!({"kind": "gore_drinker",
+                "heal_spell_id": super::talents::GORE_DRINKER_HEAL,
+                "aura": super::talents::GORE_DRINKER,
+                "trigger_aura": format!("{} - Trigger", super::talents::GORE_DRINKER),
+                "charges": ladder.effect_at(1).value_at(gore_drinker) as i32,
+                "health_fraction": ladder.effect_at(2).fraction_at(gore_drinker),
+                "healing_taken_multiplier": sim.unit(unit).pseudo_stats.healing_taken_multiplier}));
+        }
         if self.has_talent("anger_management") {
             let row = data.anger_management.highest();
             effects.push(json!({"kind": "anger_management", "spell_id": row.id,

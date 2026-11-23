@@ -60,6 +60,7 @@ const EFFECTS: &[&str] = &[
     "thunder_clap",
     "unbridled_wrath",
     "reckless_swings",
+    "gore_drinker",
     "warrior_enrage",
     "improved_hamstring",
     "warrior_charge",
@@ -135,6 +136,9 @@ fn claims(effect: &Effect) -> Vec<(&'static str, &str)> {
             trigger_aura, aura, ..
         }
         | Effect::RecklessSwings {
+            trigger_aura, aura, ..
+        }
+        | Effect::GoreDrinker {
             trigger_aura, aura, ..
         }
         | Effect::Revenge {

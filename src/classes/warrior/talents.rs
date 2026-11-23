@@ -6,6 +6,7 @@ pub(crate) mod bloodthrill;
 pub(crate) mod deep_wounds;
 pub(crate) mod enrage;
 pub(crate) mod flurry;
+pub(crate) mod gore_drinker;
 pub(crate) mod improved_hamstring;
 pub(crate) mod last_stand;
 pub(crate) mod rage_on_avoid;

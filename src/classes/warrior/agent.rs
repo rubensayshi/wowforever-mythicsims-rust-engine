@@ -47,6 +47,7 @@ use super::{
         deep_wounds::{self, DeepWounds},
         enrage::{self, Enrage},
         flurry::{self, Flurry},
+        gore_drinker::{self, GoreDrinker},
         improved_hamstring::{self, ImprovedHamstring},
         last_stand::LastStand,
         rage_on_avoid::{self, AvoidRage},
@@ -133,6 +134,8 @@ pub(crate) enum WarriorAura {
     UnbridledWrath,
     /// Reckless Swings' trigger, which grants its Rage a batch window after a landed white swing.
     RecklessSwingsTrigger,
+    /// Gore Drinker's listener on landed melee hits (Forever's rules).
+    GoreDrinkerTrigger,
     FlurryTrigger,
     Flurry,
     OverpowerTrigger,
@@ -197,6 +200,7 @@ pub(crate) struct WarriorAgent {
     unbridled_wrath: Option<UnbridledWrath>,
     flurry: Option<Flurry>,
     reckless_swings: Option<RecklessSwings>,
+    gore_drinker: Option<GoreDrinker>,
     anger_management: Option<AngerManagement>,
     overpower_window: Option<AuraRef>,
     queue: Queue,
@@ -265,6 +269,13 @@ pub(crate) struct WarriorAgent {
 }
 
 /// Whether a prepared input carries the effect of a kind.
+/// Gore Drinker's buff from one of its abilities, when the warrior has the talent.
+fn gore_drinker_trigger(fight: &mut Fight<WarriorAgent>) {
+    if let Some(params) = fight.agent.gore_drinker {
+        gore_drinker::trigger(fight, params);
+    }
+}
+
 fn has_effect(prepared: &PreparedV2, kind: &str) -> bool {
     prepared.effects.iter().any(|effect| effect.kind() == kind)
 }
@@ -432,6 +443,9 @@ impl WarriorAgent {
                 }
                 Effect::RecklessSwings { trigger_aura, .. } => {
                     auras.push((trigger_aura.clone(), WarriorAura::RecklessSwingsTrigger))
+                }
+                Effect::GoreDrinker { trigger_aura, .. } => {
+                    auras.push((trigger_aura.clone(), WarriorAura::GoreDrinkerTrigger))
                 }
                 Effect::WarriorFlurry {
                     trigger_aura, aura, ..
@@ -1143,6 +1157,26 @@ impl WarriorAgent {
                         strikes_proc: *strikes_proc,
                     });
                 }
+                Effect::GoreDrinker {
+                    heal_spell_id,
+                    aura,
+                    charges,
+                    health_fraction,
+                    healing_taken_multiplier,
+                    ..
+                } => {
+                    let metrics = fight.new_health_metrics(ActionId {
+                        spell_id: *heal_spell_id,
+                        ..ActionId::default()
+                    });
+                    fight.agent.gore_drinker = Some(GoreDrinker {
+                        aura: fight.player_aura(aura)?,
+                        charges: *charges,
+                        health_fraction: *health_fraction,
+                        healing_taken_multiplier: *healing_taken_multiplier,
+                        metrics,
+                    });
+                }
                 Effect::RecklessSwings {
                     spell_id,
                     aura,
@@ -1381,7 +1415,9 @@ impl Agent for WarriorAgent {
         match behavior {
             WarriorSpell::Bloodthirst => {
                 let params = fight.agent.bloodthirst.expect("Bloodthirst is bound");
-                bloodthirst::apply(fight, spell, target, params);
+                if bloodthirst::apply(fight, spell, target, params) {
+                    gore_drinker_trigger(fight);
+                }
             }
             WarriorSpell::Whirlwind => {
                 let params = fight.agent.whirlwind.expect("Whirlwind is bound");
@@ -1398,6 +1434,7 @@ impl Agent for WarriorAgent {
                     .reckless_swings
                     .expect("Reckless Swings is bound");
                 reckless_swings::apply(fight, params);
+                gore_drinker_trigger(fight);
             }
             WarriorSpell::Execute => {
                 let params = fight.agent.execute.expect("Execute is bound");
@@ -1438,14 +1475,17 @@ impl Agent for WarriorAgent {
             WarriorSpell::Bloodrage => {
                 let params = fight.agent.bloodrage.expect("Bloodrage is bound");
                 bloodrage::apply(fight, params);
+                gore_drinker_trigger(fight);
             }
             WarriorSpell::BerserkerRage => {
                 let params = fight.agent.berserker_rage.expect("Berserker Rage is bound");
                 berserker_rage::apply(fight, params);
+                gore_drinker_trigger(fight);
             }
             WarriorSpell::DeathWish => {
                 let params = fight.agent.death_wish.expect("Death Wish is bound");
                 death_wish::apply(fight, params);
+                gore_drinker_trigger(fight);
             }
             WarriorSpell::Recklessness => {
                 let aura = fight.agent.recklessness.expect("Recklessness is bound");
@@ -1939,6 +1979,9 @@ impl Agent for WarriorAgent {
             WarriorAura::Enrage => {
                 let params = fight.agent.enrage.expect("Enrage is bound");
                 fight.activate_mod(params.damage_mod);
+                if let Some(gore_drinker) = fight.agent.gore_drinker {
+                    gore_drinker::trigger(fight, gore_drinker);
+                }
             }
             WarriorAura::Queue(index) => {
                 if let Some(current) = fight.agent.queue.current {
@@ -2062,6 +2105,10 @@ impl Agent for WarriorAgent {
             WarriorAura::RecklessSwingsTrigger => {
                 let params = fight.agent.reckless_swings.expect("bound");
                 reckless_swings::on_hit(fight, params, spell, result);
+            }
+            WarriorAura::GoreDrinkerTrigger => {
+                let params = fight.agent.gore_drinker.expect("Gore Drinker is bound");
+                gore_drinker::on_hit(fight, params, spell, result);
             }
             WarriorAura::FlurryTrigger => {
                 let params = fight.agent.flurry.expect("Flurry is bound");

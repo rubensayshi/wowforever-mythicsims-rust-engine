@@ -15,7 +15,7 @@ use super::super::masks;
 use super::super::spell_data::spell_data;
 use super::super::spells::add_cooldown;
 use super::super::Warrior;
-use super::millis;
+use super::{millis, GORE_DRINKER, GORE_DRINKER_BUFF, GORE_DRINKER_DURATION};
 
 impl Warrior {
     /// Go `registerFuryTalents`.
@@ -43,7 +43,8 @@ impl Warrior {
         self.register_improved_execute(sim, unit);
 
         // Tier 5
-        // Improved Berserker Rage: berserker_rage.go. Gore Drinker heals and is not simulated.
+        // Improved Berserker Rage: berserker_rage.go.
+        self.register_gore_drinker(sim, unit);
         self.register_death_wish(sim, unit);
         self.register_improved_intercept(sim, unit);
 
@@ -431,6 +432,37 @@ impl Warrior {
                 cast: cast_config(row.gcd(), true, cd),
                 related_self_buff: Some(aura),
                 ..SpellConfig::default()
+            },
+        );
+    }
+
+    /// Gore Drinker (1323967), Forever's rules only: its buff (1323969, 3 charges for 8 sec on
+    /// wago.tools' live rows) and the listener on landed melee hits that spends them
+    /// (`talents/gore_drinker.rs`). The reference does not simulate it.
+    fn register_gore_drinker(&self, sim: &mut Sim, unit: UnitId) {
+        let rank = self.talent("gore_drinker");
+        if rank == 0 || sim.rules != Rules::Forever {
+            return;
+        }
+        let charges = spell_data().gore_drinker.effect_at(1).value_at(rank) as i32;
+        sim.register_aura(
+            unit,
+            AuraConfig {
+                label: GORE_DRINKER.to_string(),
+                action_id: Some(spell_action(GORE_DRINKER_BUFF)),
+                duration: GORE_DRINKER_DURATION,
+                max_stacks: charges,
+                ..AuraConfig::default()
+            },
+        );
+        sim.make_proc_trigger_aura(
+            unit,
+            &ProcTrigger {
+                name: format!("{GORE_DRINKER} - Trigger"),
+                proc_mask: ProcMask::MELEE,
+                outcome: HitOutcome::LANDED,
+                callback: CallbackMask::ON_SPELL_HIT_DEALT,
+                ..ProcTrigger::default()
             },
         );
     }

@@ -312,7 +312,7 @@ the Go goldens and exporter uses. The departures:
   Spirit) already agree with the data, and the engine starts Elemental Mastery's cooldown at the
   cast, as 70630 has it (the cooldown-on-event bit is gone). Lava Burst rank 3 and Windfury
   Weapon rank 2 are not the ranks cast, Multi-Shot 1289053 is a mob's bolt barrage, Feral
-  Swiftness is movement speed, Gore Drinker is not modelled, and the Touch of the Grave
+  Swiftness is movement speed, and the Touch of the Grave
   attribute clears and the Curse, Rogue and Power Word: Shield attribute bits are read by
   nothing the engine computes.
 - Winter's Chill is "your next Cone of Cold" (`winters_chill`, Forever preparation), from client
@@ -723,8 +723,7 @@ the Go goldens and exporter uses. The departures:
   above) or does nothing in a sim. Not taken: Poised (the next Energy ability after
   the pull costs 10 less, about 10 Energy once a fight); Pounce (the engine does not cast it);
   Frost Blast's removal (a rotation may still cast it); Ignite from Flamestrike's ticks (the
-  notes do not say a tick can crit, and only area rotations cast it); Gore Drinker (not
-  modelled); and the end of the low rank proc penalty (the engine casts level 60 ranks and never
+  notes do not say a tick can crit, and only area rotations cast it); and the end of the low rank proc penalty (the engine casts level 60 ranks and never
   applied one).
 - The Warrior trees of the same notes, from the client's rows (the hotfix cache of 3 and 4
   November, build 70755 up to push 113596: wowsims/forever #841's regenerated store, which states
@@ -754,7 +753,7 @@ the Go goldens and exporter uses. The departures:
   swings spend the charges. A rotation casts it by its id (`castSpell 1329555`), class spell
   `reckless_swings`. Spearing Strike deals 75% weapon damage and 150% against Giants and
   Dragonkin (rows; was 40% and 120%). Furious Precision is unchanged (4/7/10% off hand hit).
-  Not simulated: Lingering Rage (the Rage decay out of combat) and Gore Drinker (healing). Not
+  Not simulated: Lingering Rage (the Rage decay out of combat). Gore Drinker is (see below). Not
   taken: Booming Voice's new cut to Piercing Howl's cost (Piercing Howl has no class mask here and
   no rotation casts it), and Defensive Stance's 80% and Defiance's 20% threat, which stay the
   notes' values although the 4 November store and Wowhead's tooltips still state 30% and 15%
@@ -2142,3 +2141,14 @@ the Go goldens and exporter uses. The departures:
     - Guardian Druid, Grovekeeper Rage: Berserk's cooldown is 165 sec. Berserk has no class spell
       mask, so the registration reads the bonus's status aura rather than a mod. Without the
       Berserk talent nothing is registered and the bonus does nothing.
+
+- Gore Drinker (1323967, Fury, 2 ranks, Forever's rules) has no Go version. Enrage, Berserker
+  Rage, Bloodrage, Death Wish, Reckless Swings and a landed Bloodthirst put its buff
+  (1323969) at 3 charges for 8 sec; each landed melee hit of the warrior, white or special, spends
+  one and restores 0.5% (rank 1) or 1% (rank 2) of maximum health, times the healing taken
+  multiplier, under the health metrics of its heal (1323968). The talent's row and rank curves are
+  in the pinned store; the buff's 3 charges, 100% chance on ProcTypeMask 20 and 8 sec, and the
+  heal's Heal effect, come from wago.tools `product=wowf` (build 1.60.1.70753, 23 November 2026).
+  Which hits count, the refresh to 3 charges and Bloodthirst's own hit spending none are server
+  behavior the rows do not state (`src/classes/warrior/talents/gore_drinker.rs`,
+  tests/forever_gore_drinker_20261123.rs).

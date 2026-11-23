@@ -4730,6 +4730,18 @@ pub enum Effect {
         health_cost: f64,
         delay_ns: i64,
     },
+    /// Gore Drinker (Forever's rules, no Go version): Enrage, Berserker Rage, Bloodrage, Death
+    /// Wish, Reckless Swings and a landed Bloodthirst put the aura at `charges`; each landed melee
+    /// hit while it is up spends one and restores `health_fraction` of maximum health times
+    /// `healing_taken_multiplier`, under health metrics of `heal_spell_id`.
+    GoreDrinker {
+        heal_spell_id: i32,
+        aura: String,
+        trigger_aura: String,
+        charges: i32,
+        health_fraction: f64,
+        healing_taken_multiplier: f64,
+    },
     /// Anger Management: rage every period from the reset.
     AngerManagement {
         spell_id: i32,
@@ -5965,6 +5977,7 @@ impl Effect {
             Effect::UnbridledWrath { .. } => "unbridled_wrath",
             Effect::WarriorFlurry { .. } => "warrior_flurry",
             Effect::RecklessSwings { .. } => "reckless_swings",
+            Effect::GoreDrinker { .. } => "gore_drinker",
             Effect::AngerManagement { .. } => "anger_management",
             Effect::HeroicStrikeQueue { .. } => "heroic_strike_queue",
             Effect::OverpowerWindow { .. } => "overpower_window",

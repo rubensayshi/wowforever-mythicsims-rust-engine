@@ -9,12 +9,13 @@ pub(crate) struct Bloodthirst {
     pub(crate) base_damage: f64,
 }
 
+/// The strike; answers whether it landed.
 pub(crate) fn apply<A: Agent>(
     fight: &mut Fight<A>,
     spell: SpellId,
     target: Side,
     params: Bloodthirst,
-) {
+) -> bool {
     // Go's arm64 build fuses this multiply and add.
     let base = fight
         .melee_attack_power()
@@ -25,4 +26,5 @@ pub(crate) fn apply<A: Agent>(
     if !result.landed() {
         fight.issue_refund(spell);
     }
+    result.landed()
 }
