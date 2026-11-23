@@ -44,6 +44,11 @@
 //!   10 sec. The generated registration reads 15595 as an equip aura, which makes the -51
 //!   permanent; under Forever's rules this effect replaces it (`forever_items`), while the
 //!   reference's rules keep the generated one.
+//! - Mark of the Chosen (17774): its equip spell 21969 (ProcChance 2, a 120 sec proc recovery)
+//!   triggers 21970, +21 Strength, Agility, Stamina, Intellect and Spirit for 60 sec: "Has a 2%
+//!   chance when struck in combat of increasing all stats by 21 for 1min." The row's proc flags
+//!   also hold helpful spells taken, so the generator leaves it out; the listener hears landed
+//!   melee and ranged hits taken, as the tooltip's "struck" reads.
 //!
 //! A character no target attacks is never struck and never blocks: it wears each as a plain item,
 //! and the listeners are inert. A tank with no mana bar gains nothing from Zealot Plate, which
@@ -54,6 +59,7 @@ use serde_json::{json, Value};
 use crate::contracts::prepared_v2::ActionId;
 
 use super::aura_helpers::{CallbackMask, HitOutcome, StackingStatAura};
+use super::common_effects::{action_id_string, flat_string};
 use super::env::Environment;
 use super::export_items::{aura_named, outcome_names, spell_position};
 use super::parse_effects::{parse_effects, ParseOptions};
@@ -88,6 +94,13 @@ pub(crate) const FORCE_OF_WILL: i32 = 11_810;
 /// Force of Will's equip spell and the damage taken buff it triggers.
 const FORCE_OF_WILL_TRIGGER: i32 = 15_594;
 const FORCE_OF_WILL_BUFF: i32 = 15_595;
+/// Mark of the Chosen.
+pub(crate) const MARK_OF_THE_CHOSEN: i32 = 17_774;
+/// Mark of the Chosen's equip spell and the stat buff it triggers.
+const MARK_OF_THE_CHOSEN_TRIGGER: i32 = 21_969;
+const MARK_OF_THE_CHOSEN_BUFF: i32 = 21_970;
+/// Mark of the Chosen's stat bonus: 21970's Mod Stat of 21 on every stat (Misc -1).
+const MARK_OF_THE_CHOSEN_STATS: f64 = 21.0;
 
 /// The shield spike enchants: the enchant, its label and the equip spell its row casts.
 const SHIELD_SPIKE_ENCHANTS: [(i32, &str, i32); 3] = [
@@ -103,16 +116,18 @@ const KROLDOK_5_LABEL: &str = "Krol'dok Battlegear 5P";
 const ZEALOT_PLATE_LABEL: &str = "Zealot Plate";
 const GIRDLE_LABEL: &str = "Girdle of Extracted Answers";
 const FORCE_OF_WILL_LABEL: &str = "Force of Will Trigger";
+const MARK_OF_THE_CHOSEN_LABEL: &str = "Mark of the Chosen Trigger";
 /// The stacking buff Ogre Dominance applies.
 const OGRE_DOMINANCE_AURA: &str = "Ogre Dominance";
-/// The buff Force of Will applies.
+/// The buffs Force of Will and Mark of the Chosen apply.
 const FORCE_OF_WILL_AURA: &str = "Force of Will";
+const MARK_OF_THE_CHOSEN_AURA: &str = "Mark of the Chosen";
 
 /// The item effects of this module, applied under Forever's rules.
 pub(crate) fn has_item_effect(item: i32) -> bool {
     matches!(
         item,
-        ZEALOT_PLATE | GIRDLE_OF_EXTRACTED_ANSWERS | FORCE_OF_WILL
+        ZEALOT_PLATE | GIRDLE_OF_EXTRACTED_ANSWERS | FORCE_OF_WILL | MARK_OF_THE_CHOSEN
     )
 }
 
@@ -130,6 +145,7 @@ pub(crate) fn apply_item(env: &mut Environment, item: i32) -> bool {
             },
         ),
         FORCE_OF_WILL => force_of_will(env),
+        MARK_OF_THE_CHOSEN => mark_of_the_chosen(env),
         _ => return false,
     }
     true
@@ -274,15 +290,58 @@ fn force_of_will(env: &mut Environment) {
     source.register_trigger(env, &listener);
 }
 
+/// Mark of the Chosen: the 60 sec buff of +21 to every stat, and the listener on the item that
+/// activates it at a 2% chance when a melee or ranged hit taken lands, at most once in 120 sec.
+fn mark_of_the_chosen(env: &mut Environment) {
+    let unit = env.player;
+    let buff = must_find(MARK_OF_THE_CHOSEN_BUFF);
+    let bonus = mark_of_the_chosen_stats();
+    env.sim.new_temporary_stats_aura(
+        unit,
+        MARK_OF_THE_CHOSEN_AURA,
+        &ActionId::spell(MARK_OF_THE_CHOSEN_BUFF),
+        bonus,
+        buff.duration(),
+    );
+    let source = EffectSource {
+        id: MARK_OF_THE_CHOSEN,
+        is_enchant: false,
+    };
+    let trigger = must_find(MARK_OF_THE_CHOSEN_TRIGGER);
+    let mut listener = proc_trigger(&env.sim, Some(unit), trigger, &[chance(0.02)]);
+    listener.name = MARK_OF_THE_CHOSEN_LABEL.to_string();
+    listener.action_id = source.action_id();
+    // The row's helpful spells taken are left out: no heal in a fight makes the wearer "struck".
+    listener.callback = CallbackMask::ON_SPELL_HIT_TAKEN;
+    listener.proc_mask = ProcMask::MELEE_OR_RANGED;
+    listener.outcome = HitOutcome::LANDED;
+    listener.require_damage_dealt = false;
+    // SpellAuraOptions: ProcCategoryRecovery 120000.
+    listener.icd = 120 * SECOND;
+    source.register_trigger(env, &listener);
+}
+
+/// Mark of the Chosen's buff: +21 Strength, Agility, Stamina, Intellect and Spirit.
+fn mark_of_the_chosen_stats() -> Stats {
+    Stats::from_pairs(&[
+        (Stat::Strength, MARK_OF_THE_CHOSEN_STATS),
+        (Stat::Agility, MARK_OF_THE_CHOSEN_STATS),
+        (Stat::Stamina, MARK_OF_THE_CHOSEN_STATS),
+        (Stat::Intellect, MARK_OF_THE_CHOSEN_STATS),
+        (Stat::Spirit, MARK_OF_THE_CHOSEN_STATS),
+    ])
+}
+
 /// The stat auras of the effects above, for the combinations `statAurasEffect` reads, when the
-/// wearer is struck at all: Ogre Dominance's stacks and Force of Will's damage taken, which the
-/// target's swing reads from the combination's rolls.
+/// wearer is struck at all: Ogre Dominance's stacks, Mark of the Chosen's stats and Force of
+/// Will's damage taken, which the target's swing reads from the combination's rolls.
 pub(crate) fn stat_auras(env: &Environment) -> Vec<String> {
     if !env.tanking() {
         return Vec::new();
     }
     [
         (KROLDOK_5_LABEL, OGRE_DOMINANCE_AURA),
+        (MARK_OF_THE_CHOSEN_LABEL, MARK_OF_THE_CHOSEN_AURA),
         (FORCE_OF_WILL_LABEL, FORCE_OF_WILL_AURA),
     ]
     .into_iter()
@@ -309,6 +368,7 @@ pub(crate) fn export_effects(env: &Environment) -> Vec<Value> {
         ZEALOT_PLATE_LABEL,
         GIRDLE_LABEL,
         FORCE_OF_WILL_LABEL,
+        MARK_OF_THE_CHOSEN_LABEL,
     ]
     .into_iter()
     .chain(SHIELD_SPIKE_ENCHANTS.iter().map(|(_, label, _)| *label));
@@ -323,6 +383,7 @@ pub(crate) fn export_effects(env: &Environment) -> Vec<Value> {
                 ZEALOT_PLATE_LABEL => Some(zealot_plate_effect(env, aura)),
                 GIRDLE_LABEL => shield_spike_effect(env, aura, SHIELD_SPIKE),
                 FORCE_OF_WILL_LABEL => Some(force_of_will_effect(env, aura)),
+                MARK_OF_THE_CHOSEN_LABEL => Some(mark_of_the_chosen_effect(env, aura)),
                 _ => SHIELD_SPIKE_ENCHANTS
                     .iter()
                     .find(|(_, enchant_label, _)| *enchant_label == label)
@@ -383,6 +444,21 @@ fn force_of_will_effect(env: &Environment, aura: AuraId) -> Value {
         "aura": FORCE_OF_WILL_AURA, "trigger_spells": Vec::<usize>::new(),
         "callbacks": ["on_spell_hit_taken"], "struck": true, "landed_only": true,
         "require_damage": false, "proc_chance": 1.0,
+    })
+}
+
+/// `spell_data_stat_proc` for Mark of the Chosen: a landed hit taken activates the buff at a 2%
+/// chance, a spell batch window later.
+fn mark_of_the_chosen_effect(env: &Environment, aura: AuraId) -> Value {
+    let bonus = mark_of_the_chosen_stats();
+    let id = action_id_string(&ActionId::spell(MARK_OF_THE_CHOSEN_BUFF));
+    json!({
+        "kind": "spell_data_stat_proc", "trigger_aura": env.sim.aura(aura).label,
+        "aura": MARK_OF_THE_CHOSEN_AURA, "trigger_spells": Vec::<usize>::new(),
+        "callbacks": ["on_spell_hit_taken"], "struck": true, "landed_only": true,
+        "require_damage": false, "proc_chance": 0.02,
+        "gain_log": format!("Gained {} from {id}.", flat_string(&bonus)),
+        "expire_log": format!("Lost {} from fading {id}.", flat_string(&bonus)),
     })
 }
 
