@@ -164,8 +164,16 @@ fn run() -> Result<(), Failure> {
         );
         return Ok(());
     }
+    if args == ["target-levels"] {
+        let (lowest, levels_above) = forever_engine::target_level_range();
+        println!(
+            "{}",
+            serde_json::json!({"lowest": lowest, "levels_above": levels_above})
+        );
+        return Ok(());
+    }
     if args.is_empty() || args == ["--help"] {
-        println!("forever-engine sim --infile REQUEST.json|PREPARED_V2.json [--outfile RESULT.json] [--trace] [--gate] [--rotation-stats]\nforever-engine sim --request RAID_SIM_REQUEST.json [--scenario ID] [--outfile RESULT.json] [--gate] [--rotation-stats] [--go-rules]\nforever-engine prepare --request RAID_SIM_REQUEST.json [--scenario ID] [--outfile PREPARED_V2.json] [--go-rules]\nforever-engine bench --infile REQUEST.json|PREPARED_V2.json [--outfile RESULT.json] [--warmups 3] [--samples 7]\nforever-engine check --infile PREPARED_V2.json\nforever-engine version");
+        println!("forever-engine sim --infile REQUEST.json|PREPARED_V2.json [--outfile RESULT.json] [--trace] [--gate] [--rotation-stats]\nforever-engine sim --request RAID_SIM_REQUEST.json [--scenario ID] [--outfile RESULT.json] [--gate] [--rotation-stats] [--go-rules]\nforever-engine prepare --request RAID_SIM_REQUEST.json [--scenario ID] [--outfile PREPARED_V2.json] [--go-rules]\nforever-engine bench --infile REQUEST.json|PREPARED_V2.json [--outfile RESULT.json] [--warmups 3] [--samples 7]\nforever-engine check --infile PREPARED_V2.json\nforever-engine target-levels\nforever-engine version");
         return Ok(());
     }
     if args.len() == 3 && args[0] == "check" && args[1] == "--infile" {
@@ -181,7 +189,7 @@ fn run() -> Result<(), Failure> {
         return raid(&args[1..]);
     }
     if args[0] != "sim" && args[0] != "bench" && args[0] != "prepare" {
-        return Err("expected sim, raid, prepare, bench, check or version".into());
+        return Err("expected sim, raid, prepare, bench, check, target-levels or version".into());
     }
     let mut infile = None;
     let mut request_file = None;

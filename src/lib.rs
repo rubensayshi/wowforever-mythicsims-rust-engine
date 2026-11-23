@@ -35,6 +35,16 @@ pub use prepare::{
     prepare, prepare_json, prepare_json_with, PrepareError, Refusal as PrepareRefusal, Rules,
 };
 
+/// The target levels a Forever sim can fight: the lowest level, and how many levels above the
+/// character the highest is. `forever-engine target-levels` prints them, so an application
+/// offers no level the engine it runs would refuse.
+pub fn target_level_range() -> (i32, i32) {
+    (
+        prepare::levels::MIN_TARGET_LEVEL,
+        prepare::level_gap::MAX_LEVELS_ABOVE,
+    )
+}
+
 /// Prepared v2 effect kinds this engine executes. The release manifest must agree.
 pub fn implemented_prepared_effects() -> &'static [&'static str] {
     engine::coverage::implemented_effects()

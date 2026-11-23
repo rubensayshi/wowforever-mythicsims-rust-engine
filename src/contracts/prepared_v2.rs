@@ -315,6 +315,12 @@ pub struct Target {
     /// target partially resists non-binary spells and dot ticks by 2% a level on average.
     #[serde(default, skip_serializing_if = "is_false")]
     pub no_level_partial_resist: bool,
+    /// Forever's rule: the target's level is one the reference's attack tables have no column
+    /// for, and its tables follow the gap between its level and the character's
+    /// (`prepare::level_gap`). The gate lets such a level through only with this mark, so a
+    /// reference document, whose tables give it the 3 above column, stays refused.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub level_gap_tables: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

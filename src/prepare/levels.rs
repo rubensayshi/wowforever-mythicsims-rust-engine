@@ -61,14 +61,22 @@ pub(crate) fn level_refusal(class: &str, level: i32, has_sheet: bool) -> Option<
     None
 }
 
-/// The target levels a character of `level` can fight: a level 60 character a level 60 to 63
-/// target, a levelling one a target from its own level to 3 above.
+/// The lowest level a target can be: the lowest levelling character's. No dungeon boss is
+/// lower, and the creatures below it follow rules of their own.
+pub(crate) const MIN_TARGET_LEVEL: i32 = MIN_LEVEL;
+
+/// The target levels the reference's tables cover for a character of `level`: its own level to
+/// 3 above, so 60 to 63 at level 60.
+pub(crate) fn reference_target_levels(level: i32) -> std::ops::RangeInclusive<i32> {
+    level..=level + 3
+}
+
+/// The target levels a character of `level` can fight under Forever's rules: from level 10 to 5
+/// above its own. Outside the reference's levels the target's tables follow the gap between the
+/// two levels ([`super::level_gap`], which says why it stops at 5 above); from 10 below the
+/// character every one of them has reached its floor, so a lower target changes nothing more.
 pub(crate) fn target_levels(level: i32) -> std::ops::RangeInclusive<i32> {
-    if level == MAX_LEVEL {
-        MAX_LEVEL..=MAX_LEVEL + 3
-    } else {
-        level..=level + 3
-    }
+    MIN_TARGET_LEVEL..=level + super::level_gap::MAX_LEVELS_ABOVE
 }
 
 /// The character being prepared.
@@ -870,6 +878,20 @@ fn same_name_ranks(rank: &Spell) -> &'static [i32] {
 
 #[cfg(test)]
 mod tests {
+    /// A character fights a target from level 10 to 5 above its own under Forever's rules; the
+    /// reference's tables cover its own level to 3 above.
+    #[test]
+    fn target_levels_run_from_ten_to_five_above() {
+        for (level, lowest, highest) in [(60, 10, 65), (30, 10, 35), (10, 10, 15)] {
+            let levels = super::target_levels(level);
+            assert_eq!((*levels.start(), *levels.end()), (lowest, highest));
+            assert!(!levels.contains(&(highest + 1)));
+            assert!(!levels.contains(&9));
+            let reference = super::reference_target_levels(level);
+            assert_eq!((*reference.start(), *reference.end()), (level, level + 3));
+        }
+    }
+
     use super::*;
     use crate::prepare::spelldata::Ladder;
 

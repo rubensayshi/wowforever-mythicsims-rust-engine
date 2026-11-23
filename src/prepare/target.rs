@@ -31,6 +31,7 @@ pub(crate) fn new_target(sim: &mut Sim, options: &Message, index: i32) -> Result
     if unit.level == 0 {
         unit.level = character_level() + 3;
     }
+    let forever = sim.rules == super::sim::Rules::Forever;
     let id = sim.add_unit(unit);
     let gcd = sim.new_timer(id);
     let rotation = sim.new_timer(id);
@@ -38,7 +39,14 @@ pub(crate) fn new_target(sim: &mut Sim, options: &Message, index: i32) -> Result
     let u = sim.unit_mut(id);
     u.gcd = Some(gcd);
     u.rotation_timer = Some(rotation);
-    u.stats[Stat::PhysicalCritPercent] += unit_level_f64(level, 4.6, 5.0, 5.2, 5.4, 5.6);
+    // Forever's rules: an enemy the reference has no column for crits by its own level
+    // (`level_gap`); the reference gives it the 3 above column.
+    let gap = super::level_gap::gap(level);
+    u.stats[Stat::PhysicalCritPercent] += if forever && !super::level_gap::has_column(gap) {
+        super::level_gap::enemy_crit_percent(gap)
+    } else {
+        unit_level_f64(level, 4.6, 5.0, 5.2, 5.4, 5.6)
+    };
     u.stats[Stat::BlockValue] = 54.0;
     add_rating_conversions(sim, id);
     let u = sim.unit_mut(id);

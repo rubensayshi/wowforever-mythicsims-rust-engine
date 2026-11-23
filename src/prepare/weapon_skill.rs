@@ -180,6 +180,9 @@ pub(crate) struct TableUnits {
     pub attacker_level: i32,
     pub defender_type: UnitType,
     pub defender_level: i32,
+    /// Forever's rules: the table follows a target the reference has no column for
+    /// ([`super::level_gap`]).
+    pub forever: bool,
 }
 
 /// Go `AttackTable.weaponSkillGap`: target defense minus the attack's skill, when the skill moves
@@ -204,6 +207,12 @@ pub(crate) fn moves_table(units: TableUnits, bonus: f64) -> bool {
 /// Go `weaponSkillAvoidance`: below the defense the gap costs 0.1% a point, `per_point_far` once
 /// it passes 10; above it, skill takes 0.04% a point off. Go fuses each product into its add.
 fn weapon_skill_avoidance(gap: f64, per_point_far: f64) -> f64 {
+    avoidance(gap, per_point_far)
+}
+
+/// [`weapon_skill_avoidance`] for the tables of a target the reference has no column for
+/// ([`super::level_gap`]), which read it at base skill.
+pub(crate) fn avoidance(gap: f64, per_point_far: f64) -> f64 {
     if gap > 10.0 {
         gap.mul_add(per_point_far, 0.05)
     } else if gap >= 0.0 {
@@ -222,9 +231,13 @@ pub(crate) fn miss_chance(table: &AttackTable, units: TableUnits, bonus: f64) ->
 }
 
 /// Go `AttackTable.HitSuppressionFor`: 0.2% of hit a point past a 10 point gap, and none when the
-/// table takes none (`Encounter.no_hit_suppression`).
+/// table takes none (`Encounter.no_hit_suppression`). Past the 15 points of a boss at base skill
+/// the reference would keep adding; under Forever's rules a target 4 or more above takes the 1%
+/// Blizzard states for any gap past 10, as its table does at base skill (`level_gap`). Only such
+/// a target has a gap past 15, and no reference document has one.
 pub(crate) fn hit_suppression(table: &AttackTable, units: TableUnits, bonus: f64) -> f64 {
     match weapon_skill_gap(units, bonus) {
+        Some(gap) if table.hit_suppression != 0.0 && gap > 15.0 && units.forever => 0.01,
         Some(gap) if table.hit_suppression != 0.0 => (gap - 10.0).max(0.0) * 0.002,
         _ => table.hit_suppression,
     }
@@ -243,12 +256,17 @@ pub(crate) fn dodge_chance(table: &AttackTable, units: TableUnits, bonus: f64) -
 pub(crate) fn glance(table: &AttackTable, units: TableUnits, bonus: f64) -> (f64, f64) {
     match weapon_skill_gap(units, bonus) {
         None => (table.glance_multiplier, table.glance_spread),
-        Some(gap) => {
-            let low = (-0.05f64).mul_add(gap, 1.3).clamp(0.01, 0.91);
-            let high = (-0.03f64).mul_add(gap, 1.2).clamp(0.2, 0.99);
-            ((low + high) / 2.0, (high - low) / 2.0)
-        }
+        Some(gap) => glance_at(gap),
     }
+}
+
+/// What a glancing blow keeps at a gap between the target's defense and the attack's skill: its
+/// average share and the spread either side, from a low end of 1.3 less 0.05 a point (0.01 to
+/// 0.91) and a high end of 1.2 less 0.03 a point (0.2 to 0.99).
+pub(crate) fn glance_at(gap: f64) -> (f64, f64) {
+    let low = (-0.05f64).mul_add(gap, 1.3).clamp(0.01, 0.91);
+    let high = (-0.03f64).mul_add(gap, 1.2).clamp(0.2, 0.99);
+    ((low + high) / 2.0, (high - low) / 2.0)
 }
 
 #[cfg(test)]
@@ -262,6 +280,7 @@ mod tests {
             attacker_level: character_level(),
             defender_type: UnitType::Enemy,
             defender_level: level,
+            forever: true,
         };
         (
             new_attack_table(character_level(), UnitType::Enemy, level),
@@ -375,6 +394,7 @@ mod tests {
             attacker_level: character_level() + 3,
             defender_type: UnitType::Player,
             defender_level: character_level(),
+            forever: true,
         };
         let enemy_table =
             new_attack_table(character_level() + 3, UnitType::Player, character_level());
@@ -382,6 +402,75 @@ mod tests {
             dodge_chance(&enemy_table, enemy, 11.0),
             enemy_table.base_dodge_chance
         );
+    }
+
+    /// The table of a target `gap` levels from the character under Forever's rules, as
+    /// preparation builds it.
+    fn forever_boss(gap: i32) -> (AttackTable, TableUnits) {
+        let (mut table, units) = boss(character_level() + gap);
+        crate::prepare::level_gap::apply(
+            &mut table,
+            units.attacker_level,
+            units.defender_type,
+            units.defender_level,
+        );
+        (table, units)
+    }
+
+    /// Forever's rules: against a target 4 or 5 above, skill moves the same formulas from a
+    /// wider gap, and they meet the table at base skill.
+    #[test]
+    fn against_a_target_past_three_above() {
+        // gap in levels, skill above base, miss, dodge, hit suppression, glance multiplier,
+        // glance spread.
+        for (gap, bonus, miss, dodge, suppressed, multiplier, spread) in [
+            // 320 defense against 300: the table.
+            (4, 0.0, 0.09, 0.07, 0.01, 0.45, 0.15),
+            // 305: the boss's 15 points.
+            (4, 5.0, 0.08, 0.065, 0.01, 0.65, 0.10),
+            // 303, 17 points: Blizzard's flat 1% of hit, not 1.4%.
+            (4, 3.0, 0.084, 0.067, 0.01, 0.57, 0.12),
+            // 311, 9 points: under the 10 that suppress hit.
+            (4, 11.0, 0.059, 0.059, 0.0, 0.89, 0.04),
+            (5, 0.0, 0.10, 0.075, 0.01, 0.25, 0.20),
+            // 308 against 325: 17 points.
+            (5, 8.0, 0.084, 0.067, 0.01, 0.57, 0.12),
+        ] {
+            let (table, units) = forever_boss(gap);
+            let (got_multiplier, got_spread) = glance(&table, units, bonus);
+            let at = format!("{gap} above, {bonus} skill");
+            assert!(near(miss_chance(&table, units, bonus), miss), "{at}");
+            assert!(near(dodge_chance(&table, units, bonus), dodge), "{at}");
+            assert!(
+                near(hit_suppression(&table, units, bonus), suppressed),
+                "{at}"
+            );
+            assert!(near(got_multiplier, multiplier), "{at}: {got_multiplier}");
+            assert!(near(got_spread, spread), "{at}: {got_spread}");
+        }
+        // The reference keeps adding past 15 points; no reference document has such a gap.
+        let (table, mut units) = forever_boss(4);
+        units.forever = false;
+        assert!(near(hit_suppression(&table, units, 3.0), 0.014));
+        // No hit suppression in the encounter stays none.
+        let (mut table, units) = forever_boss(5);
+        table.hit_suppression = 0.0;
+        assert_eq!(hit_suppression(&table, units, 3.0), 0.0);
+    }
+
+    /// Skill above base still moves nothing against a target below the attacker: every lookup is
+    /// the table's, which under Forever's rules follows the target's level.
+    #[test]
+    fn a_target_below_the_attacker_reads_its_table() {
+        for gap in [-1, -5, -12] {
+            let (table, units) = forever_boss(gap);
+            assert!(!moves_table(units, 11.0), "{gap}");
+            assert_eq!(miss_chance(&table, units, 11.0), table.base_miss_chance);
+            assert_eq!(dodge_chance(&table, units, 11.0), table.base_dodge_chance);
+            assert_eq!(hit_suppression(&table, units, 11.0), 0.0);
+            assert_eq!(glance(&table, units, 11.0), (0.95, 0.04));
+            assert_eq!(table.base_glance_chance, 0.0);
+        }
     }
 
     /// Go `TestWeaponSkillOf`.
