@@ -1097,11 +1097,13 @@ fn group_casts(
             ..
         } if target.resolve(targets).is_some() => casts.extend(apl_cast_spell(env, spell)),
         Action::Schedule { inner, .. } => group_casts(env, &inner.action, casts, pruned),
-        Action::Sequence { steps, .. } => casts.extend(steps.iter().filter_map(|step| {
-            step.target
-                .resolve(targets)
-                .and_then(|_| apl_cast_spell(env, &step.spell))
-        })),
+        Action::Sequence { steps, .. } => {
+            casts.extend(steps.iter().filter(|step| step.casts()).filter_map(|step| {
+                step.target
+                    .resolve(targets)
+                    .and_then(|_| apl_cast_spell(env, &step.spell))
+            }))
+        }
         // A change of target casts nothing; Go builds it for a unit it finds.
         Action::StrictSequence(steps) => {
             let found: Vec<Option<Option<SpellId>>> = steps

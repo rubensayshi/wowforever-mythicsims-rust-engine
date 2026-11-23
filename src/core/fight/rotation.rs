@@ -53,6 +53,9 @@ pub(crate) enum Act {
         targets: Vec<Side>,
         /// Each step's own condition.
         conditions: Vec<Option<Rc<Cond>>>,
+        /// Each step that is Go `APLActionWait`: its own rotation item (an `Act::Wait`), which
+        /// holds the time it waits until; its spell and target are unused.
+        waits: Vec<Option<usize>>,
         next: usize,
     },
     /// Go `APLActionChannelSpell` with an interrupt condition.
@@ -1126,8 +1129,15 @@ impl<A: Agent> Fight<A> {
         let offset = items.len();
         items.extend(inner);
         for item in &mut items {
-            if let Act::Schedule { inner, .. } = &mut item.action {
-                *inner += offset;
+            match &mut item.action {
+                Act::Schedule { inner, .. } => *inner += offset,
+                // A sequence's wait steps are inner items too.
+                Act::Sequence { waits, .. } => {
+                    for wait in waits.iter_mut().flatten() {
+                        *wait += offset;
+                    }
+                }
+                _ => {}
             }
         }
         // Go's finalizing walks each action's inner actions before the action itself.
@@ -1274,9 +1284,27 @@ impl<A: Agent> Fight<A> {
                 let mut spells = Vec::with_capacity(steps.len());
                 let mut targets = Vec::with_capacity(steps.len());
                 let mut conditions = Vec::with_capacity(steps.len());
+                let mut waits = Vec::with_capacity(steps.len());
                 for step in steps {
-                    let Some((spell, target)) = self.step_spell(step) else {
-                        continue;
+                    // Go `newActionWait` as a step, its own action: no action without a value.
+                    let (spell, target, wait) = match &step.wait {
+                        Some(duration) => {
+                            let Some(duration) = compile_duration_value(Some(duration), lookup)
+                            else {
+                                continue;
+                            };
+                            let act = Act::Wait {
+                                duration: Rc::new(duration),
+                                until: 0,
+                            };
+                            (SpellId::default(), Side::Player, Some(act))
+                        }
+                        None => {
+                            let Some((spell, target)) = self.step_spell(step) else {
+                                continue;
+                            };
+                            (spell, target, None)
+                        }
                     };
                     let condition = match compile_condition(step.condition.as_ref(), lookup) {
                         CompiledCondition::Pruned => continue,
@@ -1285,6 +1313,10 @@ impl<A: Agent> Fight<A> {
                             Some(Rc::new(Cond::lower(&condition)))
                         }
                     };
+                    waits.push(wait.map(|act| {
+                        inner.push(Item::new(None, act));
+                        inner.len() - 1
+                    }));
                     spells.push(spell);
                     targets.push(target);
                     conditions.push(condition);
@@ -1297,6 +1329,7 @@ impl<A: Agent> Fight<A> {
                     spells,
                     targets,
                     conditions,
+                    waits,
                     next: 0,
                 }
             }
@@ -2700,6 +2733,7 @@ impl<A: Agent> Fight<A> {
         let Act::Sequence {
             ref spells,
             ref conditions,
+            ref waits,
             next,
             ..
         } = self.rotation[item].action
@@ -2707,10 +2741,22 @@ impl<A: Agent> Fight<A> {
             unreachable!("item is a sequence");
         };
         let step = spells.get(next).copied();
+        let wait = waits.get(next).copied().flatten();
         let condition = conditions.get(next).cloned().flatten();
         self.apl.in_sequence = true;
         let ready = step.is_some_and(|spell| {
-            self.step_condition_holds(condition.as_deref()) && self.cast_ready(spell)
+            self.step_condition_holds(condition.as_deref())
+                && match wait {
+                    // Go `APLActionWait.IsReady`: a duration to wait.
+                    Some(wait) => {
+                        let Act::Wait { ref duration, .. } = self.rotation[wait].action else {
+                            unreachable!("a sequence's wait step is a wait");
+                        };
+                        let duration = Rc::clone(duration);
+                        self.get_duration(&duration) > 0
+                    }
+                    None => self.cast_ready(spell),
+                }
         });
         self.apl.in_sequence = false;
         ready
@@ -3031,16 +3077,24 @@ impl<A: Agent> Fight<A> {
             // Go APLActionSequence.Execute: a cast advances the step at once; a queued one
             // advances it when its action fires, and the rotation waits until just after.
             Ready::SequenceStep(item) => {
-                self.apl.in_sequence = true;
                 let Act::Sequence {
                     ref spells,
                     ref targets,
+                    ref waits,
                     next,
                     ..
                 } = self.rotation[item].action
                 else {
                     unreachable!("item is a sequence");
                 };
+                // Go `APLActionSequence.Execute`: the step's own `Execute`, here a wait taking
+                // control, then the next step.
+                if let Some(wait) = waits[next] {
+                    self.start_wait(wait);
+                    self.advance_sequence(item);
+                    return;
+                }
+                self.apl.in_sequence = true;
                 let (spell, target) = (spells[next], targets[next]);
                 self.cast_or_queue(spell, target);
                 if self.can_queue_spell() {
@@ -3085,22 +3139,7 @@ impl<A: Agent> Fight<A> {
             }
             Ready::ItemSwap(to_swapped) => self.item_swap_action(to_swapped),
             // Go `APLActionWait.Execute`: control, then wait for the duration read again.
-            Ready::Wait(item) => {
-                assert!(self.apl.controlling.is_none(), "nested controlling actions");
-                self.apl.controlling = Some(item);
-                let Act::Wait { ref duration, .. } = self.rotation[item].action else {
-                    unreachable!("item is a wait");
-                };
-                let duration = Rc::clone(duration);
-                let until = self.now + self.get_duration(&duration);
-                if let Act::Wait {
-                    until: ref mut at, ..
-                } = self.rotation[item].action
-                {
-                    *at = until;
-                }
-                self.wait_until(until);
-            }
+            Ready::Wait(item) => self.start_wait(item),
             // Go `APLActionStrictMultidot.Execute`: a strict sequence of the casts on the targets
             // its readiness found takes control.
             Ready::StrictMultidot(item) => {
@@ -3199,6 +3238,26 @@ impl<A: Agent> Fight<A> {
                 self.apl.allow_channel_recast = allow_recast;
             }
         }
+    }
+
+    /// Go `APLActionWait.Execute`: the wait takes control and runs until the duration, read
+    /// again now, has passed. `item` is an `Act::Wait`: a priority list line or a sequence's
+    /// wait step.
+    fn start_wait(&mut self, item: usize) {
+        assert!(self.apl.controlling.is_none(), "nested controlling actions");
+        self.apl.controlling = Some(item);
+        let Act::Wait { ref duration, .. } = self.rotation[item].action else {
+            unreachable!("item is a wait");
+        };
+        let duration = Rc::clone(duration);
+        let until = self.now + self.get_duration(&duration);
+        if let Act::Wait {
+            until: ref mut at, ..
+        } = self.rotation[item].action
+        {
+            *at = until;
+        }
+        self.wait_until(until);
     }
 
     /// Go `APLActionChannelSpell.Execute` in the prepull: the cast, then the rotation reads the

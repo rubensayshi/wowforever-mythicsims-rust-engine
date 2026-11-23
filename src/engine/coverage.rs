@@ -2935,7 +2935,7 @@ fn other_target_casts(
             if unreachable.contains(&item.position) {
                 continue;
             }
-            for step in steps.iter().filter(|step| !step.change_target) {
+            for step in steps.iter().filter(|step| step.casts()) {
                 let Some(spell) = rotation_spell(prepared, &step.spell) else {
                     continue;
                 };
