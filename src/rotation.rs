@@ -815,6 +815,16 @@ pub struct Step {
     pub condition: Option<Value>,
     /// The step changes the player's current target to `target` and casts nothing.
     pub change_target: bool,
+    /// A sequence's Go `APLActionWait` step: the rotation waits for this duration and casts
+    /// nothing. `None` for every other step.
+    pub wait: Option<Value>,
+}
+
+impl Step {
+    /// Whether the step casts its spell: not a change of target, not a wait.
+    pub fn casts(&self) -> bool {
+        !self.change_target && self.wait.is_none()
+    }
 }
 
 impl Action {
@@ -831,7 +841,7 @@ impl Action {
             Action::Wait(value) | Action::WaitUntil(value) => value.iter().collect(),
             Action::StrictSequence(steps) | Action::Sequence { steps, .. } => steps
                 .iter()
-                .filter_map(|step| step.condition.as_ref())
+                .flat_map(|step| step.condition.iter().chain(step.wait.iter()))
                 .collect(),
             // Go builds the inner action without the group's variables.
             Action::Schedule { inner, .. } => {
@@ -852,7 +862,7 @@ impl Action {
         match self {
             Action::Sequence { steps, .. } => steps
                 .iter()
-                .filter(|step| !step.change_target && step.target.resolve(targets).is_some())
+                .filter(|step| step.casts() && step.target.resolve(targets).is_some())
                 .map(|step| &step.spell)
                 .collect(),
             Action::Schedule { inner, .. } => inner.action.reachable_spells(targets),
@@ -882,7 +892,7 @@ impl Action {
             Action::AutocastOtherCooldowns => Vec::new(),
             Action::StrictSequence(steps) | Action::Sequence { steps, .. } => steps
                 .iter()
-                .filter(|step| !step.change_target)
+                .filter(|step| step.casts())
                 .map(|step| &step.spell)
                 .collect(),
             Action::Schedule { inner, .. } => inner.action.spells(),
@@ -1754,6 +1764,7 @@ fn parse_strict_sequence(config: &Json) -> Result<Action, String> {
                     target,
                     condition,
                     change_target: true,
+                    wait: None,
                 })
             }
             (name, _) => return Err(format!("strictSequence action {name} is unsupported")),
@@ -1790,6 +1801,26 @@ fn parse_sequence(config: &Json) -> Result<Action, String> {
                         Some(parse_value(condition).map_err(|reasons| reasons.join("; "))?);
                 }
                 spells.push(step)
+            }
+            // Go `newActionWait` as a step: it builds no action without a duration, and Go's
+            // sequence drops a step it builds no action for.
+            ("wait", config) => {
+                let Some(duration) = parse_value_field("wait", config, "duration")? else {
+                    continue;
+                };
+                let condition = match action.get("condition") {
+                    Some(condition) => {
+                        Some(parse_value(condition).map_err(|reasons| reasons.join("; "))?)
+                    }
+                    None => None,
+                };
+                spells.push(Step {
+                    spell: ActionId::default(),
+                    target: UnitRef::CurrentTarget,
+                    condition,
+                    change_target: false,
+                    wait: Some(duration),
+                })
             }
             (name, _) => return Err(format!("sequence action {name} is unsupported")),
         }
@@ -1971,6 +2002,7 @@ fn parse_step(config: &Json) -> Result<Step, String> {
         target,
         condition: None,
         change_target: false,
+        wait: None,
     })
 }
 
@@ -5175,12 +5207,14 @@ mod tests {
                     target: UnitRef::CurrentTarget,
                     condition: None,
                     change_target: false,
+                    wait: None,
                 },
                 Step {
                     spell: ActionId::spell(10947),
                     target: UnitRef::CurrentTarget,
                     condition: None,
                     change_target: false,
+                    wait: None,
                 }
             ])
         );
@@ -5237,12 +5271,14 @@ mod tests {
                         target: UnitRef::CurrentTarget,
                         condition: None,
                         change_target: false,
+                        wait: None,
                     },
                     Step {
                         spell: ActionId::spell(1719),
                         target: UnitRef::CurrentTarget,
                         condition: None,
                         change_target: false,
+                        wait: None,
                     }
                 ]
             }
@@ -5526,6 +5562,7 @@ mod tests {
                         target: unit,
                         condition: None,
                         change_target: false,
+                        wait: None,
                     }]
                 })
             );
