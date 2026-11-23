@@ -734,13 +734,17 @@ fn mana_item(env: &mut Environment, name: &str, spell_id: i32, class_flags: Clas
     });
 }
 
-/// Sudden Insight, the reference's five piece of Vestments of the Devout and Magister's Regalia:
-/// a spell cast's 5% chance to restore 200 mana.
+/// Sudden Insight, the reference's five piece of Vestments of the Devout and Magister's Regalia
+/// and the four piece of Vestments of the Virtuous and Sorcerer's Regalia: a spell cast's 5%
+/// chance to restore 200 mana.
 fn sudden_insight(env: &mut Environment) {
     let unit = env.player;
     for (set, spell_id) in [
         ("Vestments of the Devout 5P", 450576),
         ("Magister's Regalia 5P", 450527),
+        // The live client's Tier 0.5 caster sets give it at 4 pieces (`forever_client_sets`).
+        ("Vestments of the Virtuous 4P", 450576),
+        ("Sorcerer's Regalia 4P", 450527),
     ] {
         let Some(aura) = env.sim.get_aura(unit, set) else {
             continue;

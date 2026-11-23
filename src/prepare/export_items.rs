@@ -1761,16 +1761,21 @@ const SPELL_DATA_HEAL_PROCS: [(&str, i32, i32); 2] = [
     ("Truesilver Breastplate", 9778, 9777),
 ];
 
-/// Dreadmist Raiment (5) under Forever's rules: a completed cast of a magic spell has a 5%
-/// chance to cast Dark Reward on the wearer at once, a heal of 270 to 330 that no spell power
-/// adds to (`forever_item_sets::dreadmist_raiment_5`). Without this the bonus aura listened to
-/// casts with nothing to run them, and the gate refused every character wearing five pieces.
+/// Dreadmist Raiment (5), and Deathmist Raiment (4) of the live client, under Forever's rules: a
+/// completed cast of a magic spell has a 5% chance to cast Dark Reward on the wearer at once, a
+/// heal of 270 to 330 that no spell power adds to (`forever_item_sets::dark_reward`). Without
+/// this the bonus aura listened to casts with nothing to run them, and the gate refused every
+/// character wearing the pieces.
 fn dark_reward_effects(env: &Environment, unrepresented: &mut Vec<String>) -> Vec<Value> {
-    use super::forever_item_sets::{dark_reward_trigger, DARK_REWARD, DREADMIST_RAIMENT_5};
+    use super::forever_item_sets::{dark_reward_trigger, DARK_REWARD, DARK_REWARD_AURAS};
     if env.sim.rules != super::sim::Rules::Forever {
         return Vec::new();
     }
-    let Some(aura) = aura_named(env, DREADMIST_RAIMENT_5) else {
+    // Eight armor slots hold at most one of the two sets' bonuses.
+    let Some(aura) = DARK_REWARD_AURAS
+        .iter()
+        .find_map(|label| aura_named(env, label))
+    else {
         return Vec::new();
     };
     let heal = must_find(DARK_REWARD);
@@ -1782,7 +1787,8 @@ fn dark_reward_effects(env: &Environment, unrepresented: &mut Vec<String>) -> Ve
         effect.effect_type == dbcenums::E_HEAL && coefficient == 0.0,
     ) else {
         unrepresented.push(format!(
-            "{DREADMIST_RAIMENT_5}'s proc is not a direct heal on the wearer"
+            "{}'s proc is not a direct heal on the wearer",
+            env.sim.aura(aura).label
         ));
         return Vec::new();
     };

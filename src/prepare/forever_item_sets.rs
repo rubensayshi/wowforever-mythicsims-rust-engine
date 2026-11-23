@@ -163,8 +163,9 @@ fn set_stat_proc(
 }
 
 /// Go `suddenInsight`: the 5 piece shared by Magister's Regalia and Vestments of the Devout: a
-/// spellcast has a 5% chance to restore 200 mana.
-fn sudden_insight(env: &mut Environment, aura: AuraId, spell_id: i32) {
+/// spellcast has a 5% chance to restore 200 mana. The live client's Tier 0.5 caster sets give it
+/// at 4 pieces (`forever_client_sets`).
+pub(crate) fn sudden_insight(env: &mut Environment, aura: AuraId, spell_id: i32) {
     env.sim.attach_proc_trigger(
         aura,
         &ProcTrigger {
@@ -560,6 +561,11 @@ set_stats!(dreadmist_raiment_3, set_spell_power(18.0));
 pub(crate) const DARK_REWARD: i32 = 450583;
 /// The aura Dreadmist Raiment's five pieces register, which carries the listener.
 pub(crate) const DREADMIST_RAIMENT_5: &str = "Dreadmist Raiment 5P";
+/// The aura Deathmist Raiment's four pieces register (`forever_client_sets`), which carries the
+/// same listener.
+pub(crate) const DEATHMIST_RAIMENT_4: &str = "Deathmist Raiment 4P";
+/// The set auras that carry Dark Reward's listener.
+pub(crate) const DARK_REWARD_AURAS: [&str; 2] = [DREADMIST_RAIMENT_5, DEATHMIST_RAIMENT_4];
 
 /// Dreadmist Raiment (5)'s listener, "S03 - Heal Proc on Cast - Dreadmist Raiment" (450585):
 /// the completed casts of magic spells, harmful and helpful (its SpellAuraOptions row 236875:
@@ -583,6 +589,12 @@ pub(crate) fn dark_reward_trigger() -> ProcTrigger {
 /// fight by `export_items::dark_reward_effects`. The reference registers the listener alone, so
 /// its gate refuses the five pieces.
 fn dreadmist_raiment_5(env: &mut Environment, aura: AuraId) {
+    dark_reward(env, aura);
+}
+
+/// Dark Reward's spell and its listener on a set bonus aura: Dreadmist Raiment (5) and, in the
+/// live client, Deathmist Raiment (4).
+pub(crate) fn dark_reward(env: &mut Environment, aura: AuraId) {
     if env.sim.rules == Rules::Forever {
         let unit = env.player;
         let config = spell_data_proc_heal_spell(env, must_find(DARK_REWARD), true);
